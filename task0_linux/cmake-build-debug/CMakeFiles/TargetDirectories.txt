@@ -1,0 +1,3 @@
+/home/dywkx/CLionProjects/course_of_compiler_theory/task0_linux/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/dywkx/CLionProjects/course_of_compiler_theory/task0_linux/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/dywkx/CLionProjects/course_of_compiler_theory/task0_linux/cmake-build-debug/CMakeFiles/task0_linux.dir

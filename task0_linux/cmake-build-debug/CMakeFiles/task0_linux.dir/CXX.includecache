@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/dywkx/CLionProjects/course_of_compiler_theory/task0_linux/main.cpp
+iostream
+-
+cstring
+-
+fstream
+-
+cctype
+-
+
