@@ -6,19 +6,22 @@
 using namespace std;
 
 #define NORW    13
-#define TXMAX   100
 #define NMAX    14
 #define AL      10
-#define AMAX    2047
-#define LEVMAX  3
-#define CXMAX   200
 
-char word[NORW][AL];
+char word[40][12] = {"", "", "", "+", "-", "*", "/", "=", "<>", "<", "<=", ">", ">=",
+                     "(", ")", ",", ";", ".", ":=", "begin", "call", "const", "do",
+                     "end", "if", "odd", "procedure", "read",
+                     "then", "var", "while", "write"};
+char symstr[40][12] = {"NUL", "IDENT", "NUMBER", "PLUS", "MINUS", "TIMES", "SLASH", "EQL", "NEQ", "LSS",
+                       "LEQ", "GTR", "GEQ", "LPAREN", "RPAREN", "COMMA", "SEMICOLON", "PERIOD", "BECOMES",
+                       "BEGINSYM", "CALLSYM", "CONSTSYM", "DOSYM", "ENDSYM", "IFSYM", "ODDSYM", "PROCSYM",
+                       "READSYM", "THENSYM", "VARSYM", "WHILESYM", "WRITESYM"};
 enum symbol {
-    nul, ident, number, plus, minus, times, slash, oddsym, eql, neq, lss,
-    leq, gtr, geq, lparen, rparen, comma, semicolon, period, becomes,
-    beginsym, endsym, ifsym, thensym, whilesym, dosym, callsym, constsym,
-    varsym, procsym, readsym, writesym
+    NUL, IDENT, NUMBER, PLUS, MINUS, TIMES, SLASH, EQL, NEQ, LSS,
+    LEQ, GTR, GEQ, LPAREN, RPAREN, COMMA, SEMICOLON, PERIOD, BECOMES,
+    BEGINSYM, CALLSYM, CONSTSYM, DOSYM, ENDSYM, IFSYM, ODDSYM, PROCSYM,
+    READSYM, THENSYM, VARSYM, WHILESYM, WRITESYM
 };
 
 
@@ -27,13 +30,16 @@ char ch;
 int cc = 0;
 int num;
 int ll;
+char a[AL + 1];
+char id[AL + 1];
 char line[100];
-//ifstream in;
+symbol wsym[NORW + 1];
+symbol ssym[255];
 
 
 void getch(ifstream &in);
 
-void getsym();
+void getsym(ifstream &in);
 
 int main() {
 //    char filename[100];
@@ -45,22 +51,56 @@ int main() {
         cout << "Error opening file";
         exit(1);
     }
+
+    wsym[19] = BEGINSYM;
+    wsym[20] = CALLSYM;
+    wsym[21] = CONSTSYM;
+    wsym[22] = DOSYM;
+    wsym[23] = ENDSYM;
+    wsym[24] = IFSYM;
+    wsym[25] = ODDSYM;
+    wsym[26] = PROCSYM;
+    wsym[27] = READSYM;
+    wsym[28] = THENSYM;
+    wsym[29] = VARSYM;
+    wsym[30] = WHILESYM;
+    wsym[31] = WRITESYM;
+
+    ssym['+'] = PLUS;
+    ssym['-'] = MINUS;
+    ssym['*'] = TIMES;
+    ssym['/'] = SLASH;
+    ssym['('] = LPAREN;
+    ssym[')'] = RPAREN;
+    ssym['='] = EQL;
+    ssym[','] = COMMA;
+    ssym['.'] = PERIOD;
+    ssym['<'] = LSS;
+    ssym['>'] = GTR;
+    ssym[';'] = SEMICOLON;
+
+
     cc = 0;
     ll = 0;
     ch = ' ';
+    int count = 0;
+    while (!in.eof()) {
+        getsym(in);
+        if (sym == IDENT) {
+            cout << count << " " << symstr[sym] << " " << id << endl;
+        } else if (sym == NUMBER) {
+            cout << count << " " << symstr[sym] << " " << num << endl;
+        } else {
+            cout << count << " " << symstr[sym] << " " << word[sym] << endl;
+        }
+        count++;
+    }
 
-
-//    while (!in.eof()) {
-//        getch(in);
-//        cout << ch ;
-//    }
-
-    getsym();
+    getsym(in);
     return 0;
 }
 
 void getch(ifstream &in) {
-//    cout << "cc: " << cc << " ;ll:" << ll;
     if (cc == ll) {
         if (in.eof()) {
             cout << "program incomplete" << endl;
@@ -69,16 +109,88 @@ void getch(ifstream &in) {
         ll = 0;
         cc = 0;
         in.getline(line, 1000);
-        cout << line;
-        ll = (int)strlen(line);
+        ll = (int) strlen(line);
     }
 
     ch = line[cc];
     cc += 1;
-//    cout << line[cc] ;
 }
 
 
-void getsym() {
-
+void getsym(ifstream &in) {
+    int i, j, k;
+    while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
+        getch(in);
+    }
+    if (isalpha(ch)) {
+        k = 0;
+        while (isalnum(ch)) {
+            if (k < AL) {
+                a[k] = ch;
+                k++;
+            }
+            getch(in);
+        }
+        a[k] = '\0';
+        strcpy(id, a);
+        i = 19;
+        j = NORW+18;
+        do {
+            k = (i + j) / 2;
+            if (strcmp(id, word[k]) <= 0) {
+                j = k - 1;
+            }
+            if (strcmp(id, word[k]) >= 0) {
+                i = k + 1;
+            }
+        } while (i <= j);
+        if (i - 1 > j) {
+            sym = wsym[k];
+        } else {
+            sym = IDENT;
+        }
+    } else if (isdigit(ch)) {
+        k = 0;
+        num = 0;
+        sym = NUMBER;
+        do {
+            num = 10 * num + ch - '0';
+            k++;
+            getch(in);
+        } while (isdigit(ch));
+        if (k > NMAX) {
+            cout << "Integer constant expected";
+            exit(1);
+        }
+    } else if (ch == ':') {
+        getch(in);
+        if (ch == '=') {
+            sym = BECOMES;
+            getch(in);
+        } else {
+            sym = NUL;
+        };
+    } else if (ch == '<') {
+        getch(in);
+        if (ch == '=') {
+            sym = LEQ;
+            getch(in);
+        } else if (ch == '>') {
+            sym = NEQ;
+            getch(in);
+        } else {
+            sym = LSS;
+        }
+    } else if (ch == '>') {
+        getch(in);
+        if (ch == '=') {
+            sym = GEQ;
+            getch(in);
+        } else {
+            sym = GTR;
+        }
+    } else {
+        sym = ssym[ch];
+        getch(in);
+    }
 }
