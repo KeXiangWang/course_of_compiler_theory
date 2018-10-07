@@ -33,7 +33,7 @@ int ll;
 char a[AL + 1];
 char id[AL + 1];
 char line[100];
-symbol wsym[NORW + 1];
+symbol wsym[40];
 symbol ssym[255];
 
 
@@ -46,7 +46,7 @@ int main() {
 //    cout << "please input source program file name : " << endl;
 //    cin >> filename;
 //    ifstream in(filename);
-    ifstream in("/home/dywkx/CLionProjects/course_of_compiler_theory/pl0code.txt");
+    ifstream in("../16061040_test.txt");
     if (!in.is_open()) {
         cout << "Error opening file";
         exit(1);
