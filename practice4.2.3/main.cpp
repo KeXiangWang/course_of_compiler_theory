@@ -14,10 +14,10 @@ int parseB(string word, int n);
 
 
 int main() {
-    string sentense;
-    getline(cin, sentense);
-    if (parseZ(sentense, 0) < 0) call_error();
-    cout << sentense;
+    string sentence;
+    getline(cin, sentence);
+    if (parseZ(sentence, 0) < 0) call_error();
+    cout << sentence;
     return 0;
 }
 
@@ -26,9 +26,9 @@ int parseZ(string word, int n) {
     int tem;
     if (parseA(word, i) >= 0) {
         i = parseA(word, i);
-        if (word[i] == 'c'){
+        if (word[i] == 'c') {
             i++;
-        } else{
+        } else {
             return -1;
         }
         if (parseB(word, i) >= 0) {
@@ -42,7 +42,7 @@ int parseZ(string word, int n) {
         i = parseB(word, i);
         if (word[i] == 'd') {
             i++;
-        }else{
+        } else {
             return -1;
         }
         return i;
@@ -53,9 +53,9 @@ int parseZ(string word, int n) {
 
 int parseA(string word, int n) {
     int i = n;
-    if (word[i]=='c') {
+    if (word[i] == 'c') {
         i++;
-        while(word[i]=='a'){
+        while (word[i] == 'a') {
             i++;
             if (parseB(word, i) >= 0) {
                 i = parseB(word, i);
@@ -64,22 +64,20 @@ int parseA(string word, int n) {
             }
         }
         return i;
-    }
-    else{
+    } else {
         return -1;
     }
 };
 
 int parseB(string word, int n) {
     int i = n;
-    if (word[i]=='a') {
+    if (word[i] == 'a') {
         i++;
         if (parseA(word, i) >= 0) {
             i = parseA(word, i);
         }
         return i;
-    }
-    else{
+    } else {
         return -1;
     }
 
