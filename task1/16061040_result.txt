@@ -1,0 +1,4 @@
+ ‰»Î£∫
+5
+ ‰≥ˆ£∫
+start   1 1 2 3 5 8 13 21 34 55            start   !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~            start  XY            start  original: 0   changed: 16            start  nothing     
