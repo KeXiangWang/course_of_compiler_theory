@@ -139,7 +139,7 @@ Token Lexicon::nextToken() {
 		}
 		currentToken = ERRORSYM;
 		reportError();
-		jumpToSentenceEnd();
+		jumpToLineEnd();
 		return currentToken;
 
 	case '\"':
