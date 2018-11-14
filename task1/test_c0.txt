@@ -1,4 +1,3 @@
-
 const int length = 10, width = +8;
 const char firstLowerCase = 'a', firstUpperCase = 'A';
 const char lastLowerCase = 'z', lastUpperCase = 'Z';
