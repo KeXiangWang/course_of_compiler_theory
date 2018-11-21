@@ -1,0 +1,1 @@
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test_for_grammar.txt
