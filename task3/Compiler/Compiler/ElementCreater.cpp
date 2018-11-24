@@ -1,20 +1,23 @@
 #include "pch.h"
 #include "ElementCreater.h"
 #include "Table.h"
+#include "Quad.h"
 
 
-ElementCreater::ElementCreater()
+bool ElementCreater::creatConst(string name, DataType dataType, int value)
 {
-}
+	if (globalTable.find(name) != nullptr) {
+		if (parsingFunction) {
 
-
-ElementCreater::~ElementCreater()
-{
-}
-
-bool ElementCreater::creatConst()
-{
-	return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		currentTable->insert(new TableElement(KINDCONST, name, dataType, value));
+		return true;
+	}
 }
 
 bool ElementCreater::creatVar()
@@ -39,6 +42,5 @@ bool ElementCreater::creatArg()
 
 TableElement * ElementCreater::find(string identifier)
 {
-	TableElement * tableElement = new TableElement();
-	return tableElement;
+	return nullptr;
 }

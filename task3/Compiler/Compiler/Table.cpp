@@ -1,12 +1,16 @@
 #include "pch.h"
 #include "Table.h"
 
-
-Table::Table()
+TableElement * Table::find(string name)
 {
+	for (auto iter = elementVector.begin(); iter != elementVector.end(); iter++) {
+		if ((*iter)->name == name) {
+			return (*iter);
+		}
+	}
+	return nullptr;
 }
-
-
-Table::~Table()
+void Table::insert(TableElement * tableElement)
 {
+	elementVector.push_back(tableElement);
 }

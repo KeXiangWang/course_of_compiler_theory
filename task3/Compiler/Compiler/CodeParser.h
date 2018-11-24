@@ -10,7 +10,6 @@ using std::unordered_set;
 
 class CodeParser
 {
-
 private:
 	Token token; // temp token
 	string identifier; // temp identifier
@@ -27,6 +26,7 @@ private:
 
 	unordered_set<Token> statementHeadSet;
 	unordered_set<Token> compareSet;
+
 public:
 	CodeParser(ErrorHandler &errorHandler, Lexicon &lexicon, ElementCreater &elementCreater)
 		: errorHandler(errorHandler), lexicon(lexicon), elementCreater(elementCreater)

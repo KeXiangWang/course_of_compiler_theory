@@ -5,6 +5,13 @@ enum DataType {
 	TYPEVOID
 };
 
+enum ElementKind {
+	KINDCONST,
+	KINDVAR,
+	KINDPARA,
+	KINDARRAY
+};
+
 enum OPCode {
 	OP_PLUS,
 	OP_SUB,

@@ -863,10 +863,10 @@ void CodeParser::parseReturn() {
 }
 // tested
 void CodeParser::jumpToToken(Token token) {
-	Token tokenGot;
-	do {
+	Token tokenGot = NULLSYM;
+	while (tokenGot != token){
 		tokenGot = lexicon.nextToken();
-	} while (tokenGot == token);
+	} 
 }
 
 Token CodeParser::reportAndJumpOver(ErrorType errorType, Token targetToken) {
