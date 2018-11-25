@@ -19,4 +19,10 @@ enum OPCode {
 	OP_DIV,
 	OP_BNE,
 	OP_BEQ,
+	OP_CONST,
+	OP_VAR,
+	OP_FUNC,
+	OP_VOIDFUNC,
+	OP_SCANF,
+	OP_PRINTF
 };

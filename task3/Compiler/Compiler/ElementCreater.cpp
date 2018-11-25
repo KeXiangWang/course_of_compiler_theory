@@ -33,13 +33,16 @@ bool ElementCreater::creatPara(DataType dataType, string name) {
 	if (currentTable->find(name) != nullptr) {
 		return false;
 	}
-	currentTable->insert(new TableElement(KINDPARA, dataType, name));
+	TableElement * tableElement = new TableElement(KINDPARA, dataType, name);
+	currentFunction->parameters.push_back(tableElement);
+	currentTable->insert(tableElement);
 	return true;
 }
 
 bool ElementCreater::creatFunc(DataType dataType, string name) {
 	currentFunction = new Function(dataType, name);
 	currentTable = &currentFunction->elementTable;
+	currentQuadTable = &currentFunction->quadTable;
 	functionTable.insert(currentFunction);
 	return true;
 }

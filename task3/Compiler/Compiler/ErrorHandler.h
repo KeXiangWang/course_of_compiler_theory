@@ -36,8 +36,7 @@ enum ErrorType {
 using std::unordered_map;
 using std::string;
 
-class ErrorHandler
-{
+class ErrorHandler {
 public:
 	ErrorHandler();
 	bool errorHaveOccured();

@@ -7,6 +7,7 @@
 
 using std::cout;
 using std::endl;
+using std::vector;
 
 Quantity *CodeParser::parseExpression() {
 	cout << "parse an expression " << endl;
@@ -24,6 +25,9 @@ Quantity *CodeParser::parseExpression() {
 		token = lexicon.nextToken();
 		return nullptr;
 	}
+	if (opCode == OP_SUB) { // deal with -+
+		quantity = new Caculator(opCode, new Constant(TYPEINT, 0), quantity);
+	}
 	while (token == PLUS || token == MINUS) {
 		opCode = token == PLUS ? OP_PLUS : OP_SUB;
 		token = lexicon.nextToken();
@@ -33,7 +37,7 @@ Quantity *CodeParser::parseExpression() {
 			token = lexicon.nextToken();
 			return nullptr;
 		}
-		quantity = new Caculator(); // TODOK optimizer
+		quantity = new Caculator(opCode, quantity, quantity_next); // TODO optimizer
 	}
 	return quantity;
 }
@@ -48,7 +52,6 @@ Quantity *CodeParser::parseTerm() {
 		token = lexicon.nextToken();
 		return nullptr;
 	}
-
 	while (token == MULT || token == DIV) {
 		opCode = token == MULT ? OP_MULT : OP_DIV;
 		token = lexicon.nextToken();
@@ -58,7 +61,7 @@ Quantity *CodeParser::parseTerm() {
 			token = lexicon.nextToken();
 			return nullptr;
 		}
-		quantity = new Caculator(); // TODO optimizer
+		quantity = new Caculator(opCode, quantity, quantity_next); // TODO optimizer
 	}
 	return quantity;
 
@@ -78,6 +81,7 @@ Quantity *CodeParser::parseFactor() {
 		if (token == LPARENTHESE) { // deal with int/char func
 			Function *function;
 			string functionName = identifier;
+
 			if ((function = elementCreater.findFunc(identifier)) = nullptr) {
 				reportAndJumpOver(WRONG_FUNCTION_CALL, RPARENTHESE);
 				return nullptr;
@@ -87,18 +91,20 @@ Quantity *CodeParser::parseFactor() {
 				return nullptr;
 			}
 			// TODO make a parameter list
+			vector<Quantity *> parameters;
 			do {
 				token = lexicon.nextToken();
-				Quantity *arg = parseExpression();
-				if (arg == nullptr) {
+				Quantity *parameter = parseExpression();
+				if (parameter == nullptr) {
 					return nullptr;
 				}
 				// TODO add to the parameter list
+				parameters.push_back(parameter);
 			} while (token == COMMA);
 			if (token != RPARENTHESE) {
 				return nullptr;
 			}
-			quantity = new FunctionCall();
+			quantity = new FunctionCall(function->functionType, functionName, );
 			token = lexicon.nextToken();
 			cout << "call a function " << functionName << endl;
 			return quantity;
@@ -111,6 +117,7 @@ Quantity *CodeParser::parseFactor() {
 			}
 			if (tableElement->kind == KINDARRAY) {
 				if (token == LBRACKET) {
+					string arrayName = identifier;
 					token = lexicon.nextToken();
 					Quantity *index = parseExpression();
 					if (index == nullptr) {
@@ -130,8 +137,9 @@ Quantity *CodeParser::parseFactor() {
 				}
 			}
 			else {
+				string varName = identifier;
 				token = lexicon.nextToken();
-				quantity = new Variable(); // TODO creat var;
+				quantity = new Variable(dataType, varName); // TODO creat var;
 				return quantity;
 			}
 		}
@@ -158,11 +166,11 @@ Quantity *CodeParser::parseFactor() {
 	case NUM:
 		number = lexicon.getNumberTemp();
 		token = lexicon.nextToken();
-		return new Constant();
+		return new Constant(TYPEINT, sign * number);
 	case ALPHA:
 		alpha = lexicon.getStringWord()[0];
 		token = lexicon.nextToken();
-		return new Constant();
+		return new Constant(TYPECHAR, alpha);
 	}
 
 	return nullptr;
@@ -206,9 +214,18 @@ void CodeParser::parseStatement() {
 		identifier = lexicon.getStringWord();
 		token = lexicon.nextToken();
 		// TODO should judge whether is a array
-		if (token == LBRACKET) {
+		if (token == LBRACKET) { // array
 			token = lexicon.nextToken();
+			TableElement *tableElement;
 			Quantity *index;
+			if ((tableElement = elementCreater.findElement(identifier)) == nullptr) {
+				reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
+				return;
+			}
+			if (tableElement->kind != KINDARRAY) {
+				reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
+				return;
+			}
 			index = parseExpression();
 			// TODO deal with idex
 			if (index == nullptr) {
@@ -217,7 +234,7 @@ void CodeParser::parseStatement() {
 			}
 		}
 		if (token == BECOME) {
-			cout << "assign a value to ident " << identifier<<endl;
+			cout << "assign a value to ident " << identifier << endl;
 			token = lexicon.nextToken();
 			Quantity *quantity;
 			quantity = parseExpression();
@@ -233,30 +250,52 @@ void CodeParser::parseStatement() {
 		}
 		else if (token == LPARENTHESE) {
 			cout << "use a self-defined function " << endl;
+			Function *function;
+			if ((function = elementCreater.findFunc(identifier)) = nullptr) {
+				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
+			}
+			vector<Quantity *> parameters;
 			// TODO make a list
-			
-			Quantity *quantity;
-			do {
-				token = lexicon.nextToken();
-				if (token == RPARENTHESE) {
-					break;
-				}
-				quantity = parseExpression();
-				if (quantity == nullptr) {
-					jumpToToken(SEMICOLON);
-				}
-			} while (token == COMMA);
+			if (function->withParameters) {
+				Quantity *parameter;
+				do {
+					token = lexicon.nextToken();
+					if (token == RPARENTHESE) {
+						break;
+					}
+					parameter = parseExpression();
+					if (parameter == nullptr) {
+						jumpToToken(SEMICOLON);
+					}
+					parameters.push_back(parameter);
+				} while (token == COMMA);
+			}
 			if (token != RPARENTHESE) {
 				reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
 				return;
 			}
-
-			// TODO check number of args
+			if (parameters.size() != function->parameters.size()) { // TODO check number of args
+				reportAndJumpOver(WRONG_ARGUMENT_LIST, SEMICOLON);
+				return;
+			}
+			for (auto i = 0; i < parameters.size(); i++) { // TODO check type of args
+				if (parameters[i]->dataType != function->parameters[i]->dataType) {
+					reportAndJumpOver(WRONG_ARGUMENT_LIST, SEMICOLON);
+					return;
+				}
+			}
+			
 			token = lexicon.nextToken();
 			if (token != SEMICOLON) {
 				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 			}
 			token = lexicon.nextToken();
+			if (function->functionType == TYPEVOID) {
+
+			}
+			else {
+
+			}
 		}
 		else {
 			reportAndJumpOver(UNEXPECTED_SIGN, SEMICOLON);
@@ -295,7 +334,7 @@ void CodeParser::parseCompoundStatement() // ·ûºÏÓï¾ä // tested
 			token = reportAndJumpOver(IDENTIFIER_EXPECTED, SEMICOLON);
 		}
 	}
-	if (statementHeadSet.find(token) == statementHeadSet.end())	{
+	if (statementHeadSet.find(token) == statementHeadSet.end()) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
 		jumpToSet(statementHeadSet);
 	}
@@ -867,9 +906,9 @@ void CodeParser::parseReturn() {
 // tested
 void CodeParser::jumpToToken(Token token) {
 	Token tokenGot = NULLSYM;
-	while (tokenGot != token){
+	while (tokenGot != token) {
 		tokenGot = lexicon.nextToken();
-	} 
+	}
 }
 
 Token CodeParser::reportAndJumpOver(ErrorType errorType, Token targetToken) {

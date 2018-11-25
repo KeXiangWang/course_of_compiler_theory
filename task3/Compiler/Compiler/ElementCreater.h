@@ -17,5 +17,6 @@ public:
 	Table *currentTable;
 	FunctionTable functionTable;
 	Function *currentFunction;
+	QuadTable *currentQuadTable;
 };
 

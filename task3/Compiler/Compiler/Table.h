@@ -28,7 +28,9 @@ public:
 	Function(DataType dataType, string name) :functionType(dataType), name(name), withParameters(false) {};
 	DataType functionType; // Type of return
 	string name;	// name
-	Table elementTable;
+	Table elementTable;	
+	QuadTable quadTable;
+	vector<TableElement *> parameters;
 	bool withParameters;
 };
 
