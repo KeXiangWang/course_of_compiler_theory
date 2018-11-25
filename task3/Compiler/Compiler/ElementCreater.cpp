@@ -4,43 +4,57 @@
 #include "Quad.h"
 
 
-bool ElementCreater::creatConst(string name, DataType dataType, int value)
-{
-	if (globalTable.find(name) != nullptr) {
-		if (parsingFunction) {
-
-		}
-		else {
-			return false;
-		}
+bool ElementCreater::creatConst(DataType dataType, string name, int value) {
+	if (currentTable->find(name) != nullptr) {
+		return false;
 	}
-	else {
-		currentTable->insert(new TableElement(KINDCONST, name, dataType, value));
-		return true;
+	currentTable->insert(new TableElement(KINDCONST, dataType, name, value));
+	return true;
+}
+
+bool ElementCreater::creatVar(DataType dataType, string name) {
+	if (currentTable->find(name) != nullptr) {
+		return false;
 	}
-}
-
-bool ElementCreater::creatVar()
-{
+	currentTable->insert(new TableElement(KINDVAR, dataType, name));
 	return true;
 }
 
-bool ElementCreater::creatArray()
-{
+bool ElementCreater::creatArray(DataType dataType, string name, int arraySize){
+	if (currentTable->find(name) != nullptr) {
+		return false;
+	}
+	currentTable->insert(new TableElement(KINDARRAY, dataType, name, arraySize));
 	return true;
 }
 
-bool ElementCreater::creatFunc()
-{
+bool ElementCreater::creatPara(DataType dataType, string name) {
+	currentFunction->withParameters = true;
+	if (currentTable->find(name) != nullptr) {
+		return false;
+	}
+	currentTable->insert(new TableElement(KINDPARA, dataType, name));
 	return true;
 }
 
-bool ElementCreater::creatArg()
-{
+bool ElementCreater::creatFunc(DataType dataType, string name) {
+	currentFunction = new Function(dataType, name);
+	currentTable = &currentFunction->elementTable;
+	functionTable.insert(currentFunction);
 	return true;
 }
 
-TableElement * ElementCreater::find(string identifier)
-{
+Function * ElementCreater::findFunc(string identifier) {
+	return functionTable.find(identifier);
+}
+
+TableElement * ElementCreater::findElement(string identifier) {
+	TableElement * tableElement;
+	if ((tableElement = currentTable->find(identifier)) != nullptr) {
+		return tableElement;
+	}
+	else if ((tableElement = globalTable.find(identifier)) != nullptr) {
+		return tableElement;
+	}
 	return nullptr;
 }

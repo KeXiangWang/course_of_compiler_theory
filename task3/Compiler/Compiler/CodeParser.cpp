@@ -76,9 +76,17 @@ Quantity *CodeParser::parseFactor() {
 		identifier = lexicon.getStringWord();
 		token = lexicon.nextToken();
 		if (token == LPARENTHESE) { // deal with int/char func
-			// TODO check whether void func
-			// TODO make a parameter list
+			Function *function;
 			string functionName = identifier;
+			if ((function = elementCreater.findFunc(identifier)) = nullptr) {
+				reportAndJumpOver(WRONG_FUNCTION_CALL, RPARENTHESE);
+				return nullptr;
+			}
+			if (function->functionType == TYPEVOID) {
+				reportAndJumpOver(WRONG_FUNCTION_CALL, RPARENTHESE);
+				return nullptr;
+			}
+			// TODO make a parameter list
 			do {
 				token = lexicon.nextToken();
 				Quantity *arg = parseExpression();
@@ -95,23 +103,37 @@ Quantity *CodeParser::parseFactor() {
 			cout << "call a function " << functionName << endl;
 			return quantity;
 		}
-		else if (token == LBRACKET) {
-			token = lexicon.nextToken();
-			Quantity *index = parseExpression();
-			if (index == nullptr) {
+		else { // not calling a funtion
+			TableElement * tableElement;
+			if ((tableElement = elementCreater.findElement(identifier)) == nullptr) {
+				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
 				return nullptr;
 			}
-			if (token != RBRACKET) {
-				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), RIGHT_BRACKET_EXPECTED);
-				return nullptr;
+			if (tableElement->kind == KINDARRAY) {
+				if (token == LBRACKET) {
+					token = lexicon.nextToken();
+					Quantity *index = parseExpression();
+					if (index == nullptr) {
+						return nullptr;
+					}
+					if (token != RBRACKET) {
+						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), RIGHT_BRACKET_EXPECTED);
+						return nullptr;
+					}
+					token = lexicon.nextToken();
+					quantity = new Array();
+					return quantity;
+				}
+				else {
+					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
+					return nullptr;
+				}
 			}
-			token = lexicon.nextToken();
-			quantity = new Array();
-			return quantity;
-		}
-		else {
-			quantity = new Variable(); // TODO creat var;
-			return quantity;
+			else {
+				token = lexicon.nextToken();
+				quantity = new Variable(); // TODO creat var;
+				return quantity;
+			}
 		}
 		break;
 	case LPARENTHESE:
@@ -214,25 +236,6 @@ void CodeParser::parseStatement() {
 			// TODO make a list
 			
 			Quantity *quantity;
-			// TODO check whether func have args
-			//token = lexicon.nextToken();
-			//if (token != RPARENTHESE) {
-				//	quantity = parseExpression();
-				//	if (quantity == nullptr) {
-				//		jumpToToken(SEMICOLON);
-				//	}
-				//	while (token == COMMA) {
-				//		token = lexicon.nextToken();
-				//		quantity = parseExpression();
-				//		if (quantity == nullptr) {
-				//			jumpToToken(SEMICOLON);
-				//		}
-				//	}
-				//	if (token != RPARENTHESE) {
-				//		reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
-				//		return;
-				//	}
-				//}
 			do {
 				token = lexicon.nextToken();
 				if (token == RPARENTHESE) {
@@ -301,7 +304,7 @@ void CodeParser::parseCompoundStatement() // ·ûºÏÓï¾ä // tested
 // tested
 void CodeParser::parseFunction() {
 	gotFunction = true;
-	if (!elementCreater.creatFunc()) {
+	if (!elementCreater.creatFunc(dataType, identifier)) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), IDENTIFIER_ALREADY_DEFINED);
 	}
 	cout << "creat a function " << identifier << endl;
@@ -324,8 +327,8 @@ void CodeParser::parseFunction() {
 				if (token == IDENT) {
 					identifier = lexicon.getStringWord();
 					token = lexicon.nextToken();
-					if (!elementCreater.creatArg()) { // creat arguement 
-
+					if (!elementCreater.creatPara(dataType, identifier)) { // creat arguement 
+						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), IDENTIFIER_ALREADY_DEFINED);
 					}
 					cout << "creat a " << dataType << " arguement " << identifier << endl;
 					if (token == COMMA) {  // token = ,
@@ -422,7 +425,7 @@ void CodeParser::parseConstDeclare() {
 						}
 						if (token == NUM) {
 							valueTemp = lexicon.getNumberTemp();
-							if (!elementCreater.creatConst()) { // creat const
+							if (!elementCreater.creatConst(dataType, identifier, sign*valueTemp)) { // creat const
 								token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 								return;
 							}
@@ -437,7 +440,7 @@ void CodeParser::parseConstDeclare() {
 					else {
 						if (token == ALPHA) {
 							valueTemp = lexicon.getStringWord()[0]; // get the char as int
-							if (!elementCreater.creatConst()) { // creat const
+							if (!elementCreater.creatConst(dataType, identifier, valueTemp)) { // creat const
 								token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 								return;
 							}
@@ -479,7 +482,7 @@ void CodeParser::parseVarDeclare() {
 			arraySize = lexicon.getNumberTemp();
 			token = lexicon.nextToken();
 			if (token == RBRACKET) {
-				if (!elementCreater.creatArray()) { // creat Array
+				if (!elementCreater.creatArray(dataType, identifier, arraySize)) { // creat Array
 					token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 					return;
 				}
@@ -515,7 +518,7 @@ void CodeParser::parseVarDeclare() {
 		}
 	}
 	else if (token == COMMA) {
-		if (!elementCreater.creatVar()) { // creat var
+		if (!elementCreater.creatVar(dataType, identifier)) { // creat var
 			token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 			return;
 		}
@@ -529,7 +532,7 @@ void CodeParser::parseVarDeclare() {
 		parseVarDeclare();
 	}
 	else { // deal with the situation of semicolon
-		if (!elementCreater.creatVar()) { // creat const
+		if (!elementCreater.creatVar(dataType, identifier)) { // creat const
 			token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 			return;
 		}
