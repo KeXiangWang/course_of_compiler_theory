@@ -104,7 +104,7 @@ Quantity *CodeParser::parseFactor() {
 			if (token != RPARENTHESE) {
 				return nullptr;
 			}
-			quantity = new FunctionCall(function->functionType, functionName, );
+			quantity = new FunctionCall(function->functionType, functionName, parameters);
 			token = lexicon.nextToken();
 			cout << "call a function " << functionName << endl;
 			return quantity;
@@ -117,7 +117,7 @@ Quantity *CodeParser::parseFactor() {
 			}
 			if (tableElement->kind == KINDARRAY) {
 				if (token == LBRACKET) {
-					string arrayName = identifier;
+					string arrayName = identifier; // deletable
 					token = lexicon.nextToken();
 					Quantity *index = parseExpression();
 					if (index == nullptr) {
@@ -128,7 +128,7 @@ Quantity *CodeParser::parseFactor() {
 						return nullptr;
 					}
 					token = lexicon.nextToken();
-					quantity = new Array();
+					quantity = new Array(tableElement->dataType, tableElement->name, index);
 					return quantity;
 				}
 				else {
@@ -213,95 +213,97 @@ void CodeParser::parseStatement() {
 	case IDENT:
 		identifier = lexicon.getStringWord();
 		token = lexicon.nextToken();
-		// TODO should judge whether is a array
-		if (token == LBRACKET) { // array
-			token = lexicon.nextToken();
-			TableElement *tableElement;
-			Quantity *index;
-			if ((tableElement = elementCreater.findElement(identifier)) == nullptr) {
-				reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
-				return;
-			}
-			if (tableElement->kind != KINDARRAY) {
-				reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
-				return;
-			}
-			index = parseExpression();
-			// TODO deal with idex
-			if (index == nullptr) {
-				jumpToToken(SEMICOLON);
+		TableElement *tableElement;
+		Function *function;
+		if ((tableElement = elementCreater.findElement(identifier)) != nullptr) {
+			Quantity *index = nullptr;
+			if (token == LBRACKET) { // parse array
 				token = lexicon.nextToken();
-			}
-		}
-		if (token == BECOME) {
-			cout << "assign a value to ident " << identifier << endl;
-			token = lexicon.nextToken();
-			Quantity *quantity;
-			quantity = parseExpression();
-			// TODO deal with idex
-			if (quantity == nullptr) {
-				jumpToToken(SEMICOLON);
-				token = lexicon.nextToken();
-			}
-			if (token != SEMICOLON) {
-				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
-			}
-			token = lexicon.nextToken();
-		}
-		else if (token == LPARENTHESE) {
-			cout << "use a self-defined function " << endl;
-			Function *function;
-			if ((function = elementCreater.findFunc(identifier)) = nullptr) {
-				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
-			}
-			vector<Quantity *> parameters;
-			// TODO make a list
-			if (function->withParameters) {
-				Quantity *parameter;
-				do {
+				if (tableElement->kind != KINDARRAY) {
+					reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
+					return;
+				}
+				index = parseExpression();
+				// TODO deal with index
+				if (index == nullptr) {
+					jumpToToken(SEMICOLON);
 					token = lexicon.nextToken();
-					if (token == RPARENTHESE) {
-						break;
-					}
-					parameter = parseExpression();
-					if (parameter == nullptr) {
-						jumpToToken(SEMICOLON);
-					}
-					parameters.push_back(parameter);
-				} while (token == COMMA);
+				}
 			}
-			if (token != RPARENTHESE) {
-				reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
+			if (token == BECOME) { // parse become
+				cout << "assign a value to ident " << identifier << endl;
+				token = lexicon.nextToken();
+				Quantity *quantity;
+				quantity = parseExpression();
+				if (quantity == nullptr) {
+					jumpToToken(SEMICOLON);
+					token = lexicon.nextToken();
+				}
+				if (token != SEMICOLON) {
+					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
+				}
+				token = lexicon.nextToken();
+				if (tableElement->kind == KINDARRAY) {
+					elementCreater.actStatement(new Array(tableElement->dataType, tableElement->name, index, quantity)); // array[index] = quantity
+				}
+				else {
+					elementCreater.actStatement(new Variable(tableElement->dataType, tableElement->name, quantity));
+				}
+			}
+			else { // not become
+				reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
 				return;
 			}
-			if (parameters.size() != function->parameters.size()) { // TODO check number of args
-				reportAndJumpOver(WRONG_ARGUMENT_LIST, SEMICOLON);
-				return;
-			}
-			for (auto i = 0; i < parameters.size(); i++) { // TODO check type of args
-				if (parameters[i]->dataType != function->parameters[i]->dataType) {
+		}
+		else if ((function = elementCreater.findFunc(identifier)) != nullptr) {		
+			if (token == LPARENTHESE) { // function and voidfunc
+				cout << "use a self-defined function " << endl;
+				vector<Quantity *> parameters;
+				if (function->withParameters) {
+					Quantity *parameter;
+					do {
+						token = lexicon.nextToken();
+						if (token == RPARENTHESE) {
+							break;
+						}
+						parameter = parseExpression();
+						if (parameter == nullptr) {
+							jumpToToken(SEMICOLON);
+						}
+						parameters.push_back(parameter);
+					} while (token == COMMA);
+				}
+				if (token != RPARENTHESE) {
+					reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
+					return;
+				}
+				if (parameters.size() != function->parameters.size()) { // TODO check number of args
 					reportAndJumpOver(WRONG_ARGUMENT_LIST, SEMICOLON);
 					return;
 				}
-			}
-			
-			token = lexicon.nextToken();
-			if (token != SEMICOLON) {
-				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
-			}
-			token = lexicon.nextToken();
-			if (function->functionType == TYPEVOID) {
-
-			}
-			else {
-
+				for (auto i = 0; i < (int)parameters.size(); i++) { // TODO check type of args
+					if (parameters[i]->dataType != function->parameters[i]->dataType) {
+						reportAndJumpOver(WRONG_ARGUMENT_LIST, SEMICOLON);
+						return;
+					}
+				}
+				token = lexicon.nextToken();
+				if (token != SEMICOLON) {
+					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
+				}
+				token = lexicon.nextToken();
+				if (function->functionType == TYPEVOID) {
+					elementCreater.actStatement(new VoidCall(function->name, parameters));
+				}
+				else {
+					elementCreater.actStatement(new FunctionCall(function->functionType, function->name, parameters));
+				}
 			}
 		}
 		else {
-			reportAndJumpOver(UNEXPECTED_SIGN, SEMICOLON);
+			reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
 			return;
 		}
-
 		// TODO add become / func
 		break;
 	default:
@@ -884,22 +886,38 @@ void CodeParser::parseCode() {
 }
 // tested
 void CodeParser::parseReturn() {
+	Function *function = elementCreater.getCurrentFunction();
 	token = lexicon.nextToken();
 	cout << "return something " << endl;
 	// TODO talk about the type of function
-	if (token == LPARENTHESE) {
-		token = lexicon.nextToken();
-		Quantity *quantity = parseExpression();
-		if (token != RPARENTHESE) {
-			reportAndJumpOver(RIGHT_BRACE_EXPECTED, SEMICOLON);
-			return;
-		}
-		token = lexicon.nextToken();
+	if (function->functionType == TYPEVOID) {
 		if (token != SEMICOLON) {
 			errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 		}
 		else {
 			token = lexicon.nextToken();
+		}
+		elementCreater.actStatement(new Return());
+	}
+	else {
+		if (token == LPARENTHESE) {
+			token = lexicon.nextToken();
+			Quantity *quantity = parseExpression();
+			if (token != RPARENTHESE) {
+				reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
+				return;
+			}
+			token = lexicon.nextToken();
+			if (token != SEMICOLON) {
+				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
+			}
+			else {
+				token = lexicon.nextToken();
+			}
+			elementCreater.actStatement(new Return(quantity));
+		}
+		else {
+			reportAndJumpOver(LEFT_PARENTHESES_EXPECTED, SEMICOLON);
 		}
 	}
 }

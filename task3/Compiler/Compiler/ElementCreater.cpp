@@ -51,6 +51,11 @@ Function * ElementCreater::findFunc(string identifier) {
 	return functionTable.find(identifier);
 }
 
+Function * ElementCreater::getCurrentFunction()
+{
+	return currentFunction;
+}
+
 TableElement * ElementCreater::findElement(string identifier) {
 	TableElement * tableElement;
 	if ((tableElement = currentTable->find(identifier)) != nullptr) {
@@ -60,4 +65,9 @@ TableElement * ElementCreater::findElement(string identifier) {
 		return tableElement;
 	}
 	return nullptr;
+}
+
+void ElementCreater::actStatement(Quad * quad)
+{
+	currentQuadTable->addQuad(quad);
 }

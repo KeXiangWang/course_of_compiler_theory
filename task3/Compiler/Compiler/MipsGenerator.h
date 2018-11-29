@@ -41,6 +41,6 @@ public:
 	void intcharaasm();
 
 private:
-	Quad quad;
+	QuadTable *quadTable;
 };
 

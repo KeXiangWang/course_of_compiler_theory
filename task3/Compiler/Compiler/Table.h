@@ -1,5 +1,7 @@
 #pragma once
 #include "global.h"
+#include "Table.h"
+#include "Quad.h"
 
 using std::string;
 using std::vector;

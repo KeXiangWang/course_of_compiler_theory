@@ -10,7 +10,7 @@ public:
 	void deleteNode();
 	void dagAnalyze();
 private:
-	Quad quad;
+	QuadTable *quadTable;
 
 };
 
