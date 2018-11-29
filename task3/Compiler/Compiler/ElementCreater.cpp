@@ -4,7 +4,7 @@
 #include "Quad.h"
 
 
-bool ElementCreater::creatConst(DataType dataType, string name, int value) {
+bool ElementCreater::createConst(DataType dataType, string name, int value) {
 	if (currentTable->find(name) != nullptr) {
 		return false;
 	}
@@ -12,7 +12,7 @@ bool ElementCreater::creatConst(DataType dataType, string name, int value) {
 	return true;
 }
 
-bool ElementCreater::creatVar(DataType dataType, string name) {
+bool ElementCreater::createVar(DataType dataType, string name) {
 	if (currentTable->find(name) != nullptr) {
 		return false;
 	}
@@ -20,7 +20,7 @@ bool ElementCreater::creatVar(DataType dataType, string name) {
 	return true;
 }
 
-bool ElementCreater::creatArray(DataType dataType, string name, int arraySize){
+bool ElementCreater::createArray(DataType dataType, string name, int arraySize){
 	if (currentTable->find(name) != nullptr) {
 		return false;
 	}
@@ -28,7 +28,7 @@ bool ElementCreater::creatArray(DataType dataType, string name, int arraySize){
 	return true;
 }
 
-bool ElementCreater::creatPara(DataType dataType, string name) {
+bool ElementCreater::createPara(DataType dataType, string name) {
 	currentFunction->withParameters = true;
 	if (currentTable->find(name) != nullptr) {
 		return false;
@@ -39,7 +39,12 @@ bool ElementCreater::creatPara(DataType dataType, string name) {
 	return true;
 }
 
-bool ElementCreater::creatFunc(DataType dataType, string name) {
+void ElementCreater::createJump(Label * label)
+{
+	currentQuadTable->addQuad(new Jump(label));
+}
+
+bool ElementCreater::createFunc(DataType dataType, string name) {
 	currentFunction = new Function(dataType, name);
 	currentTable = &currentFunction->elementTable;
 	currentQuadTable = &currentFunction->quadTable;

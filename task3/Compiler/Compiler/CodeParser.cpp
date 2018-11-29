@@ -345,7 +345,7 @@ void CodeParser::parseCompoundStatement() // ·ûºÏÓï¾ä // tested
 // tested
 void CodeParser::parseFunction() {
 	gotFunction = true;
-	if (!elementCreater.creatFunc(dataType, identifier)) {
+	if (!elementCreater.createFunc(dataType, identifier)) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), IDENTIFIER_ALREADY_DEFINED);
 	}
 	cout << "creat a function " << identifier << endl;
@@ -368,7 +368,7 @@ void CodeParser::parseFunction() {
 				if (token == IDENT) {
 					identifier = lexicon.getStringWord();
 					token = lexicon.nextToken();
-					if (!elementCreater.creatPara(dataType, identifier)) { // creat arguement 
+					if (!elementCreater.createPara(dataType, identifier)) { // creat arguement 
 						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), IDENTIFIER_ALREADY_DEFINED);
 					}
 					cout << "creat a " << dataType << " arguement " << identifier << endl;
@@ -466,7 +466,7 @@ void CodeParser::parseConstDeclare() {
 						}
 						if (token == NUM) {
 							valueTemp = lexicon.getNumberTemp();
-							if (!elementCreater.creatConst(dataType, identifier, sign*valueTemp)) { // creat const
+							if (!elementCreater.createConst(dataType, identifier, sign*valueTemp)) { // creat const
 								token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 								return;
 							}
@@ -481,7 +481,7 @@ void CodeParser::parseConstDeclare() {
 					else {
 						if (token == ALPHA) {
 							valueTemp = lexicon.getStringWord()[0]; // get the char as int
-							if (!elementCreater.creatConst(dataType, identifier, valueTemp)) { // creat const
+							if (!elementCreater.createConst(dataType, identifier, valueTemp)) { // creat const
 								token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 								return;
 							}
@@ -523,7 +523,7 @@ void CodeParser::parseVarDeclare() {
 			arraySize = lexicon.getNumberTemp();
 			token = lexicon.nextToken();
 			if (token == RBRACKET) {
-				if (!elementCreater.creatArray(dataType, identifier, arraySize)) { // creat Array
+				if (!elementCreater.createArray(dataType, identifier, arraySize)) { // creat Array
 					token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 					return;
 				}
@@ -559,7 +559,7 @@ void CodeParser::parseVarDeclare() {
 		}
 	}
 	else if (token == COMMA) {
-		if (!elementCreater.creatVar(dataType, identifier)) { // creat var
+		if (!elementCreater.createVar(dataType, identifier)) { // creat var
 			token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 			return;
 		}
@@ -573,7 +573,7 @@ void CodeParser::parseVarDeclare() {
 		parseVarDeclare();
 	}
 	else { // deal with the situation of semicolon
-		if (!elementCreater.creatVar(dataType, identifier)) { // creat const
+		if (!elementCreater.createVar(dataType, identifier)) { // creat const
 			token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 			return;
 		}
@@ -661,6 +661,9 @@ void CodeParser::parseIf() {
 	token = lexicon.nextToken();
 	parseStatement();
 	// TODO set else then next 
+	QuadTable *thenTable = new QuadTable(); // if () {thenTable} else {elseTable} nextTable
+	QuadTable *elseTable = new QuadTable();
+	QuadTable *nextTable = new QuadTable();
 	if (gotCompareToken == NULLSYM) { // TODO set j and 
 
 	}
@@ -793,6 +796,7 @@ void CodeParser::parseFor() {
 void CodeParser::parseScanf() {
 	cout << "use scanf to get something " << endl;
 	token = lexicon.nextToken();
+	vector<Quantity *> parameters;
 	if (token != LPARENTHESE) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), LEFT_PARENTHESES_EXPECTED);
 	}
@@ -803,6 +807,13 @@ void CodeParser::parseScanf() {
 			return;
 		}
 		identifier = lexicon.getStringWord();
+		TableElement *tableElement;
+		if ((tableElement = elementCreater.findElement(identifier)) == nullptr) {
+			errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
+		}
+		else {
+			parameters.push_back(new Variable(tableElement->dataType, identifier));
+		}
 		cout << "scan into " << identifier << endl;
 		// TODO add to scanf list
 		token = lexicon.nextToken();
@@ -816,11 +827,12 @@ void CodeParser::parseScanf() {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 	}
 	token = lexicon.nextToken();
+	elementCreater.actStatement(new Scanf(parameters));
 }
 
 void CodeParser::parsePrintf() {
 	cout << "use printf to print something " << endl;
-	Quantity *quantity;
+	Quantity *quantity = nullptr;
 	token = lexicon.nextToken();
 	if (token != LPARENTHESE) {
 		reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
@@ -851,6 +863,7 @@ void CodeParser::parsePrintf() {
 			errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 		}
 		token = lexicon.nextToken();
+		elementCreater.actStatement(new Printf(stringPrintf, quantity));
 	}
 	else {
 		cout << "        print expression " << endl;
@@ -869,6 +882,7 @@ void CodeParser::parsePrintf() {
 			errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 		}
 		token = lexicon.nextToken();
+		elementCreater.actStatement(new Printf(quantity));
 	}
 }
 // tested

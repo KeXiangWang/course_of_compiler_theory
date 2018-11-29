@@ -18,8 +18,10 @@ private:
 
 class QuadTable {
 public:
+
 	vector<Quad *> quads;
 	void addQuad(Quad *quad);
+	static int count; // for name
 };
 
 class Quantity :public Quad {
@@ -79,8 +81,8 @@ public:
 class Printf :public Quad {
 public:
 	Printf(Quantity *quantity) :Quad(OP_PRINTF), quantity(quantity) {};
-	Printf(string stringConst, Quantity *quantity) :Quad(OP_PRINTF), stringConst(stringConst), quantity(quantity) {};
-	string stringConst;
+	Printf(string stringPrintf, Quantity *quantity = nullptr) :Quad(OP_PRINTF), stringPrintf(stringPrintf), quantity(quantity) {};
+	string stringPrintf;
 	Quantity *quantity;
 };
 
@@ -90,3 +92,14 @@ public:
 	Quantity *quantity;
 };
 
+class Label :public Quad {
+public:
+	Label(Quantity *quantity = nullptr) :Quad(OP_LABEL), quantity(quantity) {};
+	Quantity *quantity;
+};
+
+class Jump :public Quad {
+public:
+	Jump(Label *label) :Quad(OP_JUMP), label(label) {};
+	Label *label;
+};
