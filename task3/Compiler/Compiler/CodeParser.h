@@ -56,7 +56,7 @@ public:
 	void parseStatementSequence();
 	void parseCompoundStatement();
 	void parseFunction();
-	Token parseCondition();
+	Token parseCondition(Quantity **quantity1, Quantity **quantity2);
 	void parseConstDeclare();
 	void parseVarDeclare();
 	void parseVarAndFuncDeclare();

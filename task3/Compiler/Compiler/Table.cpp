@@ -26,3 +26,9 @@ Function * FunctionTable::find(string name) {
 void FunctionTable::insert(Function * function) {
 	functionVector.push_back(function);
 }
+
+void Function::addQuadTable(QuadTable *quadTable)
+{
+	currentQuadTable->next = quadTable;
+	currentQuadTable = quadTable;
+}

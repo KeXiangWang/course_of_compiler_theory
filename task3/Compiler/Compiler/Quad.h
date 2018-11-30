@@ -18,10 +18,11 @@ private:
 
 class QuadTable {
 public:
-
+	QuadTable() { count++; next = nullptr; };
 	vector<Quad *> quads;
 	void addQuad(Quad *quad);
 	static int count; // for name
+	QuadTable* next;
 };
 
 class Quantity :public Quad {
@@ -94,12 +95,20 @@ public:
 
 class Label :public Quad {
 public:
-	Label(Quantity *quantity = nullptr) :Quad(OP_LABEL), quantity(quantity) {};
-	Quantity *quantity;
+	Label(QuadTable *quadTable = nullptr) :Quad(OP_LABEL), labelQuadTable(quadTable) {};
+	QuadTable *labelQuadTable;
 };
 
 class Jump :public Quad {
 public:
 	Jump(Label *label) :Quad(OP_JUMP), label(label) {};
+	Label *label;
+};
+
+class Branch :public Quad {
+public:
+	Branch(OPCode opCode, Quantity *quantity1, Quantity *quantity2, Label *label) :Quad(opCode), quantity1(quantity1), quantity2(quantity2), label(label) {};
+	Quantity *quantity1;
+	Quantity *quantity2;
 	Label *label;
 };

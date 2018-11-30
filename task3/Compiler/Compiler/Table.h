@@ -27,11 +27,12 @@ private:
 
 class Function {
 public:
-	Function(DataType dataType, string name) :functionType(dataType), name(name), withParameters(false) {};
+	Function(DataType dataType, string name) :functionType(dataType), name(name), withParameters(false) { currentQuadTable = new QuadTable(); };
+	void addQuadTable(QuadTable *quadTable);
 	DataType functionType; // Type of return
 	string name;	// name
 	Table elementTable;	
-	QuadTable quadTable;
+	QuadTable *currentQuadTable;
 	vector<TableElement *> parameters;
 	bool withParameters;
 };

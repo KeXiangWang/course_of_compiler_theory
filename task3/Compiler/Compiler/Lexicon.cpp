@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Lexicon.h"
+#include "global.h"
 
 using std::string;
 using std::fstream;

@@ -1,51 +1,5 @@
 #pragma once
-
-enum Token
-{
-	PLUS,			// +
-	MINUS, 			// -
-	MULT,			// *
-	DIV,			// /
-	LESS,			// <
-	LEQ,			// <=
-	GRT,			// >
-	GEQ,			// >=
-	NEQ,			// !=
-	EQU,			// ==
-	BECOME,			// =
-	COMMA,			// ,
-	SEMICOLON,		// ;
-	COLON,			// :
-	LPARENTHESE,	// (
-	RPARENTHESE,	// )
-	LBRACKET,		// [
-	RBRACKET,		// ]
-	LBRACE,			// {
-	RBRACE,			// }
-
-	ALPHA,			// one letter
-	NUM,			// number
-	STR,			// string
-
-	CONSTSYM,
-	INTSYM,
-	CHARSYM,
-	VOIDSYM,
-
-	IFSYM,
-	ELSESYM,
-	DOSYM,
-	WHILESYM,
-	FORSYM,
-	RETURNSYM,
-	SCANFSYM,
-	PRINTFSYM,
-	MAINSYM,
-	IDENT,
-	EOFSYM,
-	ERRORSYM,
-	NULLSYM
-};
+#include "global.h"
 
 using std::unordered_map;
 using std::vector;

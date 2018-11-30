@@ -138,7 +138,6 @@ Quantity *CodeParser::parseFactor() {
 			}
 			else {
 				string varName = identifier;
-				token = lexicon.nextToken();
 				quantity = new Variable(dataType, varName); // TODO creat var;
 				return quantity;
 			}
@@ -172,7 +171,6 @@ Quantity *CodeParser::parseFactor() {
 		token = lexicon.nextToken();
 		return new Constant(TYPECHAR, alpha);
 	}
-
 	return nullptr;
 }
 // tested
@@ -416,9 +414,9 @@ void CodeParser::parseFunction() {
 	}
 }
 // tested
-Token CodeParser::parseCondition() {
+Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 	cout << "cope with condition " << endl;
-	Quantity *quantity1 = parseExpression();
+	*quantity1 = parseExpression();
 	Token compareToken;
 	if (quantity1 == nullptr) {
 		return VOIDSYM;
@@ -428,7 +426,7 @@ Token CodeParser::parseCondition() {
 	}
 	compareToken = token;
 	token = lexicon.nextToken();
-	Quantity *quantity2 = parseExpression();
+	*quantity2 = parseExpression();
 	// TODO set a compare 
 	if (quantity2 == nullptr) {
 		return VOIDSYM;
@@ -649,39 +647,46 @@ void CodeParser::parseIf() {
 		return;
 	}
 	token = lexicon.nextToken();
-	Token gotCompareToken = parseCondition();
+	QuadTable *thenTable = new QuadTable(); // if () {thenTable} else {elseTable} nextTable
+	QuadTable *elseTable = new QuadTable();
+	QuadTable *nextTable = new QuadTable();
+	Quantity *quantity1;
+	Quantity *quantity2;
+	Token gotCompareToken = parseCondition(&quantity1, &quantity2);
 	if (gotCompareToken == VOIDSYM) { // TODO deal with error
-
+		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
 	}
+	// TODO set else then next 
+	  // TODO set j and 
+	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, elseTable);
 	if (token != RPARENTHESE) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), RIGHT_PARENTHESES_EXPECTED);
 		jumpToSet(statementHeadSet);
 		return;
 	}
+	elementCreater.setQuadTable(thenTable); // enter new quadTable
 	token = lexicon.nextToken();
 	parseStatement();
-	// TODO set else then next 
-	QuadTable *thenTable = new QuadTable(); // if () {thenTable} else {elseTable} nextTable
-	QuadTable *elseTable = new QuadTable();
-	QuadTable *nextTable = new QuadTable();
-	if (gotCompareToken == NULLSYM) { // TODO set j and 
-
-	}
-	else {
-
-	}
+	elementCreater.createJump(new Label(nextTable)); // jump
+	elementCreater.setQuadTable(elseTable); 
 	if (token == ELSESYM) {
 		cout << "set a else " << endl;
-		token = lexicon.nextToken();
+		token = lexicon.nextToken();	
 		parseStatement();
 		// TODO set else then 
 	}
+	elementCreater.setQuadTable(nextTable);
 }
 // tested
 void CodeParser::parseDoWhile() {
 	// do＜语句＞while '('＜条件＞')'
 	cout << "set a do while loop " << endl;
+	QuadTable *loopTable = new QuadTable(); // do {loopTable} while() nextTable
+	QuadTable *nextTable = new QuadTable();
+	Quantity *quantity1;
+	Quantity *quantity2;
 	token = lexicon.nextToken();
+	elementCreater.setQuadTable(loopTable); // enter loopTable
 	parseStatement();
 	if (token != WHILESYM) {
 		reportAndJumpOver(WHILE_EXPECTED, RPARENTHESE);
@@ -693,24 +698,25 @@ void CodeParser::parseDoWhile() {
 		return;
 	}
 	token = lexicon.nextToken();
-	Token gotCompareToken = parseCondition();
-	if (gotCompareToken) {
-
-	}
-	else {
-
-	}
+	Token gotCompareToken = parseCondition(&quantity1, &quantity2);
+	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, nextTable);
+	elementCreater.createJump(new Label(loopTable)); // jump back loop
 	// TODO set jump next then
 	if (token != RPARENTHESE) {
 		reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, RPARENTHESE);
 		return;
 	}
 	token = lexicon.nextToken();
+	elementCreater.setQuadTable(nextTable);
 }
 
 void CodeParser::parseFor() {
 	// for'('＜标识符＞＝＜表达式＞; ＜条件＞; ＜标识符＞＝＜标识符＞(+| -)＜步长＞')'＜语句＞
 	cout << "set a for loop " << endl;
+	QuadTable *loopTable = new QuadTable(); // {loopTable for ()}  nextTable
+	QuadTable *nextTable = new QuadTable();
+	Quantity *quantity1;
+	Quantity *quantity2;
 	token = lexicon.nextToken();
 	if (token != LPARENTHESE) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), LEFT_PARENTHESES_EXPECTED);
@@ -724,6 +730,10 @@ void CodeParser::parseFor() {
 	}
 	else {
 		identifier = lexicon.getStringWord();
+		TableElement *tableElement;
+		if ((tableElement = elementCreater.findElement(identifier)) == nullptr) {
+			errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
+		}
 		token = lexicon.nextToken();
 		if (token != BECOME) {
 			errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), BECOME_EXPECTED);
@@ -733,19 +743,16 @@ void CodeParser::parseFor() {
 		if (quantity == nullptr) {
 			jumpToToken(SEMICOLON);
 		}
+		elementCreater.actStatement(new Variable(tableElement->dataType, tableElement->name, quantity)); // ＜标识符＞＝＜表达式＞
 	}
 	if (token != SEMICOLON) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 	}
 	token = lexicon.nextToken();
-	Token gotCompareToken = parseCondition();
+	elementCreater.setQuadTable(loopTable); // set label loop
+	Token gotCompareToken = parseCondition(&quantity1, &quantity2);
+	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, nextTable);
 	// TODO set jump then next
-	if (gotCompareToken) {
-
-	}
-	else {
-
-	}
 	if (token != SEMICOLON) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 	}
@@ -755,6 +762,10 @@ void CodeParser::parseFor() {
 		return;
 	}
 	identifier = lexicon.getStringWord();
+	TableElement *tableElement;
+	if ((tableElement = elementCreater.findElement(identifier)) == nullptr) {
+		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
+	}
 	// TODO check whether the ident is legal
 	cout << "the loop ident is " << identifier << endl;
 	token = lexicon.nextToken();
@@ -768,13 +779,16 @@ void CodeParser::parseFor() {
 		return;
 	}
 	identifier = lexicon.getStringWord();
-	// TODO check whether the ident is legal
+	TableElement *tableElement2;
+	if ((tableElement2 = elementCreater.findElement(identifier)) == nullptr) {
+		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
+	}
 	token = lexicon.nextToken();
 	if (token != MINUS && token != PLUS) {
 		reportAndJumpOver(UNEXPECTED_SIGN, RBRACE);
 		return;
 	}
-	sign = token == MINUS ? -1 : 1; // TODO deal with the special signal, current sign is not proper
+	OPCode opCode = token == PLUS ? OP_PLUS : OP_SUB; 
 	token = lexicon.nextToken();
 	if (token == NUM) {
 		valueTemp = lexicon.getNumberTemp();
@@ -791,6 +805,10 @@ void CodeParser::parseFor() {
 		token = lexicon.nextToken();
 	}
 	parseStatement();
+	Quantity *quantity = new Caculator(opCode, new Variable(tableElement2->dataType, tableElement2->name), new Constant(TYPEINT, valueTemp)); // ＜标识符＞(+| -)＜步长＞
+	elementCreater.actStatement(new Variable(tableElement->dataType, tableElement->name, quantity)); // ＜标识符＞＝＜标识符＞(+| -)＜步长＞
+	elementCreater.createJump(new Label(loopTable)); // jump back loop
+	elementCreater.setQuadTable(nextTable); // set label next
 }
 
 void CodeParser::parseScanf() {
