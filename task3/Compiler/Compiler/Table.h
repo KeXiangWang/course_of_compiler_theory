@@ -18,6 +18,7 @@ public:
 };
 
 class Table{
+	friend class MipsGenerator;
 public:
 	TableElement *find(string name); 
 	void insert(TableElement * tableElement);
@@ -27,17 +28,19 @@ private:
 
 class Function {
 public:
-	Function(DataType dataType, string name) :functionType(dataType), name(name), withParameters(false) { currentQuadTable = new QuadTable(); };
+	Function(DataType dataType, string name) :functionType(dataType), name(name), withParameters(false) { headQuadTable = new QuadTable(); currentQuadTable = headQuadTable; };
 	void addQuadTable(QuadTable *quadTable);
 	DataType functionType; // Type of return
 	string name;	// name
 	Table elementTable;	
 	QuadTable *currentQuadTable;
+	QuadTable *headQuadTable;
 	vector<TableElement *> parameters;
 	bool withParameters;
 };
 
 class FunctionTable {
+	friend class MipsGenerator;
 public:
 	Function *find(string name);
 	void insert(Function * function);

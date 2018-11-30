@@ -4,49 +4,40 @@
 
 using std::string;
 using std::vector;
-
+using std::unordered_map;
+using std::unordered_set;
+struct Reg {
+	string name;
+	Quantity *quantity;
+	bool free;
+	bool fix;
+	Reg(string& n) :name(n), free(true), fix(false) {}
+};
 class MipsGenerator
 {
 public:
 	MipsGenerator(ElementCreater *elementCreater) :elementCreater(elementCreater) {};
 	void generate();
-
-	void midcode2asm();
-	void insertaddress();
-	void pushstack();
-	void funcasm();
-	int varaddr();
-	void dataseg();
-	void jmpasm();
-	void printint();
-	void callasm();
-	void setlabasm();
-	void addasm();
-	void subasm();
-	void mulasm();
-	void divasm();
-	void greasm();
-	void geqasm();
-	void lssasm();
-	void leqasm();
-	void eqlasm();
-	void neqasm();
-	void assasm();
-	void aassasm();
-	void assaasm();
-	void scfasm();
-	void prtasm();
-	void fupaasm();
-	void retasm();
-	void paraasm();
-	void jneasm();
-	void intcharasm();
-	void constdefasm();
-	void intcharaasm();
+	void generateFunction(Function *function);
+	void allocateGloabal(Function * function);
+	int getVarNumber(Function * function);
 
 private:
 	QuadTable *quadTable;
 	ElementCreater *elementCreater;
 	vector<string> finalCode;
+	vector<string> initCode;
+	vector<string> exertCode;
+	unordered_map<string, int> localOffset; // relative to $fp
+	unordered_map<Quad *, int> tempOffset;  // relative to $fp
+
+	unordered_map<QuadTable *, int> bb2label;
+	unordered_map<string, int> GlobalReg;
+	unordered_map<string, Reg*> TempReg;
+	unordered_set<string> loadedToGloabal;
+
+	unordered_map<string, int> refCount;
+	unordered_map<string, int> stackOffset;
+	int labelCount;
 };
 

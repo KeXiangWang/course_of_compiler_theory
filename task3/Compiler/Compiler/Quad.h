@@ -9,10 +9,10 @@ class Quad
 {
 public:
 
-	Quad(OPCode opCode) : opCode(opCode) { count++; };
+	Quad(OPCode opCode) : opCode(opCode) { count++; id = ""; };
 	OPCode opCode;
 	string id; // for distinguish
-private:
+protected:
 	static int count; // for name
 };
 
@@ -33,27 +33,50 @@ public:
 
 class Caculator :public Quantity {
 public:
-	Caculator(OPCode opCode, Quantity *quantity1, Quantity *quantity2) : Quantity(opCode, TYPEINT) {};
+	Caculator(OPCode opCode, Quantity *quantity1, Quantity *quantity2) : Quantity(opCode, TYPEINT) {
+		switch (opCode)
+		{
+		case OP_PLUS:
+			id = "add_" + std::to_string((long long)count);
+			break;
+		case OP_SUB:
+			id = "sub_" + std::to_string((long long)count);
+			break;
+		case OP_DIV:
+			id = "div_" + std::to_string((long long)count);
+			break;
+		case OP_MULT:
+			id = "mult_" + std::to_string((long long)count);
+			break;
+		}
+	};
 	Quantity *quantity1;
 	Quantity *quantity2;
 };
 
 class Constant :public Quantity {
 public:
-	Constant(DataType dataType, int value) : Quantity(OP_CONST, dataType), value(value) {};
+	Constant(DataType dataType, int value) : Quantity(OP_CONST, dataType), value(value) {
+		if (dataType == TYPEINT) {
+			id = "const_int_" + std::to_string((long long)count);
+		}
+		else {
+			id = "const_char_" + std::to_string((long long)count);
+		}
+	};
 	int value;
 };
 
 class Variable :public Quantity {
 public:
-	Variable(DataType dataType, string name, Quantity *value = nullptr) :Quantity(OP_VAR, dataType), name(name) {};
+	Variable(DataType dataType, string name, Quantity *value = nullptr) :Quantity(OP_VAR, dataType), name(name) { id = name; };
 	string name;
 	Quantity *value;
 };
 
 class Array :public Quantity {
 public:
-	Array(DataType dataType, string name, Quantity *index, Quantity *value = nullptr) : Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) {};
+	Array(DataType dataType, string name, Quantity *index, Quantity *value = nullptr) : Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) { id = "array_" + std::to_string((long long)count); };
 	string name;
 	Quantity *value; // the value of the array element
 	Quantity *index;
@@ -61,7 +84,7 @@ public:
 
 class FunctionCall :public Quantity {
 public:
-	FunctionCall(DataType dataType, string name, vector<Quantity *> parameters) : Quantity(OP_FUNC, dataType), parameters(parameters) {};
+	FunctionCall(DataType dataType, string name, vector<Quantity *> parameters) : Quantity(OP_FUNC, dataType), parameters(parameters) { id = "fcall_" + std::to_string((long long)count); };
 	string name;
 	vector<Quantity *> parameters;
 };

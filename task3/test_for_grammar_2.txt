@@ -1,0 +1,37 @@
+const int length = 10, width = +8;
+const char firstLowerCase = 'a', firstUpperCase = 'A';
+const char lastLowerCase = 'z', lastUpperCase = 'Z';
+
+int globalInt, globalIntArray[44], globalInt2, globalIntArray2[66], globalInt3;
+int globalChar, globalCharArray[44], globalChar2, globalCharArray2[66], globalChar3;
+
+
+char toUpperCase(char x)
+{
+    char c;
+    if (x >= firstLowerCase)
+        if (x <= lastLowerCase)
+        {
+            c = x - firstLowerCase + firstUpperCase;
+            return(c);
+        }
+        else return(x);
+    else return(x);
+}
+
+void changeGlobal(){
+	printf("original: ");
+	printf(globalInt);
+	globalInt = 16;
+	printf("   changed: ");
+	printf(globalInt);
+}
+
+
+void main(){ 
+	int i;
+	int operation;
+	globalInt = 0;
+	scanf(operation);
+	changeGlobal();
+}
