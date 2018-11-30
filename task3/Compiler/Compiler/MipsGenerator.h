@@ -1,11 +1,15 @@
 #pragma once
 #include "Quad.h"
+#include "ElementCreater.h"
+
+using std::string;
+using std::vector;
 
 class MipsGenerator
 {
 public:
-	MipsGenerator();
-	~MipsGenerator();
+	MipsGenerator(ElementCreater *elementCreater) :elementCreater(elementCreater) {};
+	void generate();
 
 	void midcode2asm();
 	void insertaddress();
@@ -42,5 +46,7 @@ public:
 
 private:
 	QuadTable *quadTable;
+	ElementCreater *elementCreater;
+	vector<string> finalCode;
 };
 

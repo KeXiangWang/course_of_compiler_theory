@@ -1,16 +1,11 @@
 #include "pch.h"
 #include "MipsGenerator.h"
 
-
-MipsGenerator::MipsGenerator()
+using std::to_string;
+void MipsGenerator::generate()
 {
+	finalCode.push_back(".text");
 }
-
-
-MipsGenerator::~MipsGenerator()
-{
-}
-
 
 void MipsGenerator::midcode2asm() {
 }

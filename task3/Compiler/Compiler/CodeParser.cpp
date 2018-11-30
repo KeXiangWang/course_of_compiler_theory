@@ -82,7 +82,7 @@ Quantity *CodeParser::parseFactor() {
 			Function *function;
 			string functionName = identifier;
 
-			if ((function = elementCreater.findFunc(identifier)) = nullptr) {
+			if ((function = elementCreater.findFunc(identifier)) == nullptr) {
 				reportAndJumpOver(WRONG_FUNCTION_CALL, RPARENTHESE);
 				return nullptr;
 			}
@@ -270,6 +270,9 @@ void CodeParser::parseStatement() {
 						}
 						parameters.push_back(parameter);
 					} while (token == COMMA);
+				}
+				else {
+					token = lexicon.nextToken();
 				}
 				if (token != RPARENTHESE) {
 					reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
