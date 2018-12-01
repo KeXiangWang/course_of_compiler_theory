@@ -48,7 +48,6 @@ void MipsGenerator::initRegs() {
 		string name = "$t" + std::to_string((long long)i);
 		tempRegs.push_back(Reg(name));
 	}
-
 }
 
 void MipsGenerator::generateFunction(Function * function) {
@@ -329,14 +328,14 @@ void MipsGenerator::generateFunc(Function *function, Quad *quad, int offset) {
 	// save $t0~$t7
 	exertCode.push_back("addiu $sp $sp -32");
 	for (int i = 0; i < 8; i++) {
-		exertCode.push_back("sw $t" + to_string((long long)i) + " " + to_string((long long)(i << 2)) + "($sp)");
+		exertCode.push_back("sw $t" + to_string(i) + " " + to_string(i << 2) + "($sp)");
 	}
 	// call
 	exertCode.push_back("jal f_" + func->name);
 	exertCode.push_back("nop");
 	// restore $t0~$t7
 	for (int i = 0; i < 8; i++) {
-		exertCode.push_back("lw $t" + to_string((long long)i) + " " + to_string((long long)(i << 2)) + "($sp)");
+		exertCode.push_back("lw $t" + to_string(i) + " " + to_string(i << 2) + "($sp)");
 	}
 	exertCode.push_back("addiu $sp $sp 32");
 	exertCode.push_back("addiu $sp $sp " + to_string((long long)(func->parameters.size() << 2)));
@@ -363,14 +362,14 @@ void MipsGenerator::generateVoidFunc(Function *function, Quad *quad, int offset)
 	// save $t0~$t7
 	exertCode.push_back("addiu $sp $sp -32");
 	for (int i = 0; i < 8; i++) {
-		exertCode.push_back("sw $t" + to_string((long long)i) + " " + to_string((long long)(i << 2)) + "($sp)");
+		exertCode.push_back("sw $t" + to_string(i) + " " + to_string(i << 2) + "($sp)");
 	}
 	// call
 	exertCode.push_back("jal f_" + func->name);
 	exertCode.push_back("nop");
 	// restore $t0~$t7
 	for (int i = 0; i < 8; i++) {
-		exertCode.push_back("lw $t" + to_string((long long)i) + " " + to_string((long long)(i << 2)) + "($sp)");
+		exertCode.push_back("lw $t" + to_string(i) + " " + to_string(i << 2) + "($sp)");
 	}
 	exertCode.push_back("addiu $sp $sp 32");
 	exertCode.push_back("addiu $sp $sp " + to_string((long long)(func->parameters.size() << 2)));
@@ -432,8 +431,7 @@ void MipsGenerator::generatePrintf(Function *function, Quad *quad) {
 	}
 }
 
-void MipsGenerator::decreaseRef(Quantity *value)
-{
+void MipsGenerator::decreaseRef(Quantity *value) {
 	std::cout << "decrease " << value->id << "  " << refCount[value->id] - 1 << std::endl;
 	refCount[value->id];
 }
@@ -721,8 +719,7 @@ void MipsGenerator::loadValueG(Function *function, Quad *quad, string reg, int t
 	}
 }
 
-void MipsGenerator::storeValue(Function *function, Quad *quad, string reg)
-{
+void MipsGenerator::storeValue(Function *function, Quad *quad, string reg) {
 	if (reg.back() != ' ')
 		reg += ' ';
 	string instr = (static_cast<Quantity *>(quad)->dataType == TYPEINT) ? "sw " : "sb ";
@@ -777,4 +774,3 @@ void MipsGenerator::printCode(std::fstream &output) {
 		output << *i << std::endl;
 	}
 }
-

@@ -1,3 +1,8 @@
+int get(){
+	return 5;
+}
+
+
 void main(){
 	int k;
 	int m[5];
