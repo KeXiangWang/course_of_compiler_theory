@@ -15,6 +15,7 @@ public:
 	bool createPara(DataType dataType, string name);
 	void createBranch(Token token, Quantity *quantity1, Quantity *quantity2, QuadTable * elseTable);
 	void createJump(Label *label);
+	int addString(string stringPrintf);
 	Function *findFunc(string identifier);
 	Function *getCurrentFunction();
 	TableElement *findElement(string identifier);
@@ -27,5 +28,6 @@ private:
 	FunctionTable functionTable;
 	Function *currentFunction;
 	QuadTable *currentQuadTable;
+	vector<string> constStringVector;
 };
 

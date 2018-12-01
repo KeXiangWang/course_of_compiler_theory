@@ -26,6 +26,7 @@ public:
 };
 
 class Quantity :public Quad {
+	friend class MipsGenerator;
 public:
 	Quantity(OPCode opCode, DataType dataType) :Quad(opCode), dataType(dataType) {};
 	DataType dataType;
@@ -33,25 +34,27 @@ public:
 
 class Caculator :public Quantity {
 public:
-	Caculator(OPCode opCode, Quantity *quantity1, Quantity *quantity2) : Quantity(opCode, TYPEINT) {
+	Caculator(OPCode opCode, Quantity *quantity1, Quantity *quantity2) : Quantity(opCode, TYPEINT), quantity1(quantity1), quantity2(quantity2) {
 		switch (opCode)
 		{
 		case OP_PLUS:
-			id = "add_" + std::to_string((long long)count);
+			id = "add_" + std::to_string((long long)caculatorCount);
 			break;
 		case OP_SUB:
-			id = "sub_" + std::to_string((long long)count);
+			id = "sub_" + std::to_string((long long)caculatorCount);
 			break;
 		case OP_DIV:
-			id = "div_" + std::to_string((long long)count);
+			id = "div_" + std::to_string((long long)caculatorCount);
 			break;
 		case OP_MULT:
-			id = "mult_" + std::to_string((long long)count);
+			id = "mult_" + std::to_string((long long)caculatorCount);
 			break;
 		}
+		caculatorCount++;
 	};
 	Quantity *quantity1;
 	Quantity *quantity2;
+	static int caculatorCount; // for name
 };
 
 class Constant :public Quantity {
@@ -69,7 +72,7 @@ public:
 
 class Variable :public Quantity {
 public:
-	Variable(DataType dataType, string name, Quantity *value = nullptr) :Quantity(OP_VAR, dataType), name(name) { id = name; };
+	Variable(DataType dataType, string name, Quantity *value = nullptr) :Quantity(OP_VAR, dataType), name(name), value(value) { id = name; };
 	string name;
 	Quantity *value;
 };
@@ -79,7 +82,7 @@ public:
 	Array(DataType dataType, string name, Quantity *index, Quantity *value = nullptr) : Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) { id = "array_" + std::to_string((long long)count); };
 	string name;
 	Quantity *value; // the value of the array element
-	Quantity *index;
+	Quantity *index; // the index
 };
 
 class FunctionCall :public Quantity {
@@ -98,15 +101,15 @@ public:
 
 class Scanf :public Quad {
 public:
-	Scanf(vector<Quantity *> parameters) :Quad(OP_SCANF), parameters(parameters) {};
-	vector<Quantity *> parameters;
+	Scanf(vector<Variable *> parameters) :Quad(OP_SCANF), parameters(parameters) {};
+	vector<Variable *> parameters;
 };
 
 class Printf :public Quad {
 public:
 	Printf(Quantity *quantity) :Quad(OP_PRINTF), quantity(quantity) {};
-	Printf(string stringPrintf, Quantity *quantity = nullptr) :Quad(OP_PRINTF), stringPrintf(stringPrintf), quantity(quantity) {};
-	string stringPrintf;
+	Printf(int stringInt, Quantity *quantity = nullptr) :Quad(OP_PRINTF), stringInt(stringInt), quantity(quantity) {};
+	int stringInt;
 	Quantity *quantity;
 };
 

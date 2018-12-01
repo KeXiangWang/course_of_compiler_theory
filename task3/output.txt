@@ -1,0 +1,48 @@
+.text
+j f_main
+nop
+
+f_main:
+addiu $sp $sp -84
+sw $ra 80($sp)
+sw $fp 76($sp)
+sw $s0 72($sp)
+sw $s1 68($sp)
+sw $s2 64($sp)
+sw $s3 60($sp)
+sw $s4 56($sp)
+sw $s5 52($sp)
+sw $s6 48($sp)
+sw $s7 44($sp)
+label_0:
+li $t0 7	#const_int_2
+#	m
+li $t8 2	#const_int_1
+sll $t8 $t8 2
+addu $t8 $t8 $sp
+sw $t0 20($t8 )
+li $t1 11	#add_0
+li $t2 9	#const_int_7
+mul $t3 $t1 $t2 #	mult_1
+li $t5 2	#const_int_9
+move $t4  $t5
+sll $t4 $t4 2
+addu $t4 $t4 $sp
+lw $t4 20($t4 )
+subu $t6 $t3 $t4 #	sub_2
+move $s0 $t6	# k
+li $t7 9	#const_int_14
+addu $t0 $s0 $t7 #	add_3
+move $s1 $t0	# n
+f_main_return:
+lw $s0 72($sp)
+lw $s1 68($sp)
+lw $s2 64($sp)
+lw $s3 60($sp)
+lw $s4 56($sp)
+lw $s5 52($sp)
+lw $s6 48($sp)
+lw $s7 44($sp)
+lw $ra 80($sp)
+lw $fp 76($sp)
+addiu $sp $sp 84

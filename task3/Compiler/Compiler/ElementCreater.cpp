@@ -74,6 +74,12 @@ void ElementCreater::createJump(Label *label) {
 	currentQuadTable->addQuad(new Jump(label));
 }
 
+int ElementCreater::addString(string stringPrintf) {
+	int size = (int)(constStringVector.size());
+	constStringVector.push_back(stringPrintf);
+	return size;
+}
+
 bool ElementCreater::createFunc(DataType dataType, string name) {
 	currentFunction = new Function(dataType, name);
 	currentTable = &currentFunction->elementTable;
@@ -86,8 +92,7 @@ Function * ElementCreater::findFunc(string identifier) {
 	return functionTable.find(identifier);
 }
 
-Function * ElementCreater::getCurrentFunction()
-{
+Function * ElementCreater::getCurrentFunction() {
 	return currentFunction;
 }
 
@@ -102,13 +107,11 @@ TableElement * ElementCreater::findElement(string identifier) {
 	return nullptr;
 }
 
-void ElementCreater::actStatement(Quad * quad)
-{
+void ElementCreater::actStatement(Quad * quad) {
 	currentQuadTable->addQuad(quad);
 }
 
-void ElementCreater::setQuadTable(QuadTable * quadTable)
-{
+void ElementCreater::setQuadTable(QuadTable * quadTable) {
 	currentFunction->addQuadTable(quadTable); // add the quadTable into the current function
 	currentQuadTable = quadTable; // set the quadTable as working quadTable
 }

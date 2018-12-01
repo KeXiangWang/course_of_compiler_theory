@@ -4,6 +4,7 @@
 
 int Quad::count = 0;
 int QuadTable::count = 0;
+int Caculator::caculatorCount = 0;
 void QuadTable::addQuad(Quad * quad) {
 	if (quad == nullptr) {
 		return;
@@ -11,6 +12,7 @@ void QuadTable::addQuad(Quad * quad) {
 	switch (quad->opCode)
 	{
 	case OP_LABEL:
+		static_cast<Label *>(quad)->labelQuadTable = this;
 		break;
 	case OP_PLUS:
 	case OP_SUB:
