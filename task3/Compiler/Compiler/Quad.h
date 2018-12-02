@@ -79,7 +79,8 @@ public:
 
 class Array :public Quantity {
 public:
-	Array(DataType dataType, string name, Quantity *index, Quantity *value = nullptr) : Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) { id = "array_" + std::to_string((long long)count); };
+	Array(DataType dataType, string name, Quantity *index, Quantity *value = nullptr) : 
+		Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) { id = "array_" + std::to_string((long long)count); };
 	string name;
 	Quantity *value; // the value of the array element
 	Quantity *index; // the index
@@ -87,14 +88,15 @@ public:
 
 class FunctionCall :public Quantity {
 public:
-	FunctionCall(DataType dataType, string name, vector<Quantity *> parameters) : Quantity(OP_FUNC, dataType), parameters(parameters) { id = "fcall_" + std::to_string((long long)count); };
+	FunctionCall(DataType dataType, string name, vector<Quantity *> parameters) : 
+		Quantity(OP_FUNC, dataType), name(name), parameters(parameters) { id = "fcall_" + std::to_string((long long)count); };
 	string name;
 	vector<Quantity *> parameters;
 };
 
 class VoidCall :public Quad {
 public:
-	VoidCall(string name, vector<Quantity *> parameters) :Quad(OP_VOIDFUNC), parameters(parameters) {};
+	VoidCall(string name, vector<Quantity *> parameters) :Quad(OP_VOIDFUNC), name(name), parameters(parameters) {};
 	string name;
 	vector<Quantity *> parameters;
 };
@@ -107,7 +109,7 @@ public:
 
 class Printf :public Quad {
 public:
-	Printf(Quantity *quantity) :Quad(OP_PRINTF), quantity(quantity) {};
+	Printf(Quantity *quantity) :Quad(OP_PRINTF), quantity(quantity) { stringInt = -1; };
 	Printf(int stringInt, Quantity *quantity = nullptr) :Quad(OP_PRINTF), stringInt(stringInt), quantity(quantity) {};
 	int stringInt;
 	Quantity *quantity;
@@ -133,7 +135,8 @@ public:
 
 class Branch :public Quad {
 public:
-	Branch(OPCode opCode, Quantity *quantity1, Quantity *quantity2, Label *label) :Quad(opCode), quantity1(quantity1), quantity2(quantity2), label(label) {};
+	Branch(OPCode opCode, Quantity *quantity1, Quantity *quantity2, Label *label) 
+		:Quad(opCode), quantity1(quantity1), quantity2(quantity2), label(label) {};
 	Quantity *quantity1;
 	Quantity *quantity2;
 	Label *label;

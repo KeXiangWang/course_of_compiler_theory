@@ -12,8 +12,8 @@ public:
 	string name;
 	Quantity *quantity;
 	bool free;
-	bool fix;
-	Reg(string n) :name(n), free(true), fix(false) {};
+	bool fixed;
+	Reg(string n) :name(n), free(true), fixed(false) {};
 };
 
 class MipsGenerator
@@ -37,15 +37,14 @@ public:
 	void generateScanf(Function *function, Quad *quad);
 	void generatePrintf(Function *function, Quad *quad);
 
-
 	string getReg(Function *function, Quantity *quantity, bool write = false, int temp = 0);
 	void decreaseRef(Quantity * value);
-	Reg * spill(Function *function);
+	Reg * overflow(Function *function);
 	void allocateGloabal(Function * function);
 	int getVarNumber(Function * function);
 	void writeBack(Function * function);
 	void loadValue(Function *function, Quad *quad, string reg, int temp);
-	void loadValueG(Function *function, Quad *quad, string reg, int temp);
+	void loadValueGlobal(Function *function, Quad *quad, string reg, int temp);
 	void storeValue(Function *function, Quad *quad, string reg);
 	void storeValueArray(Function *function, Array *arr, string reg, string freeReg);
 	void moveToReg(Function *functoin, Quantity *value, string reg, int temp = 0);
@@ -57,8 +56,6 @@ private:
 	vector<string> finalCode;
 	vector<string> initCode;
 	vector<string> exertCode;
-	unordered_map<string, int> localOffset; // relative to $fp
-	unordered_map<Quad *, int> tempOffset;  // relative to $fp
 	vector<Reg> tempRegs;
 
 	unordered_map<QuadTable *, int> bb2label;

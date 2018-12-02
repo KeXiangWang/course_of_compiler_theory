@@ -65,9 +65,6 @@ void dealRequest(int operation){
 	} else if(operation == 1){
 		print();
 	} else if(operation == 2){
-		printf("%c", toUpperCase(x));
-		printf(toUpperCase('x'));
-	} else if(operation == 3){
 		changeGlobal();
 	} else {
 		printf("nothing");

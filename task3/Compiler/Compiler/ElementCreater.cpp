@@ -46,22 +46,22 @@ void ElementCreater::createBranch(Token token, Quantity * quantity1, Quantity * 
 		opCode = OP_BEQZ;
 		break;
 	case NEQ:
-		opCode = OP_BNE;
-		break;
-	case EQU:
 		opCode = OP_BEQ;
 		break;
+	case EQU:
+		opCode = OP_BNE;
+		break;
 	case LESS:
-		opCode = OP_BLE;
+		opCode = OP_BGE;
 		break;
 	case LEQ:
-		opCode = OP_BLT;
+		opCode = OP_BGT;
 		break;
 	case GEQ:
-		opCode = OP_BGE; 
+		opCode = OP_BLT;
 		break;
 	case GRT:
-		opCode = OP_BGT;
+		opCode = OP_BLE;
 		break;
 	default: // trash
 		opCode = OP_BEQZ;

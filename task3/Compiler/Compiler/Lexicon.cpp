@@ -131,6 +131,7 @@ Token Lexicon::nextToken() {
 		nextChar();
 		if (isDefineChar(currentChar)) {
 			currentString = currentString + currentChar;
+			numberTemp = currentChar;
 			nextChar();
 			if (currentChar == '\'') {
 				nextChar();

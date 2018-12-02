@@ -94,6 +94,9 @@ Quantity *CodeParser::parseFactor() {
 			vector<Quantity *> parameters;
 			do {
 				token = lexicon.nextToken();
+				if (token == RPARENTHESE) {
+					break;
+				}
 				Quantity *parameter = parseExpression();
 				if (parameter == nullptr) {
 					return nullptr;
@@ -138,7 +141,7 @@ Quantity *CodeParser::parseFactor() {
 			}
 			else {
 				string varName = identifier;
-				quantity = new Variable(dataType, varName); // TODO creat var;
+				quantity = new Variable(tableElement->dataType, tableElement->name); // TODO creat var;
 				return quantity;
 			}
 		}
@@ -364,7 +367,6 @@ void CodeParser::parseFunction() {
 		else {
 			token = lexicon.nextToken();
 		}
-
 	}
 	else { // only main mustn't have arguements
 		while (1) {
@@ -429,8 +431,13 @@ Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 	if (quantity1 == nullptr) {
 		return VOIDSYM;
 	}
-	if (compareSet.find(token) == compareSet.end()) {
-		return NULLSYM;
+	if (compareSet.find(token) == compareSet.end() ) {
+		if (token == RPARENTHESE) {
+			return NULLSYM;
+		}
+		else {
+			return BECOME;
+		}
 	}
 	compareToken = token;
 	token = lexicon.nextToken();
@@ -486,7 +493,7 @@ void CodeParser::parseConstDeclare() {
 					}
 					else {
 						if (token == ALPHA) {
-							valueTemp = lexicon.getStringWord()[0]; // get the char as int
+							valueTemp = lexicon.getNumberTemp(); // get the char as int
 							if (!elementCreater.createConst(dataType, identifier, valueTemp)) { // creat const
 								token = reportAndJumpOver(IDENTIFIER_ALREADY_DEFINED, SEMICOLON);
 								return;
@@ -758,10 +765,6 @@ void CodeParser::parseFor() {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 	}
 	token = lexicon.nextToken();
-	if (token != SEMICOLON) {
-		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
-	}
-	token = lexicon.nextToken();
 
 	elementCreater.setQuadTable(loopTable); // set label loop
 
@@ -769,6 +772,7 @@ void CodeParser::parseFor() {
 	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, nextTable);
 	// TODO set jump then next
 
+	token = lexicon.nextToken();
 	if (token != IDENT) {
 		reportAndJumpOver(BECOME_EXPECTED, RBRACE);
 		return;
