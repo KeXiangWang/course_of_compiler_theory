@@ -107,6 +107,9 @@ Quantity *CodeParser::parseFactor() {
 			if (token != RPARENTHESE) {
 				return nullptr;
 			}
+			if (function->parameters.size() != parameters.size()) {
+				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST);
+			}
 			quantity = new FunctionCall(function->functionType, functionName, parameters);
 			token = lexicon.nextToken();
 			cout << "call a function " << functionName << endl;
@@ -345,10 +348,6 @@ void CodeParser::parseCompoundStatement() // ·ûºÏÓï¾ä // tested
 			token = reportAndJumpOver(IDENTIFIER_EXPECTED, SEMICOLON);
 		}
 	}
-	//if (statementHeadSet.find(token) == statementHeadSet.end()) {
-	//	errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
-	//	jumpToSet(statementHeadSet);
-	//}
 	parseStatementSequence();
 }
 
@@ -407,6 +406,7 @@ void CodeParser::parseFunction() {
 				jumpToToken(RPARENTHESE);
 				break;
 			}
+
 		}
 	}
 	if (token == LBRACE) {

@@ -61,7 +61,7 @@ void MipsGenerator::generateFunction(Function * function) {
 	initCode.push_back("\nf_" + function->name + ":");
 	vector<TableElement *> &elementVector = function->elementTable.elementVector;
 
-	initCode.push_back("subiu $sp $sp " + to_string(offset));
+	initCode.push_back("addiu $sp $sp -" + to_string(offset));
 	initCode.push_back("sw $ra " + to_string(-4 + offset) + "($sp)");
 	initCode.push_back("sw $fp " + to_string(-8 + offset) + "($sp)");
 	for (int i = 0; i < 8; i++) {
@@ -80,6 +80,8 @@ void MipsGenerator::generateFunction(Function * function) {
 		if ((*i)->kind == KINDCONST) {
 			if (storeRegs.find((*i)->name) != storeRegs.end()) {
 				loadedToStore.insert((*i)->name);
+				std::cout << "unreachable" << std::endl;
+				assert(5 == 0);
 				initCode.push_back("li " + storeRegs[(*i)->name]->name + " " + to_string((long long)((*i)->value)));
 			}
 			else {
@@ -182,23 +184,32 @@ void MipsGenerator::generateAddSub(Function *function, Quad *quad, OPCode opCode
 	Caculator *caculator = static_cast<Caculator *>(quad);
 	if (caculator->quantity1->opCode == OP_CONST) {
 		Constant *quantity1 = static_cast<Constant*>(caculator->quantity1);
-		if (caculator->quantity2->opCode == OP_CONST) { // constant optimize
+		if (caculator->quantity2->opCode == OP_CONST) { // constant optimize : n = 3 + 2
 			Constant *quantity2 = static_cast<Constant*>(caculator->quantity2);
 			string reg0 = getReg(function, caculator, true) + " ";
 			if (opCode == OP_PLUS)
-				exertCode.push_back("li " + reg0 + to_string(quantity1->value + quantity2->value) + "\t#" + caculator->id);
+				exertCode.push_back("li " + reg0 + to_string(quantity1->value + quantity2->value) + " " + "\t#" + caculator->id);
 			else
-				exertCode.push_back("li " + reg0 + to_string(quantity1->value - quantity2->value) + "\t#" + caculator->id);
+				exertCode.push_back("li " + reg0 + to_string(quantity1->value - quantity2->value) + " " + "\t#" + caculator->id);
 			return;
 		}
-		string reg1 = getReg(function, caculator->quantity1) + " ";
+		string reg2 = getReg(function, caculator->quantity2) + " "; // constant optimize : n = 2 + n
 		string reg0 = getReg(function, caculator, true) + " ";
 		if (opCode == OP_PLUS)
-			exertCode.push_back("addiu " + reg0 + reg1 + " " + to_string(quantity1->value) + "\t#" + caculator->id);
+			exertCode.push_back("addiu " + reg0 + to_string(quantity1->value) + " " + reg2 + "\t#" + caculator->id);
 		else
-			exertCode.push_back("subiu " + reg0 + reg1 + " " + to_string(quantity1->value) + "\t#" + caculator->id);
+			exertCode.push_back("subiu " + reg0 + to_string(quantity1->value) + " " + reg2 + "\t#" + caculator->id);
 	}
 	else {
+		if (caculator->quantity2->opCode == OP_CONST) { // constant optimize: n = n + 2
+			Constant *quantity2 = static_cast<Constant*>(caculator->quantity2);
+			string reg1 = getReg(function, caculator->quantity1) + " ";
+			string reg0 = getReg(function, caculator, true) + " ";
+			if (opCode == OP_PLUS)
+				exertCode.push_back("addiu " + reg0 + reg1 + to_string(quantity2->value) + " " + "\t#" + caculator->id);
+			else
+				exertCode.push_back("subiu " + reg0 + reg1 + to_string(quantity2->value) + " " + "\t#" + caculator->id);
+		}
 		string reg1 = getReg(function, caculator->quantity1) + " ";
 		usedTempRegs[reg1[2] - '0'].fixed = true;
 		string reg2 = getReg(function, caculator->quantity2) + " ";
@@ -324,7 +335,7 @@ void MipsGenerator::generateFunc(Function *function, Quad *quad, int offset) {
 	FunctionCall *func = static_cast<FunctionCall *>(quad);
 	int temp = (func->parameters.size() << 2);
 	exertCode.push_back("# call func: " + func->name);
-	exertCode.push_back("subiu $sp $sp " + to_string(temp));
+	exertCode.push_back("addiu $sp $sp -" + to_string(temp));
 	int i;
 	for (i = 0; i < 4 && i < (int)(func->parameters.size()); i++) {
 		moveToReg(function, func->parameters[i], "$a" + to_string(i), temp);
@@ -752,7 +763,7 @@ void MipsGenerator::moveToReg(Function *function, Quantity *quantity, string reg
 	if (storeRegs.find(id) != storeRegs.end()) {
 		//string greg = " " + storeRegs[id]->name;
 		string greg = storeRegs[id]->name;
-		if (loadedToStore.find(id) == loadedToStore.end()) {
+		if (loadedToStore.find(id) == loadedToStore.end()) { // more than $8
 			loadedToStore.insert(id);
 			loadValueGlobal(function, quantity, greg, temp);
 		}
