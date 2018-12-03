@@ -59,12 +59,12 @@ private:
 	vector<Reg> tempRegs;
 
 	unordered_map<QuadTable *, int> bb2label;
-	unordered_map<string, int> GlobalReg; // $s: used (var)
-	unordered_map<string, Reg*> TempReg; // $t: temporaray
+	unordered_map<string, int> GlobalReg;
+	unordered_map<string, Reg*> TempReg;
 	unordered_set<string> loadedToGloabal;
 
-	unordered_map<string, int> refCount;  // used (var mid-var direct-const)
-	unordered_map<string, int> stackOffset; // all (para declared-const var)
+	unordered_map<string, int> refCount;
+	unordered_map<string, int> stackOffset;
 	int labelCount;
 };
 

@@ -345,10 +345,10 @@ void CodeParser::parseCompoundStatement() // ·ûºÏÓï¾ä // tested
 			token = reportAndJumpOver(IDENTIFIER_EXPECTED, SEMICOLON);
 		}
 	}
-	//if (statementHeadSet.find(token) == statementHeadSet.end()) {
-	//	errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
-	//	jumpToSet(statementHeadSet);
-	//}
+	if (statementHeadSet.find(token) == statementHeadSet.end()) {
+		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
+		jumpToSet(statementHeadSet);
+	}
 	parseStatementSequence();
 }
 

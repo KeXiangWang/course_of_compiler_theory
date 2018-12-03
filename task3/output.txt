@@ -3,171 +3,98 @@ global_length: .word 10
 global_width: .word 8
 global_firstLowerCase: .word 97
 global_firstUpperCase: .word 65
-global_lastLowerCase: .word 122
-global_lastUpperCase: .word 90
 global_globalInt: .word 0
 global_globalIntArray: .space 176
-global_globalInt2: .word 0
-global_globalIntArray2: .space 264
-global_globalInt3: .word 0
 global_globalChar: .word 0
 global_globalCharArray: .space 176
-global_globalChar2: .word 0
-global_globalCharArray2: .space 264
-global_globalChar3: .word 0
-string_0: .asciiz  "original: "
-string_1: .asciiz  "   changed: "
-string_2: .asciiz  "start  "
-string_3: .asciiz  " "
-string_4: .asciiz  "nothing"
-string_5: .asciiz  "            "
 .text
 j f_main
 nop
 
-f_fib:
-subiu $sp $sp 72
-sw $ra 68($sp)
-sw $fp 64($sp)
-sw $s0 60($sp)
-sw $s1 56($sp)
-sw $s2 52($sp)
-sw $s3 48($sp)
-sw $s4 44($sp)
-sw $s5 40($sp)
-sw $s6 36($sp)
-sw $s7 32($sp)
-sw $a0 104($sp)
-sw $a1 108($sp)
+f_none:
+subiu $sp $sp 148
+sw $ra 144($sp)
+sw $fp 140($sp)
+sw $s0 136($sp)
+sw $s1 132($sp)
+sw $s2 128($sp)
+sw $s3 124($sp)
+sw $s4 120($sp)
+sw $s5 116($sp)
+sw $s6 112($sp)
+sw $s7 108($sp)
+sw $a0 180($sp)
+sw $a1 184($sp)
+sw $a2 188($sp)
+li $t0 5
+sw $t0 92($sp)
+li $t0 5
+sw $t0 88($sp)
+li $t0 5
+sw $t0 84($sp)
+li $t0 5
+sw $t0 80($sp)
+li $t0 5
+sw $t0 76($sp)
+li $t0 5
+sw $t0 72($sp)
+li $t0 5
+sw $t0 68($sp)
+li $t0 5
+sw $t0 64($sp)
+li $t0 5
+sw $t0 60($sp)
+li $t0 100
+sw $t0 56($sp)
 label_0:
-lw $t0 104($sp)	#n
-lw $t1 108($sp)	#k
-sw $t0 104($sp)	#n
-sw $t1 108($sp)	#k
-bgt $t0 $t1 label_1
-label_2:
-li $v0 1	#const_int_5
-j f_fib_return
+li $s1 0	# d
+li $s2 1	# e
+li $s3 2	# f
+li $s4 3	# g
+li $s5 4	# h
+li $s0 5	# k
+lw $t0 180($sp)	#a
+lw $t1 184($sp)	#b
+addu $t2 $t0 $t1 #	add_0
+lw $t3 188($sp)	#c
+addu $t4 $t2 $t3 #	add_1
+addu $t5 $t4 $s1 #	add_2
+addu $t6 $t5 $s2 #	add_3
+addu $t7 $t6 $s3 #	add_4
+sw $t0 180($sp)	#a
+addu $t0 $t7 $s4 #	add_5
+sw $t1 184($sp)	#b
+addu $t1 $t0 $s5 #	add_6
+sw $t3 188($sp)	#c
+addu $t3 $t1 $s0 #	add_7
+move $s0 $t3	# k
+move $v0 $s0
+j f_none_return
 nop
-label_1:
-li $s1 0	# res
-lw $t0 104($sp)	#n
-lw $t1 108($sp)	#k
-subu $t2 $t0 $t1 #	sub_0
-move $s0 $t2	# i
-sw $t0 104($sp)	#n
-sw $t1 108($sp)	#k
-sw $t2 12($sp)	#sub_0
-label_3:
-lw $t0 104($sp)	#n
-sw $t0 104($sp)	#n
-bge $s0 $t0 label_4
-# call func: fib
-subiu $sp $sp 8
-move $a0 $s0
-lw $a1 116($sp)	#k
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_fib
-nop
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 8
-lw $a0 104($sp)
-lw $a1 108($sp)
-move $t0 $v0
-# back from func: fib
-addu $t1 $s1 $t0 #	add_1
-move $s1 $t1	# res
-li $t2 1	#const_int_25
-addu $t3 $s0 $t2 #	add_2
-move $s0 $t3	# i
-sw $t0 8($sp)	#fcall_22
-sw $t1 4($sp)	#add_1
-sw $t3 0($sp)	#add_2
-j label_3
-label_4:
-move $v0 $s1
-j f_fib_return
-nop
-label_5:
-f_fib_return:
-lw $s0 60($sp)
-lw $s1 56($sp)
-lw $s2 52($sp)
-lw $s3 48($sp)
-lw $s4 44($sp)
-lw $s5 40($sp)
-lw $s6 36($sp)
-lw $s7 32($sp)
-lw $ra 68($sp)
-lw $fp 64($sp)
-addiu $sp $sp 72
+sw $t0 8($sp)	#add_5
+sw $t1 4($sp)	#add_6
+sw $t2 28($sp)	#add_0
+sw $t3 0($sp)	#add_7
+sw $t4 24($sp)	#add_1
+sw $t5 20($sp)	#add_2
+sw $t6 16($sp)	#add_3
+sw $t7 12($sp)	#add_4
+f_none_return:
+lw $s0 136($sp)
+lw $s1 132($sp)
+lw $s2 128($sp)
+lw $s3 124($sp)
+lw $s4 120($sp)
+lw $s5 116($sp)
+lw $s6 112($sp)
+lw $s7 108($sp)
+lw $ra 144($sp)
+lw $fp 140($sp)
+addiu $sp $sp 148
 jr $ra
 nop
 
-f_print:
-subiu $sp $sp 48
-sw $ra 44($sp)
-sw $fp 40($sp)
-sw $s0 36($sp)
-sw $s1 32($sp)
-sw $s2 28($sp)
-sw $s3 24($sp)
-sw $s4 20($sp)
-sw $s5 16($sp)
-sw $s6 12($sp)
-sw $s7 8($sp)
-label_6:
-li $s0 32	# i
-label_7:
-li $t0 34	#const_int_36
-beq $s0 $t0 label_8
-label_9:
-li $v0 11
-move $a0 $s0
-syscall
-j label_10
-label_8:
-label_10:
-li $t0 1	#const_int_44
-addu $t1 $s0 $t0 #	add_3
-move $s0 $t1	# i
-li $t2 127	#const_int_48
-sw $t1 0($sp)	#add_3
-bge $s0 $t2 label_11
-j label_7
-label_11:
-f_print_return:
-lw $s0 36($sp)
-lw $s1 32($sp)
-lw $s2 28($sp)
-lw $s3 24($sp)
-lw $s4 20($sp)
-lw $s5 16($sp)
-lw $s6 12($sp)
-lw $s7 8($sp)
-lw $ra 44($sp)
-lw $fp 40($sp)
-addiu $sp $sp 48
-jr $ra
-nop
-
-f_toUpperCase:
+f_main:
 subiu $sp $sp 56
 sw $ra 52($sp)
 sw $fp 48($sp)
@@ -179,46 +106,46 @@ sw $s4 28($sp)
 sw $s5 24($sp)
 sw $s6 20($sp)
 sw $s7 16($sp)
-sw $a0 88($sp)
-label_12:
-lb $t0 88($sp)	#x
-lb $t1 global_firstLowerCase	#firstLowerCase
-sb $t0 88($sp)	#x
-sb $t1  global_firstLowerCase	#firstLowerCase
-blt $t0 $t1 label_13
-label_14:
-lb $t0 88($sp)	#x
-lb $t1 global_lastLowerCase	#lastLowerCase
-sb $t0 88($sp)	#x
-sb $t1  global_lastLowerCase	#lastLowerCase
-bgt $t0 $t1 label_15
-label_16:
-lb $t0 88($sp)	#x
-lb $t1 global_firstLowerCase	#firstLowerCase
-subu $t2 $t0 $t1 #	sub_4
-lb $t3 global_firstUpperCase	#firstUpperCase
-addu $t4 $t2 $t3 #	add_5
-move $s0 $t4	# c
-move $v0 $s0
-j f_toUpperCase_return
+label_1:
+li $s0 5	# n
+li $s1 6	# k
+mul $t0 $s0 $s1 #	mult_8
+move $s1 $t0	# k
+# call func: none
+subiu $sp $sp 0
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_none
 nop
-sb $t0 88($sp)	#x
-sb $t1  global_firstLowerCase	#firstLowerCase
-sw $t2 4($sp)	#sub_4
-sb $t3  global_firstUpperCase	#firstUpperCase
-sw $t4 0($sp)	#add_5
-label_15:
-lb $v0 88($sp)	#x
-j f_toUpperCase_return
-nop
-label_17:
-j label_18
-label_13:
-lb $v0 88($sp)	#x
-j f_toUpperCase_return
-nop
-label_18:
-f_toUpperCase_return:
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 0
+move $t1 $v0
+# back from func: none
+move $s0 $t1	# n
+li $v0 1
+move $a0 $s1
+syscall
+li $v0 1
+move $a0 $s0
+syscall
+sw $t0 4($sp)	#mult_8
+sw $t1 0($sp)	#fcall_41
+f_main_return:
 lw $s0 44($sp)
 lw $s1 40($sp)
 lw $s2 36($sp)
@@ -230,277 +157,3 @@ lw $s7 16($sp)
 lw $ra 52($sp)
 lw $fp 48($sp)
 addiu $sp $sp 56
-jr $ra
-nop
-
-f_changeGlobal:
-subiu $sp $sp 40
-sw $ra 36($sp)
-sw $fp 32($sp)
-sw $s0 28($sp)
-sw $s1 24($sp)
-sw $s2 20($sp)
-sw $s3 16($sp)
-sw $s4 12($sp)
-sw $s5 8($sp)
-sw $s6 4($sp)
-sw $s7 0($sp)
-label_19:
-li $v0 4
-la $a0 string_0
-syscall
-li $v0 1
-lw $a0 global_globalInt	#globalInt
-syscall
-li $t0 16	#const_int_80
-	# globalInt
-sw $t0  global_globalInt	#globalInt
-li $v0 4
-la $a0 string_1
-syscall
-li $v0 1
-lw $a0 global_globalInt	#globalInt
-syscall
-f_changeGlobal_return:
-lw $s0 28($sp)
-lw $s1 24($sp)
-lw $s2 20($sp)
-lw $s3 16($sp)
-lw $s4 12($sp)
-lw $s5 8($sp)
-lw $s6 4($sp)
-lw $s7 0($sp)
-lw $ra 36($sp)
-lw $fp 32($sp)
-addiu $sp $sp 40
-jr $ra
-nop
-
-f_dealRequest:
-subiu $sp $sp 68
-sw $ra 64($sp)
-sw $fp 60($sp)
-sw $s0 56($sp)
-sw $s1 52($sp)
-sw $s2 48($sp)
-sw $s3 44($sp)
-sw $s4 40($sp)
-sw $s5 36($sp)
-sw $s6 32($sp)
-sw $s7 28($sp)
-sw $a0 100($sp)
-li $t0 120
-sw $t0 20($sp)
-label_20:
-li $v0 4
-la $a0 string_2
-syscall
-li $s1 121	# y
-lw $t0 100($sp)	#operation
-li $t1 0	#const_int_89
-sw $t0 100($sp)	#operation
-bne $t0 $t1 label_21
-label_22:
-li $s0 1	# i
-label_23:
-lw $t0 global_length	#length
-sw $t0  global_length	#length
-bgt $s0 $t0 label_24
-li $t0 2	#sub_6
-# call func: fib
-subiu $sp $sp 8
-move $a0 $s0
-move $a1 $t0
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_fib
-nop
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 8
-lw $a0 100($sp)
-move $t1 $v0
-# back from func: fib
-li $v0 4
-la $a0 string_3
-syscall
-li $v0 1
-move $a0 $t1
-syscall
-li $t2 1	#const_int_104
-addu $t3 $s0 $t2 #	add_7
-move $s0 $t3	# i
-sw $t0 8($sp)	#sub_6
-sw $t1 4($sp)	#fcall_102
-sw $t3 0($sp)	#add_7
-j label_23
-label_24:
-j label_25
-label_21:
-lw $t0 100($sp)	#operation
-li $t1 1	#const_int_113
-sw $t0 100($sp)	#operation
-bne $t0 $t1 label_26
-label_27:
-# call voidfunc: print
-addiu $sp $sp -0
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_print
-nop
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 0
-lw $a0 100($sp)
-# back from voidfunc: print
-j label_28
-label_26:
-lw $t0 100($sp)	#operation
-li $t1 2	#const_int_120
-sw $t0 100($sp)	#operation
-bne $t0 $t1 label_29
-label_30:
-# call voidfunc: changeGlobal
-addiu $sp $sp -0
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_changeGlobal
-nop
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 0
-lw $a0 100($sp)
-# back from voidfunc: changeGlobal
-j label_31
-label_29:
-li $v0 4
-la $a0 string_4
-syscall
-label_31:
-label_28:
-label_25:
-f_dealRequest_return:
-lw $s0 56($sp)
-lw $s1 52($sp)
-lw $s2 48($sp)
-lw $s3 44($sp)
-lw $s4 40($sp)
-lw $s5 36($sp)
-lw $s6 32($sp)
-lw $s7 28($sp)
-lw $ra 64($sp)
-lw $fp 60($sp)
-addiu $sp $sp 68
-jr $ra
-nop
-
-f_main:
-subiu $sp $sp 52
-sw $ra 48($sp)
-sw $fp 44($sp)
-sw $s0 40($sp)
-sw $s1 36($sp)
-sw $s2 32($sp)
-sw $s3 28($sp)
-sw $s4 24($sp)
-sw $s5 20($sp)
-sw $s6 16($sp)
-sw $s7 12($sp)
-label_32:
-li $t0 0	#const_int_127
-	# globalInt
-sw $t0  global_globalInt	#globalInt
-li $v0 5
-syscall
-move $s1 $v0
-li $s0 0	# i
-label_33:
-bge $s0 $s1 label_34
-# call voidfunc: dealRequest
-addiu $sp $sp -4
-move $a0 $s0
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_dealRequest
-nop
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 4
-# back from voidfunc: dealRequest
-li $v0 4
-la $a0 string_5
-syscall
-li $t0 1	#const_int_140
-addu $t1 $s0 $t0 #	add_8
-move $s0 $t1	# i
-sw $t1 0($sp)	#add_8
-j label_33
-label_34:
-f_main_return:
-lw $s0 40($sp)
-lw $s1 36($sp)
-lw $s2 32($sp)
-lw $s3 28($sp)
-lw $s4 24($sp)
-lw $s5 20($sp)
-lw $s6 16($sp)
-lw $s7 12($sp)
-lw $ra 48($sp)
-lw $fp 44($sp)
-addiu $sp $sp 52

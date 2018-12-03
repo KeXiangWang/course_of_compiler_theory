@@ -54,24 +54,23 @@ void MipsGenerator::initRegs() {
 }
 
 void MipsGenerator::generateFunction(Function * function) {
-	GlobalReg.clear();
-	TempReg.clear();
 	int offset = getVarNumber(function);
 	allocateGloabal(function);
+	TempReg.clear();
 	initCode.push_back("\nf_" + function->name + ":");
 	vector<TableElement *> &elementVector = function->elementTable.elementVector;
 
-	initCode.push_back("subiu $sp $sp " + to_string(offset));
-	initCode.push_back("sw $ra " + to_string(-4 + offset) + "($sp)");
-	initCode.push_back("sw $fp " + to_string(-8 + offset) + "($sp)");
+	initCode.push_back("subiu $sp $sp " + to_string((long long)offset));
+	initCode.push_back("sw $ra " + to_string((long long)(-4 + offset)) + "($sp)");
+	initCode.push_back("sw $fp " + to_string((long long)(-8 + offset)) + "($sp)");
 	for (int i = 0; i < 8; i++) {
-		initCode.push_back("sw $s" + to_string(i) + " " + to_string(-12 - (i << 2) + offset) + "($sp)");
+		initCode.push_back("sw $s" + to_string((long long)i) + " " + to_string((long long)(-12 - (i << 2) + offset)) + "($sp)");
 	}
 	// store $a0~a3
 	for (int i = 0; i < (int)(function->parameters.size()); i++) {
 		int tmp = (i << 2) + offset + (8 << 2);
 		if (i < 4) {
-			initCode.push_back("sw $a" + to_string(i) + " " + to_string(tmp) + "($sp)");
+			initCode.push_back("sw $a" + to_string((long long)i) + " " + to_string((long long)tmp) + "($sp)");
 		}
 		stackOffset[function->parameters[i]->name] = tmp;
 	}
@@ -80,11 +79,11 @@ void MipsGenerator::generateFunction(Function * function) {
 		if ((*i)->kind == KINDCONST) {
 			if (GlobalReg.find((*i)->name) != GlobalReg.end()) {
 				loadedToGloabal.insert((*i)->name);
-				initCode.push_back("li $s" + to_string(GlobalReg[(*i)->name]) + " " + to_string((long long)((*i)->value)));
+				initCode.push_back("li $s" + to_string((long long)GlobalReg[(*i)->name]) + " " + to_string((long long)(*i)->value));
 			}
 			else {
-				initCode.push_back("li $t0 " + to_string((*i)->value));
-				initCode.push_back("sw $t0 " + to_string(stackOffset[(*i)->name]) + "($sp)");
+				initCode.push_back("li $t0 " + to_string((long long)(*i)->value));
+				initCode.push_back("sw $t0 " + to_string((long long)stackOffset[(*i)->name]) + "($sp)");
 			}
 		}
 	}
@@ -93,7 +92,7 @@ void MipsGenerator::generateFunction(Function * function) {
 		if (bb2label.find(quadTable) == bb2label.end()) {
 			bb2label[quadTable] = labelCount++;
 		}
-		exertCode.push_back("label_" + to_string(bb2label[quadTable]) + ":"); // each quadTable set a label
+		exertCode.push_back("label_" + to_string((long long)bb2label[quadTable]) + ":"); // each quadTable set a label
 		vector<Quad *> *quads = &quadTable->quads; // 
 		for (auto quad = quads->begin(); quad != quads->end(); quad++) {
 			switch ((*quad)->opCode)
@@ -159,17 +158,16 @@ void MipsGenerator::generateFunction(Function * function) {
 			}
 		}
 		writeBack(function);
-		std::cout << "# end a basicBlock " << std::endl;
 	}
 	exertCode.push_back("f_" + function->name + "_return:");
 	// load $s0~$s7
 	for (int i = 0; i < 8; i++) {
-		exertCode.push_back("lw $s" + to_string(i) + " " + to_string(-12 - (i << 2) + offset) + "($sp)");
+		exertCode.push_back("lw $s" + to_string((long long)i) + " " + to_string((long long)(-12 - (i << 2)) + offset) + "($sp)");
 	}
 	// load $sp %fp
-	exertCode.push_back("lw $ra " + to_string(-4 + offset) + "($sp)");
-	exertCode.push_back("lw $fp " + to_string(-8 + offset) + "($sp)");
-	exertCode.push_back("addiu $sp $sp " + to_string(offset));
+	exertCode.push_back("lw $ra " + to_string((long long)(-4 + offset)) + "($sp)");
+	exertCode.push_back("lw $fp " + to_string((long long)(-8 + offset)) + "($sp)");
+	exertCode.push_back("addiu $sp $sp " + to_string((long long)(offset)));
 
 	// return
 	if (function->name != "main") {
@@ -447,7 +445,7 @@ void MipsGenerator::decreaseRef(Quantity *value) {
 string MipsGenerator::getReg(Function *function, Quantity *quantity, bool write, int temp) {
 	string id = quantity->id;
 	if (GlobalReg.find(id) != GlobalReg.end()) { // from global
-		string reg = "$s" + to_string(GlobalReg[id]);
+		string reg = "$s" + to_string((long long)GlobalReg[id]);
 		if (loadedToGloabal.find(id) == loadedToGloabal.end()) {
 			loadedToGloabal.insert(id);
 			TableElement *e = function->elementTable.find(id);
@@ -507,7 +505,7 @@ void MipsGenerator::allocateGloabal(Function * function) {
 	for (auto var = refCount.begin(); var != refCount.end(); var++)
 		v.emplace_back(std::make_pair(var->first, var->second));
 	std::sort(v.begin(), v.end(), cmp);
-	
+	GlobalReg.clear();
 	for (int i = 0, regNum = 0; regNum < 8 && i < (int)(v.size()); i++) {
 		TableElement *element = function->elementTable.find(v[i].first);
 		if (element == nullptr)
@@ -676,15 +674,15 @@ void MipsGenerator::loadValueGlobal(Function *function, Quad *quad, string reg, 
 		initCode.push_back("li " + reg + to_string((long long)static_cast<Constant *>(quad)->value) + "\t#" + quad->id);
 	}
 	else if (quad->opCode == OP_VAR) {
-		string name = static_cast<Variable *>(quad)->name;
+		auto name = static_cast<Variable *>(quad)->name;
 		if (function->elementTable.find(name) != nullptr) // local var
 			initCode.push_back(instr + reg + to_string((long long)stackOffset[name] + temp) + "($sp)" + "\t#" + name);
 		else //global var
 			initCode.push_back(instr + reg + "global_" + name + "\t#" + name);
 	}
 	else if (quad->opCode == OP_ARRAY) {
-		string name = static_cast<Array *>(quad)->name;
-		Quantity *offset = static_cast<Array *>(quad)->index;
+		auto name = static_cast<Array *>(quad)->name;
+		auto offset = static_cast<Array *>(quad)->index;
 		if (offset->opCode != OP_ARRAY) {
 			auto offReg = getReg(function, offset, false, temp);
 			decreaseRef(offset);
