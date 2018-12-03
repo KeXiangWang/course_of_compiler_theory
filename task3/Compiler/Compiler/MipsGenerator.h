@@ -56,12 +56,12 @@ private:
 	vector<string> finalCode;
 	vector<string> initCode;
 	vector<string> exertCode;
-	vector<Reg> tempRegs;
+	vector<Reg> usedTempRegs;
 
 	unordered_map<QuadTable *, int> bb2label;
-	unordered_map<string, int> GlobalReg; // $s: used (var)
-	unordered_map<string, Reg*> TempReg; // $t: temporaray
-	unordered_set<string> loadedToGloabal;
+	unordered_map<string, int> storeRegs; // $s: used (var)
+	unordered_map<string, Reg*> tempRegs; // $t: temporaray
+	unordered_set<string> loadedToStore;
 
 	unordered_map<string, int> refCount;  // used (var mid-var direct-const)
 	unordered_map<string, int> stackOffset; // all (para declared-const var)

@@ -49,13 +49,13 @@ void MipsGenerator::initData() {
 
 void MipsGenerator::initRegs() {
 	for (int i = 0; i < 8; i++) {
-		tempRegs.push_back(Reg("$t" + to_string(i)));
+		usedTempRegs.push_back(Reg("$t" + to_string(i)));
 	}
 }
 
 void MipsGenerator::generateFunction(Function * function) {
-	GlobalReg.clear();
-	TempReg.clear();
+	storeRegs.clear();
+	tempRegs.clear();
 	int offset = getVarNumber(function);
 	allocateGloabal(function);
 	initCode.push_back("\nf_" + function->name + ":");
@@ -78,9 +78,9 @@ void MipsGenerator::generateFunction(Function * function) {
 	// init const
 	for (auto i = elementVector.begin(); i != elementVector.end(); i++) {
 		if ((*i)->kind == KINDCONST) {
-			if (GlobalReg.find((*i)->name) != GlobalReg.end()) {
-				loadedToGloabal.insert((*i)->name);
-				initCode.push_back("li $s" + to_string(GlobalReg[(*i)->name]) + " " + to_string((long long)((*i)->value)));
+			if (storeRegs.find((*i)->name) != storeRegs.end()) {
+				loadedToStore.insert((*i)->name);
+				initCode.push_back("li $s" + to_string(storeRegs[(*i)->name]) + " " + to_string((long long)((*i)->value)));
 			}
 			else {
 				initCode.push_back("li $t0 " + to_string((*i)->value));
@@ -200,9 +200,9 @@ void MipsGenerator::generateAddSub(Function *function, Quad *quad, OPCode opCode
 	}
 	else {
 		string reg1 = getReg(function, caculator->quantity1) + " ";
-		tempRegs[reg1[2] - '0'].fixed = true;
+		usedTempRegs[reg1[2] - '0'].fixed = true;
 		string reg2 = getReg(function, caculator->quantity2) + " ";
-		tempRegs[reg1[2] - '0'].fixed = false;
+		usedTempRegs[reg1[2] - '0'].fixed = false;
 		decreaseRef(caculator->quantity1);
 		decreaseRef(caculator->quantity2);
 		string reg0 = getReg(function, caculator, true) + " ";
@@ -216,9 +216,9 @@ void MipsGenerator::generateAddSub(Function *function, Quad *quad, OPCode opCode
 void MipsGenerator::generateMultDiv(Function *function, Quad *quad, OPCode opCode) {
 	Caculator *caculator = static_cast<Caculator *>(quad);
 	string reg1 = getReg(function, caculator->quantity1) + " ";
-	tempRegs[reg1[2] - '0'].fixed = true;
+	usedTempRegs[reg1[2] - '0'].fixed = true;
 	string reg2 = getReg(function, caculator->quantity2) + " ";
-	tempRegs[reg1[2] - '0'].fixed = false;
+	usedTempRegs[reg1[2] - '0'].fixed = false;
 	decreaseRef(caculator->quantity1);
 	decreaseRef(caculator->quantity2);
 	string reg0 = getReg(function, caculator, true) + " ";;
@@ -265,9 +265,9 @@ void MipsGenerator::generateArray(Function *function, Quad *quad) {
 void MipsGenerator::generateBranch(Function *function, Quad *quad, string branchName) {
 	Branch *branch = static_cast<Branch *>(quad);
 	string reg1 = getReg(function, branch->quantity1) + " ";
-	tempRegs[reg1[2] - '0'].fixed = true;
+	usedTempRegs[reg1[2] - '0'].fixed = true;
 	string reg2 = getReg(function, branch->quantity2) + " ";
-	tempRegs[reg1[2] - '0'].fixed = false;
+	usedTempRegs[reg1[2] - '0'].fixed = false;
 	decreaseRef(branch->quantity1);
 	decreaseRef(branch->quantity2);
 	writeBack(function);
@@ -446,10 +446,10 @@ void MipsGenerator::decreaseRef(Quantity *value) {
 
 string MipsGenerator::getReg(Function *function, Quantity *quantity, bool write, int temp) {
 	string id = quantity->id;
-	if (GlobalReg.find(id) != GlobalReg.end()) { // from global
-		string reg = "$s" + to_string(GlobalReg[id]);
-		if (loadedToGloabal.find(id) == loadedToGloabal.end()) {
-			loadedToGloabal.insert(id);
+	if (storeRegs.find(id) != storeRegs.end()) { // from global
+		string reg = "$s" + to_string(storeRegs[id]);
+		if (loadedToStore.find(id) == loadedToStore.end()) {
+			loadedToStore.insert(id);
 			TableElement *e = function->elementTable.find(id);
 			if (e != nullptr && e->kind == KINDPARA)
 				loadValueGlobal(function, quantity, reg, temp);
@@ -460,22 +460,25 @@ string MipsGenerator::getReg(Function *function, Quantity *quantity, bool write,
 		}
 		return reg;
 	}
-	else if (TempReg.find(id) != TempReg.end())  // from local
-		return TempReg[id]->name;
-	auto reg = overflow(function);
-	reg->quantity = quantity;
-	reg->free = false;
-	TempReg[id] = reg;
-	if (!write)
-		loadValue(function, quantity, reg->name, temp);
-	return reg->name;
+	else if (tempRegs.find(id) != tempRegs.end()) {	// from local
+		return tempRegs[id]->name;
+	}
+	else {
+		Reg *reg = overflow(function);
+		reg->quantity = quantity;
+		reg->free = false;
+		tempRegs[id] = reg;
+		if (!write)
+			loadValue(function, quantity, reg->name, temp);
+		return reg->name;
+	}
 }
 
 Reg * MipsGenerator::overflow(Function *function) {
 	int max = 0;
 	Quantity* maxValue = nullptr;
 	Reg *maxIter = nullptr;
-	for (auto reg = tempRegs.begin(); reg != tempRegs.end(); reg++) {
+	for (auto reg = usedTempRegs.begin(); reg != usedTempRegs.end(); reg++) {
 		if ((*reg).free) {
 			(*reg).free = false;
 			return &(*reg);
@@ -483,7 +486,7 @@ Reg * MipsGenerator::overflow(Function *function) {
 		auto pre_value = (*reg).quantity;
 		int ref = refCount[pre_value->id];
 		if (ref == 0) {
-			TempReg.erase(pre_value->id);
+			tempRegs.erase(pre_value->id);
 			(*reg).free = true;
 			return &(*reg);
 		}
@@ -494,7 +497,7 @@ Reg * MipsGenerator::overflow(Function *function) {
 		}
 	}
 	storeValue(function, maxValue, maxIter->name);
-	TempReg.erase(maxValue->id);
+	tempRegs.erase(maxValue->id);
 	return maxIter;
 }
 
@@ -514,7 +517,7 @@ void MipsGenerator::allocateGloabal(Function * function) {
 			continue;
 		if (element->kind == KINDPARA)
 			continue;
-		GlobalReg[v[i].first] = regNum;
+		storeRegs[v[i].first] = regNum;
 		regNum++;
 	}
 }
@@ -618,10 +621,10 @@ int MipsGenerator::getVarNumber(Function * function) {
 }
 
 void MipsGenerator::writeBack(Function * function) {
-	for (auto i = tempRegs.begin(); i != tempRegs.end(); i++) {
+	for (auto i = usedTempRegs.begin(); i != usedTempRegs.end(); i++) {
 		auto& reg = *i;
 		if (!reg.free&&refCount[reg.quantity->id] > 0) {
-			TempReg.erase(reg.quantity->id);
+			tempRegs.erase(reg.quantity->id);
 			storeValue(function, reg.quantity, reg.name);
 			reg.free = true;
 		}
@@ -713,7 +716,7 @@ void MipsGenerator::storeValue(Function *function, Quad *quad, string reg) {
 		reg += ' ';
 	string instr = (static_cast<Quantity *>(quad)->dataType == TYPEINT) ? "sw " : "sb ";
 	if (quad->opCode == OP_VAR) {
-		auto name = static_cast<Variable *>(quad)->name;
+		string name = static_cast<Variable *>(quad)->name;
 		if (function->elementTable.find(name) != nullptr) {
 			exertCode.push_back(instr + reg + to_string((long long)stackOffset[name]) + "($sp)" + "\t#" + name);
 		}
@@ -746,18 +749,20 @@ void MipsGenerator::storeValueArray(Function *function, Array *arr, string reg, 
 
 void MipsGenerator::moveToReg(Function *function, Quantity *quantity, string reg, int temp) {
 	string id = quantity->id;
-	if (GlobalReg.find(id) != GlobalReg.end()) {
-		string greg = " $s" + to_string((long long)GlobalReg[id]);
-		if (loadedToGloabal.find(id) == loadedToGloabal.end()) {
-			loadedToGloabal.insert(id);
+	if (storeRegs.find(id) != storeRegs.end()) {
+		string greg = " $s" + to_string((long long)storeRegs[id]);
+		if (loadedToStore.find(id) == loadedToStore.end()) {
+			loadedToStore.insert(id);
 			loadValueGlobal(function, quantity, greg, temp);
 		}
 		exertCode.push_back("move " + reg + greg);
 	}
-	else if (TempReg.find(id) != TempReg.end())
-		exertCode.push_back("move " + reg + " " + TempReg[id]->name);
-	else
+	else if (tempRegs.find(id) != tempRegs.end()) {
+		exertCode.push_back("move " + reg + " " + tempRegs[id]->name);
+	}
+	else {
 		loadValue(function, quantity, reg, temp);
+	}
 }
 
 void MipsGenerator::printCode(std::fstream &output) {
