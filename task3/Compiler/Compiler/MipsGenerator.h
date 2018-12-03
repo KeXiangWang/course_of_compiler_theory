@@ -59,7 +59,7 @@ private:
 	vector<Reg> usedTempRegs;
 
 	unordered_map<QuadTable *, int> bb2label;
-	unordered_map<string, int> storeRegs; // $s: used (var)
+	unordered_map<string, Reg*> storeRegs; // $s: used (var)
 	unordered_map<string, Reg*> tempRegs; // $t: temporaray
 	unordered_set<string> loadedToStore;
 

@@ -80,7 +80,7 @@ void MipsGenerator::generateFunction(Function * function) {
 		if ((*i)->kind == KINDCONST) {
 			if (storeRegs.find((*i)->name) != storeRegs.end()) {
 				loadedToStore.insert((*i)->name);
-				initCode.push_back("li $s" + to_string(storeRegs[(*i)->name]) + " " + to_string((long long)((*i)->value)));
+				initCode.push_back("li " + storeRegs[(*i)->name]->name + " " + to_string((long long)((*i)->value)));
 			}
 			else {
 				initCode.push_back("li $t0 " + to_string((*i)->value));
@@ -447,7 +447,7 @@ void MipsGenerator::decreaseRef(Quantity *value) {
 string MipsGenerator::getReg(Function *function, Quantity *quantity, bool write, int temp) {
 	string id = quantity->id;
 	if (storeRegs.find(id) != storeRegs.end()) { // from global
-		string reg = "$s" + to_string(storeRegs[id]);
+		string reg = storeRegs[id]->name;
 		if (loadedToStore.find(id) == loadedToStore.end()) {
 			loadedToStore.insert(id);
 			TableElement *e = function->elementTable.find(id);
@@ -517,7 +517,7 @@ void MipsGenerator::allocateGloabal(Function * function) {
 			continue;
 		if (element->kind == KINDPARA)
 			continue;
-		storeRegs[v[i].first] = regNum;
+		storeRegs[v[i].first] = new Reg("$s"+to_string(regNum));
 		regNum++;
 	}
 }
@@ -681,7 +681,7 @@ void MipsGenerator::loadValueGlobal(Function *function, Quad *quad, string reg, 
 	else if (quad->opCode == OP_VAR) {
 		string name = static_cast<Variable *>(quad)->name;
 		if (function->elementTable.find(name) != nullptr) // local var
-			initCode.push_back(instr + reg + to_string((long long)stackOffset[name] + temp) + "($sp)" + "\t#" + name);
+			initCode.push_back(instr + reg + to_string(stackOffset[name] + temp) + "($sp)" + "\t#" + name);
 		else //global var
 			initCode.push_back(instr + reg + "global_" + name + "\t#" + name);
 	}
@@ -699,7 +699,7 @@ void MipsGenerator::loadValueGlobal(Function *function, Quad *quad, string reg, 
 		if (function->elementTable.find(name) != nullptr) {
 			initCode.push_back("sll " + reg + reg + to_string(2ll));											// reg is address offset
 			initCode.push_back("addu " + reg + reg + "$sp");													// reg = $fp + address offset
-			initCode.push_back(instr + reg + to_string((long long)stackOffset[name] + temp) + "(" + reg + ")"); // reg += base address
+			initCode.push_back(instr + reg + to_string(stackOffset[name] + temp) + "(" + reg + ")"); // reg += base address
 		}
 		else {
 			initCode.push_back("sll " + reg + reg + to_string(2ll));
@@ -750,12 +750,13 @@ void MipsGenerator::storeValueArray(Function *function, Array *arr, string reg, 
 void MipsGenerator::moveToReg(Function *function, Quantity *quantity, string reg, int temp) {
 	string id = quantity->id;
 	if (storeRegs.find(id) != storeRegs.end()) {
-		string greg = " $s" + to_string((long long)storeRegs[id]);
+		//string greg = " " + storeRegs[id]->name;
+		string greg = storeRegs[id]->name;
 		if (loadedToStore.find(id) == loadedToStore.end()) {
 			loadedToStore.insert(id);
 			loadValueGlobal(function, quantity, greg, temp);
 		}
-		exertCode.push_back("move " + reg + greg);
+		exertCode.push_back("move " + reg + " " + greg);
 	}
 	else if (tempRegs.find(id) != tempRegs.end()) {
 		exertCode.push_back("move " + reg + " " + tempRegs[id]->name);

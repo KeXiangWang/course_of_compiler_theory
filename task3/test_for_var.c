@@ -24,7 +24,7 @@ int none(int a, int b, int c){
 	g = 3;
 	h = 4;
 	k = 5;
-	k = a + b + c + d + e + f + g + h + k;
+	k = a + b + c + d + e + f + g + h + k + testGlobal1 + testGlobal2 + testGlobal3 ;
 	return (k);
 }
 void main(){
@@ -32,7 +32,7 @@ void main(){
 	n = 5;
 	k = 6;
 	k = n * k;
-	n = none();
+	n = none(2, 2, 2);
 	printf(k);
 	printf(n);
 } 
