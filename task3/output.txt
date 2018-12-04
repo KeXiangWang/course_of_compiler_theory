@@ -1,4 +1,204 @@
 .data
+global_length: .word 10
+global_width: .word 8
+global_firstLowerCase: .word 97
+global_firstUpperCase: .word 65
+global_globalInt: .word 0
+global_globalIntArray: .space 176
+global_globalChar: .word 0
+global_globalCharArray: .space 176
 .text
 j f_main
 nop
+
+f_none:
+addiu $sp $sp -208
+sw $ra 204($sp)
+sw $fp 200($sp)
+sw $s0 196($sp)
+sw $s1 192($sp)
+sw $s2 188($sp)
+sw $s3 184($sp)
+sw $s4 180($sp)
+sw $s5 176($sp)
+sw $s6 172($sp)
+sw $s7 168($sp)
+sw $a0 240($sp)
+sw $a1 244($sp)
+sw $a2 248($sp)
+li $t0 50000
+sw $t0 152($sp)
+li $t0 50000
+sw $t0 148($sp)
+li $t0 50000
+sw $t0 144($sp)
+li $t0 5
+sw $t0 140($sp)
+li $t0 5
+sw $t0 136($sp)
+li $t0 5
+sw $t0 132($sp)
+li $t0 5
+sw $t0 128($sp)
+li $t0 5
+sw $t0 124($sp)
+li $t0 5
+sw $t0 120($sp)
+li $t0 100
+sw $t0 116($sp)
+label_0:
+li $s1 0	# d
+li $s3 1	# e
+li $s6 2	# f
+li $t0 3	# g
+li $t1 4	# h
+li $s0 5	# k
+li $s5 6	# p
+li $s2 7	# q
+li $s7 8	# w
+li $t2 9	# x
+li $t3 10	# y
+li $s4 11	# z
+lw $t4 240($sp)	#a
+lw $t5 244($sp)	#b
+addu $t6 $t4 $t5 #	add_0
+lw $t7 248($sp)	#c
+sb $t0 76($sp)	#g
+addu $t0 $t6 $t7 #	add_1
+sb $t1 72($sp)	#h
+addu $t1 $t0 $s1 #	add_2
+sw $t2 88($sp)	#x
+addu $t2 $t1 $s3 #	add_3
+sw $t3 84($sp)	#y
+addu $t3 $t2 $s6 #	add_4
+sw $t4 240($sp)	#a
+lb $t4 76($sp)	#g
+sb $t4 76($sp)	#g
+addu $t4 $t3 $t4 #	add_5
+sw $t5 244($sp)	#b
+lb $t5 72($sp)	#h
+sb $t5 72($sp)	#h
+addu $t5 $t4 $t5 #	add_6
+sw $t7 248($sp)	#c
+addu $t7 $t5 $s0 #	add_7
+sw $t0 60($sp)	#add_1
+addu $t0 $t7 $s5 #	add_8
+sw $t0 32($sp)	#add_8
+addu $t0 $t0 $s2 #	add_9
+sw $t0 28($sp)	#add_9
+addu $t0 $t0 $s7 #	add_10
+sw $t1 56($sp)	#add_2
+lw $t1 88($sp)	#x
+sw $t1 88($sp)	#x
+addu $t1 $t0 $t1 #	add_11
+sw $t0 24($sp)	#add_10
+lw $t0 84($sp)	#y
+sw $t0 84($sp)	#y
+addu $t0 $t1 $t0 #	add_12
+sw $t0 16($sp)	#add_12
+addu $t0 $t0 $s4 #	add_13
+sw $t1 20($sp)	#add_11
+lw $t1 152($sp)	#testGlobal1
+sw $t1 152($sp)	#testGlobal1
+addu $t1 $t0 $t1 #	add_14
+sw $t0 12($sp)	#add_13
+lw $t0 148($sp)	#testGlobal2
+sw $t0 148($sp)	#testGlobal2
+addu $t0 $t1 $t0 #	add_15
+sw $t1 8($sp)	#add_14
+lw $t1 144($sp)	#testGlobal3
+sw $t1 144($sp)	#testGlobal3
+addu $t1 $t0 $t1 #	add_16
+move $s0 $t1	# k
+move $v0 $s0
+j f_none_return
+nop
+sw $t0 4($sp)	#add_15
+sw $t1 0($sp)	#add_16
+sw $t2 52($sp)	#add_3
+sw $t3 48($sp)	#add_4
+sw $t4 44($sp)	#add_5
+sw $t5 40($sp)	#add_6
+sw $t6 64($sp)	#add_0
+sw $t7 36($sp)	#add_7
+f_none_return:
+lw $s0 196($sp)
+lw $s1 192($sp)
+lw $s2 188($sp)
+lw $s3 184($sp)
+lw $s4 180($sp)
+lw $s5 176($sp)
+lw $s6 172($sp)
+lw $s7 168($sp)
+lw $ra 204($sp)
+lw $fp 200($sp)
+addiu $sp $sp 208
+jr $ra
+nop
+
+f_main:
+addiu $sp $sp -56
+sw $ra 52($sp)
+sw $fp 48($sp)
+sw $s0 44($sp)
+sw $s1 40($sp)
+sw $s2 36($sp)
+sw $s3 32($sp)
+sw $s4 28($sp)
+sw $s5 24($sp)
+sw $s6 20($sp)
+sw $s7 16($sp)
+label_1:
+li $s0 5	# n
+li $s1 6	# k
+mul $t0 $s0 $s1 #	mult_17
+move $s1 $t0	# k
+# call func: none
+addiu $sp $sp -12
+li $a0 100	#const_int_71
+li $a1 100	#const_int_72
+li $a2 100	#const_int_73
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_none
+nop
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 12
+move $t1 $v0
+# back from func: none
+move $s0 $t1	# n
+li $v0 1
+move $a0 $s1
+syscall
+li $v0 1
+move $a0 $s0
+syscall
+sw $t0 4($sp)	#mult_17
+sw $t1 0($sp)	#fcall_74
+f_main_return:
+lw $s0 44($sp)
+lw $s1 40($sp)
+lw $s2 36($sp)
+lw $s3 32($sp)
+lw $s4 28($sp)
+lw $s5 24($sp)
+lw $s6 20($sp)
+lw $s7 16($sp)
+lw $ra 52($sp)
+lw $fp 48($sp)
+addiu $sp $sp 56

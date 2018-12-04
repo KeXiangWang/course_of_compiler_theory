@@ -459,7 +459,7 @@ void MipsGenerator::decreaseRef(Quantity *value) {
 
 string MipsGenerator::getReg(Function *function, Quantity *quantity, bool write, int temp) {
 	string id = quantity->id;
-	if (storeRegs.find(id) != storeRegs.end()) { // from global
+	if (storeRegs.find(id) != storeRegs.end()) { // from $s
 		string reg = storeRegs[id]->name;
 		if (loadedToStore.find(id) == loadedToStore.end()) {
 			loadedToStore.insert(id);
@@ -473,10 +473,10 @@ string MipsGenerator::getReg(Function *function, Quantity *quantity, bool write,
 		}
 		return reg;
 	}
-	else if (tempRegs.find(id) != tempRegs.end()) {	// from local
+	else if (tempRegs.find(id) != tempRegs.end()) {	// from $t
 		return tempRegs[id]->name;
 	}
-	else {
+	else { // allocate a reg from $t
 		Reg *reg = overflow(function);
 		reg->quantity = quantity;
 		reg->free = false;
@@ -496,14 +496,14 @@ Reg * MipsGenerator::overflow(Function *function) {
 			(*reg).free = false;
 			return &(*reg);
 		}
-		auto pre_value = (*reg).quantity;
+		Quantity *pre_value = (*reg).quantity;
 		int ref = refCount[pre_value->id];
 		if (ref == 0) {
 			tempRegs.erase(pre_value->id);
 			(*reg).free = true;
 			return &(*reg);
 		}
-		if (!(*reg).fixed&&ref > max) {
+		if ((*reg).fixed == false && ref > max) {
 			max = ref;
 			maxValue = pre_value;
 			maxIter = &(*reg);
