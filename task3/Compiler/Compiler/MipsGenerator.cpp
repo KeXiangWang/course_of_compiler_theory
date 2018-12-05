@@ -9,7 +9,8 @@ void MipsGenerator::generate() {
 	initRegs();
 	finalCode.push_back(".text");
 	finalCode.push_back("j f_main");
-	finalCode.push_back("nop");
+	//finalCode.push_back("nop");
+	finalCode.push_back("\n");
 	for (auto function = elementCreater->functionTable.functionVector.begin();
 		function != elementCreater->functionTable.functionVector.end(); function++) {
 		initCode.clear();
@@ -58,22 +59,26 @@ void MipsGenerator::generateFunction(Function * function) {
 	tempRegs.clear();
 	int offset = getVarNumber(function);
 	allocateGloabal(function);
-	initCode.push_back("\nf_" + function->name + ":");
+	initCode.push_back("\n");
+	initCode.push_back("f_" + function->name + ":");
 	vector<TableElement *> &elementVector = function->elementTable.elementVector;
 
 	initCode.push_back("addiu $sp $sp -" + to_string(offset));
-	initCode.push_back("sw $ra " + to_string(-4 + offset) + "($sp)");
-	initCode.push_back("sw $fp " + to_string(-8 + offset) + "($sp)");
-	for (int i = 0; i < 8; i++) {
-		initCode.push_back("sw $s" + to_string(i) + " " + to_string(-12 - (i << 2) + offset) + "($sp)");
-	}
-	// store $a0~a3
-	for (int i = 0; i < (int)(function->parameters.size()); i++) {
-		int tmp = (i << 2) + offset + (8 << 2);
-		if (i < 4) {
-			initCode.push_back("sw $a" + to_string(i) + " " + to_string(tmp) + "($sp)");
+
+	if (function->name != "main") {
+		initCode.push_back("sw $ra " + to_string(-4 + offset) + "($sp)");
+		initCode.push_back("sw $fp " + to_string(-8 + offset) + "($sp)");
+		for (int i = 0; i < 8; i++) {
+			initCode.push_back("sw $s" + to_string(i) + " " + to_string(-12 - (i << 2) + offset) + "($sp)");
 		}
-		stackOffset[function->parameters[i]->name] = tmp;
+		// store $a0~a3
+		for (int i = 0; i < (int)(function->parameters.size()); i++) {
+			int tmp = (i << 2) + offset + (8 << 2);
+			if (i < 4) {
+				initCode.push_back("sw $a" + to_string(i) + " " + to_string(tmp) + "($sp)");
+			}
+			stackOffset[function->parameters[i]->name] = tmp;
+		}
 	}
 	// init const
 	for (auto i = elementVector.begin(); i != elementVector.end(); i++) {
@@ -91,12 +96,19 @@ void MipsGenerator::generateFunction(Function * function) {
 		}
 	}
 	// init global
-	for (auto quadTable = function->headQuadTable; quadTable != nullptr; quadTable = quadTable->next) {
-		if (bb2label.find(quadTable) == bb2label.end()) {
-			bb2label[quadTable] = labelCount++;
+	//for (auto quadTable = function->headQuadTable; quadTable != nullptr; quadTable = quadTable->next) {
+		//if (quadTableToLabel.find(quadTable) == quadTableToLabel.end()) {
+		//	quadTableToLabel[quadTable] = labelCount++;
+		//}
+		//exertCode.push_back("label_" + to_string(quadTableToLabel[quadTable]) + ":"); // each quadTable set a label
+		//vector<Quad *> *quads = &quadTable->quads; // 
+	for (auto quadTable = function->quadTableVector.begin(); quadTable != function->quadTableVector.end(); quadTable++) {
+		if (quadTableToLabel.find(*quadTable) == quadTableToLabel.end()) {
+			quadTableToLabel[*quadTable] = labelCount++;
 		}
-		exertCode.push_back("label_" + to_string(bb2label[quadTable]) + ":"); // each quadTable set a label
-		vector<Quad *> *quads = &quadTable->quads; // 
+		exertCode.push_back("label_" + to_string(quadTableToLabel[*quadTable]) + ":"); // each quadTable set a label
+		vector<Quad *> *quads = &(*quadTable)->quads; // 
+
 		for (auto quad = quads->begin(); quad != quads->end(); quad++) {
 			switch ((*quad)->opCode)
 			{
@@ -163,20 +175,19 @@ void MipsGenerator::generateFunction(Function * function) {
 		writeBack(function);
 		std::cout << "# end a basicBlock " << std::endl;
 	}
-	exertCode.push_back("f_" + function->name + "_return:");
-	// load $s0~$s7
-	for (int i = 0; i < 8; i++) {
-		exertCode.push_back("lw $s" + to_string(i) + " " + to_string(-12 - (i << 2) + offset) + "($sp)");
-	}
-	// load $sp %fp
-	exertCode.push_back("lw $ra " + to_string(-4 + offset) + "($sp)");
-	exertCode.push_back("lw $fp " + to_string(-8 + offset) + "($sp)");
-	exertCode.push_back("addiu $sp $sp " + to_string(offset));
-
-	// return
 	if (function->name != "main") {
+		exertCode.push_back("f_" + function->name + "_return:");
+		// load $s0~$s7
+		for (int i = 0; i < 8; i++) {
+			exertCode.push_back("lw $s" + to_string(i) + " " + to_string(-12 - (i << 2) + offset) + "($sp)");
+		}
+		// load $sp %fp
+		exertCode.push_back("lw $ra " + to_string(-4 + offset) + "($sp)");
+		exertCode.push_back("lw $fp " + to_string(-8 + offset) + "($sp)");
+		exertCode.push_back("addiu $sp $sp " + to_string(offset));
+		// return
 		exertCode.push_back("jr $ra");
-		exertCode.push_back("nop");
+		//exertCode.push_back("nop");
 	}
 }
 
@@ -283,11 +294,11 @@ void MipsGenerator::generateBranch(Function *function, Quad *quad, string branch
 	decreaseRef(branch->quantity1);
 	decreaseRef(branch->quantity2);
 	writeBack(function);
-	if (bb2label.find(branch->label->labelQuadTable) != bb2label.end()) {
-		exertCode.push_back(branchName + reg1 + reg2 + "label_" + to_string(bb2label[branch->label->labelQuadTable]));
+	if (quadTableToLabel.find(branch->label->labelQuadTable) != quadTableToLabel.end()) {
+		exertCode.push_back(branchName + reg1 + reg2 + "label_" + to_string(quadTableToLabel[branch->label->labelQuadTable]));
 	}
 	else {
-		bb2label[branch->label->labelQuadTable] = labelCount;
+		quadTableToLabel[branch->label->labelQuadTable] = labelCount;
 		exertCode.push_back(branchName + reg1 + reg2 + "label_" + to_string(labelCount));
 		labelCount++;
 	}
@@ -298,11 +309,11 @@ void MipsGenerator::generateBranchZ(Function *function, Quad *quad) {
 	string reg = getReg(function, branch->quantity1) + " ";
 	decreaseRef(branch->quantity1);
 	writeBack(function);
-	if (bb2label.find(branch->label->labelQuadTable) != bb2label.end()) {
-		exertCode.push_back("beqz " + reg + " label_" + to_string(bb2label[branch->label->labelQuadTable]));
+	if (quadTableToLabel.find(branch->label->labelQuadTable) != quadTableToLabel.end()) {
+		exertCode.push_back("beqz " + reg + " label_" + to_string(quadTableToLabel[branch->label->labelQuadTable]));
 	}
 	else {
-		bb2label[branch->label->labelQuadTable] = labelCount;
+		quadTableToLabel[branch->label->labelQuadTable] = labelCount;
 		exertCode.push_back("beqz " + reg + " label_" + to_string(labelCount));
 		labelCount++;
 	}
@@ -311,11 +322,11 @@ void MipsGenerator::generateBranchZ(Function *function, Quad *quad) {
 void MipsGenerator::generateJump(Function *function, Quad *quad) {
 	Jump *jump = static_cast<Jump *>(quad);
 	writeBack(function);
-	if (bb2label.find(jump->label->labelQuadTable) != bb2label.end()) {
-		exertCode.push_back("j label_" + to_string(bb2label[jump->label->labelQuadTable]));
+	if (quadTableToLabel.find(jump->label->labelQuadTable) != quadTableToLabel.end()) {
+		exertCode.push_back("j label_" + to_string(quadTableToLabel[jump->label->labelQuadTable]));
 	}
 	else {
-		bb2label[jump->label->labelQuadTable] = labelCount;
+		quadTableToLabel[jump->label->labelQuadTable] = labelCount;
 		exertCode.push_back("j label_" + to_string(labelCount));
 		labelCount++;
 	}
@@ -328,7 +339,7 @@ void MipsGenerator::generateReturn(Function *function, Quad *quad) {
 		decreaseRef(ret->quantity);
 	}
 	exertCode.push_back("j f_" + function->name + "_return");
-	exertCode.push_back("nop");
+	//exertCode.push_back("nop");
 	writeBack(function);
 }
 
@@ -337,7 +348,7 @@ void MipsGenerator::generateFunc(Function *function, Quad *quad, int offset) {
 	int paraSize4 = func->parameters.size() << 2;
 	exertCode.push_back("# call func: " + func->name);
 	exertCode.push_back("addiu $sp $sp -" + to_string(paraSize4));
-	for (int i = 0; i < (int)(func->parameters.size()); i++) { 
+	for (int i = 0; i < (int)(func->parameters.size()); i++) {
 		if (i < 4) { // front 4 para to $a0-3
 			moveToReg(function, func->parameters[i], "$a" + to_string(i), paraSize4);
 			decreaseRef(func->parameters[i]);
@@ -353,7 +364,7 @@ void MipsGenerator::generateFunc(Function *function, Quad *quad, int offset) {
 		exertCode.push_back("sw $t" + to_string(i) + " " + to_string(i << 2) + "($sp)");
 	}
 	exertCode.push_back("jal f_" + func->name);
-	exertCode.push_back("nop");
+	//exertCode.push_back("nop");
 	for (int i = 0; i < 8; i++) {
 		exertCode.push_back("lw $t" + to_string(i) + " " + to_string(i << 2) + "($sp)");
 	}
@@ -389,7 +400,7 @@ void MipsGenerator::generateVoidFunc(Function *function, Quad *quad, int offset)
 		exertCode.push_back("sw $t" + to_string(i) + " " + to_string(i << 2) + "($sp)");
 	}
 	exertCode.push_back("jal f_" + func->name);
-	exertCode.push_back("nop");
+	//exertCode.push_back("nop");
 	for (int i = 0; i < 8; i++) {
 		exertCode.push_back("lw $t" + to_string(i) + " " + to_string(i << 2) + "($sp)");
 	}
@@ -465,12 +476,14 @@ string MipsGenerator::getReg(Function *function, Quantity *quantity, bool write,
 		if (loadedToStore.find(id) == loadedToStore.end()) {
 			loadedToStore.insert(id);
 			TableElement *e = function->elementTable.find(id);
-			if (e != nullptr && e->kind == KINDPARA)
+			if (e != nullptr && e->kind == KINDPARA) {
 				loadValueGlobal(function, quantity, reg, temp);
-			else
+			}
+			else {
 				if (!write) {
 					loadValueGlobal(function, quantity, reg, temp);
 				}
+			}
 		}
 		return reg;
 	}
@@ -524,14 +537,14 @@ void MipsGenerator::allocateGloabal(Function * function) {
 	for (auto var = refCount.begin(); var != refCount.end(); var++)
 		v.emplace_back(std::make_pair(var->first, var->second));
 	std::sort(v.begin(), v.end(), cmp);
-	
+
 	for (int i = 0, regNum = 0; regNum < 8 && i < (int)(v.size()); i++) {
 		TableElement *element = function->elementTable.find(v[i].first);
 		if (element == nullptr)
 			continue;
 		if (element->kind == KINDPARA)
 			continue;
-		storeRegs[v[i].first] = new Reg("$s"+to_string(regNum));
+		storeRegs[v[i].first] = new Reg("$s" + to_string(regNum));
 		regNum++;
 	}
 }
@@ -548,13 +561,15 @@ int MipsGenerator::getVarNumber(Function * function) {
 			stackOffset[(*i)->name] = offset;
 			break;
 		case KINDARRAY:
-			offset += ((*i)->value << 2)  + 4;
+			offset += ((*i)->value << 2) + 4;
 			stackOffset[(*i)->name] = offset;
 			break;
 		}
 	}
-	for (QuadTable *quadTable = function->headQuadTable; quadTable != nullptr; quadTable = quadTable->next) {
-		for (auto quad = quadTable->quads.begin(); quad != quadTable->quads.end(); quad++) {
+	//for (QuadTable *quadTable = function->headQuadTable; quadTable != nullptr; quadTable = quadTable->next) {
+		//for (auto quad = quadTable->quads.begin(); quad != quadTable->quads.end(); quad++) {
+	for (auto quadTable = function->quadTableVector.begin(); quadTable != function->quadTableVector.end(); quadTable++) {
+		for (auto quad = (*quadTable)->quads.begin(); quad != (*quadTable)->quads.end(); quad++) {
 			switch ((*quad)->opCode) {
 			case OP_PLUS:
 			case OP_SUB:
@@ -649,7 +664,7 @@ void MipsGenerator::loadValue(Function *function, Quad *quad, string reg, int te
 	if (reg.back() != ' ')
 		reg += ' ';
 	string instr = (static_cast<Quantity *>(quad)->dataType == TYPEINT) ? "lw " : "lb ";
-	if (quad->opCode == OP_CONST){
+	if (quad->opCode == OP_CONST) {
 		exertCode.push_back("li " + reg + to_string((long long)static_cast<Constant *>(quad)->value) + "\t#" + quad->id);
 	}
 	else if (quad->opCode == OP_VAR) {
@@ -732,14 +747,17 @@ void MipsGenerator::storeValue(Function *function, Quad *quad, string reg) {
 	if (quad->opCode == OP_VAR) {
 		string name = static_cast<Variable *>(quad)->name;
 		if (function->elementTable.find(name) != nullptr) {
-			exertCode.push_back(instr + reg + to_string((long long)stackOffset[name]) + "($sp)" + "\t#" + name);
+			exertCode.push_back(instr + reg + to_string((long long)stackOffset[name]) + "($sp)" + "\t# " + name);
 		}
 		else {
 			exertCode.push_back(instr + reg + " global_" + name + "\t#" + name);
 		}
 	}
 	else if (quad->opCode != OP_ARRAY && quad->opCode != OP_CONST) {
-		exertCode.push_back(instr + reg + to_string((long long)stackOffset[quad->id]) + "($sp)" + "\t#" + quad->id);
+		exertCode.push_back(instr + reg + to_string((long long)stackOffset[quad->id]) + "($sp)" + "\t# " + quad->id);
+	}
+	else {
+		std::cout << quad->opCode << "why" << std::endl;
 	}
 }
 

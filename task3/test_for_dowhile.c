@@ -18,10 +18,12 @@ void main(){
 	k = 0;
 	n = 50;
 	c = 20;
-	for(i = 0; i < 20; i = i + 1){
+	i = 10;
+	do{
 		listInt[i] = c;
 		c = c + 1;
-	} 
+		i = i + 1;
+	} while(i!=30);
 	for(i = 0; i < 20; i = i + 1)
 		k = listInt[i] + k;
 		

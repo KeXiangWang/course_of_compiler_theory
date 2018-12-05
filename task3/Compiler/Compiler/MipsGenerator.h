@@ -58,7 +58,7 @@ private:
 	vector<string> exertCode;
 	vector<Reg> usedTempRegs;
 
-	unordered_map<QuadTable *, int> bb2label;
+	unordered_map<QuadTable *, int> quadTableToLabel;
 	unordered_map<string, Reg*> storeRegs; // $s: used (var)
 	unordered_map<string, Reg*> tempRegs; // $t: temporaray
 	unordered_set<string> loadedToStore;

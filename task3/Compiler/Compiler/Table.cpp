@@ -29,6 +29,8 @@ void FunctionTable::insert(Function * function) {
 
 void Function::addQuadTable(QuadTable *quadTable)
 {
-	currentQuadTable->next = quadTable;
-	currentQuadTable = quadTable;
+	quadTableVector.push_back(quadTable); // temp
+	//currentQuadTable->next = quadTable;
+	//currentQuadTable = quadTable; 
+	currentQuadTable = quadTableVector.back(); // temp
 }

@@ -8,87 +8,140 @@ global_globalIntArray: .space 176
 global_globalChar: .word 0
 global_globalCharArray: .space 176
 global_listInt: .space 400
-string_0: .asciiz  "%d"
-string_1: .asciiz  "             "
-string_2: .asciiz  "%d"
+string_0: .asciiz  "    "
+string_1: .asciiz  "    "
+string_2: .asciiz  "    "
+string_3: .asciiz  "%d"
+string_4: .asciiz  "             "
+string_5: .asciiz  "%d"
+string_6: .asciiz  "             "
+string_7: .asciiz  "%d"
+string_8: .asciiz  "             "
 .text
 j f_main
-nop
+
+
+
 
 f_none:
-addiu $sp $sp -64
-sw $ra 60($sp)
-sw $fp 56($sp)
-sw $s0 52($sp)
-sw $s1 48($sp)
-sw $s2 44($sp)
-sw $s3 40($sp)
-sw $s4 36($sp)
-sw $s5 32($sp)
-sw $s6 28($sp)
-sw $s7 24($sp)
-sw $a0 96($sp)
-sw $a1 100($sp)
-sw $a2 104($sp)
+addiu $sp $sp -56
+sw $ra 52($sp)
+sw $fp 48($sp)
+sw $s0 44($sp)
+sw $s1 40($sp)
+sw $s2 36($sp)
+sw $s3 32($sp)
+sw $s4 28($sp)
+sw $s5 24($sp)
+sw $s6 20($sp)
+sw $s7 16($sp)
+sw $a0 88($sp)
+sw $a1 92($sp)
+sw $a2 96($sp)
 label_0:
-lw $t0 96($sp)	#a
-move $s0 $t0	# i
-sw $t0 96($sp)	#a
+li $v0 1
+lw $a0 88($sp)	#a
+syscall
+li $v0 4
+la $a0 string_0
+syscall
+li $v0 1
+lw $a0 92($sp)	#b
+syscall
+li $v0 4
+la $a0 string_1
+syscall
+li $v0 1
+lw $a0 96($sp)	#c
+syscall
+j f_none_return
+f_none_return:
+lw $s0 44($sp)
+lw $s1 40($sp)
+lw $s2 36($sp)
+lw $s3 32($sp)
+lw $s4 28($sp)
+lw $s5 24($sp)
+lw $s6 20($sp)
+lw $s7 16($sp)
+lw $ra 52($sp)
+lw $fp 48($sp)
+addiu $sp $sp 56
+jr $ra
+
+
+f_main:
+addiu $sp $sp -76
 label_1:
-lw $t0 100($sp)	#b
-sw $t0 100($sp)	#b
-bge $s0 $t0 label_2
-lw $t0 104($sp)	#c
+li $s1 0	# k
+li $s3 50	# n
+li $s2 20	# c
+li $s0 10	# i
+label_2:
 # listInt
 move $t8  $s0
 sll $t8 $t8 2
-sw $t0 global_listInt($t8 )
-addiu $t1 $t0 1 	# add_0
-move $t0 $t1	# c
-addiu $t2 $s0 1 	# add_1
-move $s0 $t2	# i
-sw $t0 104($sp)	#c
-sw $t1 4($sp)	#add_0
-sw $t2 0($sp)	#add_1
-j label_1
-label_2:
-lw $v0 104($sp)	#c
-j f_none_return
-nop
-f_none_return:
-lw $s0 52($sp)
-lw $s1 48($sp)
-lw $s2 44($sp)
-lw $s3 40($sp)
-lw $s4 36($sp)
-lw $s5 32($sp)
-lw $s6 28($sp)
-lw $s7 24($sp)
-lw $ra 60($sp)
-lw $fp 56($sp)
-addiu $sp $sp 64
-jr $ra
-nop
-
-f_main:
-addiu $sp $sp -68
-sw $ra 64($sp)
-sw $fp 60($sp)
-sw $s0 56($sp)
-sw $s1 52($sp)
-sw $s2 48($sp)
-sw $s3 44($sp)
-sw $s4 40($sp)
-sw $s5 36($sp)
-sw $s6 32($sp)
-sw $s7 28($sp)
+sw $s2 global_listInt($t8 )
+addiu $t0 $s2 1 	# add_0
+move $s2 $t0	# c
+addiu $t1 $s0 1 	# add_1
+move $s0 $t1	# i
+li $t2 30	#const_int_30
+sw $t0 16($sp)	# add_0
+sw $t1 12($sp)	# add_1
+beq $s0 $t2 label_3
+j label_2
 label_3:
-li $s0 0	# k
-# call func: none
+li $s0 0	# i
+label_4:
+li $t0 20	#const_int_38
+bge $s0 $t0 label_5
+move $t0  $s0
+sll $t0 $t0 2
+lw $t0 global_listInt($t0 )
+addu $t1 $t0 $s1 	# add_2
+move $s1 $t1	# k
+addiu $t2 $s0 1 	# add_3
+move $s0 $t2	# i
+sw $t1 8($sp)	# add_2
+sw $t2 4($sp)	# add_3
+j label_4
+label_5:
+li $t0 20	#const_int_53
+div $t1 $s1 $t0 	# div_4
+move $s1 $t1	# k
+li $v0 4
+la $a0 string_3
+syscall
+li $v0 1
+move $a0 $s1
+syscall
+li $v0 4
+la $a0 string_4
+syscall
+li $v0 4
+la $a0 string_5
+syscall
+li $v0 1
+move $a0 $s3
+syscall
+li $v0 4
+la $a0 string_6
+syscall
+li $v0 4
+la $a0 string_7
+syscall
+li $v0 1
+move $a0 $s2
+syscall
+li $v0 4
+la $a0 string_8
+syscall
+# call voidfunc: none
 addiu $sp $sp -12
-li $a0 0	#const_int_24
-li $a1 20	#const_int_25
-li $a2 20	#const_int_26
+li $a0 90	#const_int_65
+li $a1 100	#const_int_66
+li $a2 88	#const_int_67
 addiu $sp $sp -32
 sw $t0 0($sp)
 sw $t1 4($sp)
@@ -99,7 +152,6 @@ sw $t5 20($sp)
 sw $t6 24($sp)
 sw $t7 28($sp)
 jal f_none
-nop
 lw $t0 0($sp)
 lw $t1 4($sp)
 lw $t2 8($sp)
@@ -110,53 +162,5 @@ lw $t6 24($sp)
 lw $t7 28($sp)
 addiu $sp $sp 32
 addiu $sp $sp 12
-move $t0 $v0
-# back from func: none
-move $s2 $t0	# n
-li $s1 0	# i
-sw $t0 12($sp)	#fcall_27
-label_4:
-li $t0 20	#const_int_32
-bge $s1 $t0 label_5
-move $t0  $s1
-sll $t0 $t0 2
-lw $t0 global_listInt($t0 )
-addu $t1 $t0 $s0 	# add_2
-move $s0 $t1	# k
-addiu $t2 $s1 1 	# add_3
-move $s1 $t2	# i
-sw $t1 8($sp)	#add_2
-sw $t2 4($sp)	#add_3
-j label_4
-label_5:
-li $t0 20	#const_int_47
-div $t1 $s0 $t0 	# div_4
-move $s0 $t1	# k
-li $v0 4
-la $a0 string_0
-syscall
-li $v0 1
-move $a0 $s0
-syscall
-li $v0 4
-la $a0 string_1
-syscall
-li $v0 4
-la $a0 string_2
-syscall
-li $v0 1
-move $a0 $s2
-syscall
-sw $t1 0($sp)	#div_4
-f_main_return:
-lw $s0 56($sp)
-lw $s1 52($sp)
-lw $s2 48($sp)
-lw $s3 44($sp)
-lw $s4 40($sp)
-lw $s5 36($sp)
-lw $s6 32($sp)
-lw $s7 28($sp)
-lw $ra 64($sp)
-lw $fp 60($sp)
-addiu $sp $sp 68
+# back from voidfunc: none
+sw $t1 0($sp)	# div_4
