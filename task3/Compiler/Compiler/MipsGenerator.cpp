@@ -188,17 +188,17 @@ void MipsGenerator::generateAddSub(Function *function, Quad *quad, OPCode opCode
 			Constant *quantity2 = static_cast<Constant*>(caculator->quantity2);
 			string reg0 = getReg(function, caculator, true) + " ";
 			if (opCode == OP_PLUS)
-				exertCode.push_back("li " + reg0 + to_string(quantity1->value + quantity2->value) + " " + "\t#" + caculator->id);
+				exertCode.push_back("li " + reg0 + to_string(quantity1->value + quantity2->value) + " " + "\t# " + caculator->id);
 			else
-				exertCode.push_back("li " + reg0 + to_string(quantity1->value - quantity2->value) + " " + "\t#" + caculator->id);
+				exertCode.push_back("li " + reg0 + to_string(quantity1->value - quantity2->value) + " " + "\t# " + caculator->id);
 			return;
 		}
 		string reg2 = getReg(function, caculator->quantity2) + " "; // constant optimize : n = 2 + n
 		string reg0 = getReg(function, caculator, true) + " ";
 		if (opCode == OP_PLUS)
-			exertCode.push_back("addiu " + reg0 + to_string(quantity1->value) + " " + reg2 + "\t#" + caculator->id);
+			exertCode.push_back("addiu " + reg0 + to_string(quantity1->value) + " " + reg2 + "\t# " + caculator->id);
 		else
-			exertCode.push_back("subiu " + reg0 + to_string(quantity1->value) + " " + reg2 + "\t#" + caculator->id);
+			exertCode.push_back("subiu " + reg0 + to_string(quantity1->value) + " " + reg2 + "\t# " + caculator->id);
 	}
 	else {
 		if (caculator->quantity2->opCode == OP_CONST) { // constant optimize: n = n + 2
@@ -206,9 +206,10 @@ void MipsGenerator::generateAddSub(Function *function, Quad *quad, OPCode opCode
 			string reg1 = getReg(function, caculator->quantity1) + " ";
 			string reg0 = getReg(function, caculator, true) + " ";
 			if (opCode == OP_PLUS)
-				exertCode.push_back("addiu " + reg0 + reg1 + to_string(quantity2->value) + " " + "\t#" + caculator->id);
+				exertCode.push_back("addiu " + reg0 + reg1 + to_string(quantity2->value) + " " + "\t# " + caculator->id);
 			else
-				exertCode.push_back("subiu " + reg0 + reg1 + to_string(quantity2->value) + " " + "\t#" + caculator->id);
+				exertCode.push_back("subiu " + reg0 + reg1 + to_string(quantity2->value) + " " + "\t# " + caculator->id);
+			return;
 		}
 		string reg1 = getReg(function, caculator->quantity1) + " ";
 		usedTempRegs[reg1[2] - '0'].fixed = true;
@@ -218,9 +219,9 @@ void MipsGenerator::generateAddSub(Function *function, Quad *quad, OPCode opCode
 		decreaseRef(caculator->quantity2);
 		string reg0 = getReg(function, caculator, true) + " ";
 		if (opCode == OP_PLUS)
-			exertCode.push_back("addu " + reg0 + reg1 + reg2 + "#\t" + caculator->id);
+			exertCode.push_back("addu " + reg0 + reg1 + reg2 + "\t# " + caculator->id);
 		else
-			exertCode.push_back("subu " + reg0 + reg1 + reg2 + "#\t" + caculator->id);
+			exertCode.push_back("subu " + reg0 + reg1 + reg2 + "\t# " + caculator->id);
 	}
 }
 
@@ -234,9 +235,9 @@ void MipsGenerator::generateMultDiv(Function *function, Quad *quad, OPCode opCod
 	decreaseRef(caculator->quantity2);
 	string reg0 = getReg(function, caculator, true) + " ";;
 	if (opCode == OP_MULT)
-		exertCode.push_back("mul " + reg0 + reg1 + reg2 + "#\t" + caculator->id);
+		exertCode.push_back("mul " + reg0 + reg1 + reg2 + "\t# " + caculator->id);
 	else
-		exertCode.push_back("div " + reg0 + reg1 + reg2 + "#\t" + caculator->id);
+		exertCode.push_back("div " + reg0 + reg1 + reg2 + "\t# " + caculator->id);
 }
 
 void MipsGenerator::generateVar(Function *function, Quad *quad) {
@@ -268,7 +269,7 @@ void MipsGenerator::generateArray(Function *function, Quad *quad) {
 	if (arr->value != nullptr) {
 		string reg = getReg(function, arr->value);
 		decreaseRef(arr->value);
-		exertCode.push_back("#\t" + arr->name);
+		exertCode.push_back("# " + arr->name);
 		storeValueArray(function, arr, reg, "$t1");
 	}
 }
