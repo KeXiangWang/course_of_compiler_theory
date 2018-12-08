@@ -147,10 +147,17 @@ Token Lexicon::nextToken() {
 	case '\"':
 		nextChar();
 		stringTemp.clear();
+		char temp;
 		while (isCharInString(currentChar)) {
 			currentString += currentChar;
 			stringTemp += currentChar;
+			temp = currentChar;
 			nextChar();
+			if (temp == '\\') {
+				currentString += '\\';
+				stringTemp += '\\';
+
+			}
 		}
 		if (currentChar == '\"') {
 			currentToken = STR;
@@ -233,6 +240,7 @@ void Lexicon::jumpToLineEnd() {
 		nextChar();
 	}
 }
+
 void Lexicon::jumpToSentenceEnd() {
 	while (currentChar != ';' && currentChar != EOF) {
 		nextChar();

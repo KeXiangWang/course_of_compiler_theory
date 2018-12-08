@@ -67,7 +67,8 @@ void ElementCreater::createBranch(Token token, Quantity * quantity1, Quantity * 
 		opCode = OP_BEQZ;
 		break;
 	}
-	currentQuadTable->addQuad(new Branch(opCode, quantity1, quantity2, new Label(elseTable)));
+	Branch *branch = new Branch(opCode, quantity1, quantity2, new Label(elseTable));
+	currentQuadTable->addQuad(branch);
 }
 
 void ElementCreater::createJump(Label *label) {

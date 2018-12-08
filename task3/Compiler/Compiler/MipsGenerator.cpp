@@ -172,7 +172,9 @@ void MipsGenerator::generateFunction(Function * function) {
 				break;
 			}
 		}
-		writeBack(function);
+		if (!(function->name == "main" &&(quadTable + 1 == function->quadTableVector.end()))) {
+			writeBack(function);
+		}
 		std::cout << "# end a basicBlock " << std::endl;
 	}
 	if (function->name != "main") {
@@ -206,10 +208,15 @@ void MipsGenerator::generateAddSub(Function *function, Quad *quad, OPCode opCode
 		}
 		string reg2 = getReg(function, caculator->quantity2) + " "; // constant optimize : n = 2 + n
 		string reg0 = getReg(function, caculator, true) + " ";
-		if (opCode == OP_PLUS)
-			exertCode.push_back("addiu " + reg0 + to_string(quantity1->value) + " " + reg2 + "\t# " + caculator->id);
-		else
-			exertCode.push_back("subiu " + reg0 + to_string(quantity1->value) + " " + reg2 + "\t# " + caculator->id);
+		if (opCode == OP_PLUS) {
+			exertCode.push_back("addiu " + reg0 + reg2 + to_string(quantity1->value) + " " + "\t# " + caculator->id);
+		}
+		else {
+			exertCode.push_back("subu " + reg0 + "$0 " + reg2 + "\t# -" + caculator->quantity2->id);
+			if (quantity1->value != 0) {
+				exertCode.push_back("addiu " + reg0 + reg0 + to_string(quantity1->value) + " " + "\t# " + caculator->id);
+			}
+		}
 	}
 	else {
 		if (caculator->quantity2->opCode == OP_CONST) { // constant optimize: n = n + 2
@@ -444,19 +451,19 @@ void MipsGenerator::generateScanf(Function *function, Quad *quad) {
 void MipsGenerator::generatePrintf(Function *function, Quad *quad) {
 	Printf * prin = static_cast<Printf *>(quad);
 	if (prin->stringInt >= 0) {
-		exertCode.push_back("li $v0 4");
+		exertCode.push_back("li $v0 4  # printf string");
 		exertCode.push_back("la $a0 string_" + to_string((long long)prin->stringInt));
 		exertCode.push_back("syscall");
 	}
 	if (prin->quantity != nullptr) {
 		if (prin->quantity->dataType == TYPEINT) {
-			exertCode.push_back("li $v0 1");
+			exertCode.push_back("li $v0 1  # printf int");
 			moveToReg(function, prin->quantity, "$a0");
 			decreaseRef(prin->quantity);
 			exertCode.push_back("syscall");
 		}
 		else if (prin->quantity->dataType == TYPECHAR) {
-			exertCode.push_back("li $v0 11");
+			exertCode.push_back("li $v0 11  # printf char");
 			moveToReg(function, prin->quantity, "$a0");
 			decreaseRef(prin->quantity);
 			exertCode.push_back("syscall");
@@ -597,48 +604,50 @@ int MipsGenerator::getVarNumber(Function * function) {
 				break;
 			}
 			case OP_CONST: {
-				auto op = static_cast<Constant*>(*quad);
-				refCount[op->id]++;
+				auto con = static_cast<Constant*>(*quad);
+				refCount[con->id]++;
 				break;
 			}
 			case OP_VAR: {
-				auto op = static_cast<Variable *>(*quad);
-				refCount[op->id]++;
-				if (op->value != nullptr)
-					refCount[op->value->id]++;
+				auto var = static_cast<Variable *>(*quad);
+				refCount[var->id]++;
+				if (var->value != nullptr)
+					refCount[var->value->id]++;
 				break;
 			}
 			case OP_ARRAY: {
-				auto op = static_cast<Array *>(*quad);
-				refCount[op->index->id]++;
-				if (op->value != nullptr)
-					refCount[op->value->id]++;
+				auto arr = static_cast<Array *>(*quad);
+				refCount[arr->index->id]++;
+				if (arr->value != nullptr)
+					refCount[arr->value->id]++;
+				break;
+			}
+			case OP_BEQZ: {
+				auto branch = static_cast<Branch *>(*quad);
+				refCount[branch->quantity1->id]++;
 				break;
 			}
 			case OP_BEQ:
-			case OP_BEQZ:
 			case OP_BNE:
 			case OP_BLE:
 			case OP_BGE:
 			case OP_BGT:
 			case OP_BLT: {
-				auto op = static_cast<Branch *>(*quad);
-				if (op->quantity1 != nullptr)
-					refCount[op->quantity1->id]++;
-				if (op->quantity2 != nullptr)
-					refCount[op->quantity2->id]++;
+				auto branch = static_cast<Branch *>(*quad);
+				refCount[branch->quantity1->id]++;
+				refCount[branch->quantity2->id]++;
 				break;
 			}
 			case OP_PRINTF: {
-				auto op = static_cast<Printf*>(*quad);
-				if (op->quantity != nullptr)
-					refCount[op->quantity->id]++;
+				auto prin = static_cast<Printf*>(*quad);
+				if (prin->quantity != nullptr)
+					refCount[prin->quantity->id]++;
 				break;
 			}
 			case OP_RETURN: {
-				auto op = static_cast<Return*>(*quad);
-				if (op->quantity != nullptr)
-					refCount[op->quantity->id]++;
+				auto ret = static_cast<Return*>(*quad);
+				if (ret->quantity != nullptr)
+					refCount[ret->quantity->id]++;
 				break;
 			}
 			}
@@ -650,6 +659,7 @@ int MipsGenerator::getVarNumber(Function * function) {
 }
 
 void MipsGenerator::writeBack(Function * function) {
+	exertCode.push_back("# writeBack");
 	for (auto i = usedTempRegs.begin(); i != usedTempRegs.end(); i++) {
 		auto& reg = *i;
 		if (!reg.free&&refCount[reg.quantity->id] > 0) {
@@ -658,6 +668,7 @@ void MipsGenerator::writeBack(Function * function) {
 			reg.free = true;
 		}
 	}
+	exertCode.push_back("# end writeBack");
 }
 
 void MipsGenerator::loadValue(Function *function, Quad *quad, string reg, int temp) {

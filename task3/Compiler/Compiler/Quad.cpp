@@ -24,7 +24,12 @@ void QuadTable::addQuad(Quad * quad) {
 		break;
 	}
 
-	case OP_BEQZ:
+	case OP_BEQZ: {
+		auto branch = static_cast<Branch *>(quad);
+		addQuad(branch->quantity1);
+		break;
+	}
+
 	case OP_BEQ:
 	case OP_BGE:
 	case OP_BGT:

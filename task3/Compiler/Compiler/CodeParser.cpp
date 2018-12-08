@@ -665,14 +665,12 @@ void CodeParser::parseIf() {
 	QuadTable *thenTable = new QuadTable(); // if () {thenTable} else {elseTable} nextTable
 	QuadTable *elseTable = new QuadTable();
 	QuadTable *nextTable = new QuadTable();
-	Quantity *quantity1;
-	Quantity *quantity2;
+	Quantity *quantity1 = nullptr;
+	Quantity *quantity2 = nullptr;
 	Token gotCompareToken = parseCondition(&quantity1, &quantity2);
 	if (gotCompareToken == VOIDSYM) { // TODO deal with error
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
 	}
-	// TODO set else then next 
-	  // TODO set j and 
 	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, elseTable);
 	if (token != RPARENTHESE) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), RIGHT_PARENTHESES_EXPECTED);

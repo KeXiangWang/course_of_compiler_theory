@@ -2,3 +2,6 @@ D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test_for_grammar_2.txt
 D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\simplest.cpp
 D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test_for_grammar_3.txt
 D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test_for_var.c
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test_for_array.c
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test_for_dowhile.c
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test_czy.c
