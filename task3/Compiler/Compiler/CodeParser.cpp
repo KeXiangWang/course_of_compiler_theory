@@ -173,7 +173,7 @@ Quantity *CodeParser::parseFactor() {
 		token = lexicon.nextToken();
 		return new Constant(TYPEINT, sign * number);
 	case ALPHA:
-		alpha = lexicon.getStringWord()[0];
+		alpha = lexicon.getNumberTemp();
 		token = lexicon.nextToken();
 		return new Constant(TYPECHAR, alpha);
 	}

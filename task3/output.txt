@@ -1,85 +1,155 @@
 .data
-global_length: .word 10
-global_width: .word 8
-global_firstLowerCase: .word 97
-global_firstUpperCase: .word 65
-global_lastLowerCase: .word 122
-global_lastUpperCase: .word 90
-global_globalInt: .word 0
-global_globalIntArray: .space 176
-global_globalInt2: .word 0
-global_globalIntArray2: .space 264
-global_globalInt3: .word 0
-global_globalChar: .word 0
-global_globalCharArray: .space 176
-global_globalChar2: .word 0
-global_globalCharArray2: .space 264
-global_globalChar3: .word 0
-string_0: .asciiz  "original: "
-string_1: .asciiz  "   changed: "
-string_2: .asciiz  "start  "
-string_3: .asciiz  " "
-string_4: .asciiz  "%c"
-string_5: .asciiz  "nothing"
-string_6: .asciiz  "            "
+global_multi: .word 43
+global_one: .word 1
+global_two: .word 2
+global_three: .word 3
+global_four: .word 4
+global_five: .word 5
+global_One: .word 10
+global_Two: .word 20
+global_Three: .word 30
+global_Four: .word 40
+global_Five: .word 50
+global_small_array: .space 40
+global_large_array: .space 400
+global_mul: .word 0
+string_0: .asciiz  "%d "
+string_1: .asciiz  "\\n"
+string_2: .asciiz  "prepare finished.\\n"
+string_3: .asciiz  "%d "
+string_4: .asciiz  "\\n"
+string_5: .asciiz  "%d "
+string_6: .asciiz  "\\n"
+string_7: .asciiz  "PROGRAM START!!!\\n"
+string_8: .asciiz  "your lucky number is:"
+string_9: .asciiz  "\\n"
+string_10: .asciiz  "choose your branch(from number 1 to 2):\\n"
+string_11: .asciiz  "res:%d "
+string_12: .asciiz  "res:%d "
+string_13: .asciiz  "res:%d "
 .text
 j f_main
 
 
 
 
-f_fib:
-addiu $sp $sp -72
-sw $ra 68($sp)
-sw $fp 64($sp)
-sw $s0 60($sp)
-sw $s1 56($sp)
-sw $s2 52($sp)
-sw $s3 48($sp)
-sw $s4 44($sp)
-sw $s5 40($sp)
-sw $s6 36($sp)
-sw $s7 32($sp)
-sw $a0 104($sp)
-sw $a1 108($sp)
+f_pro_start:
+addiu $sp $sp -52
+sw $ra 48($sp)
+sw $fp 44($sp)
+sw $s0 40($sp)
+sw $s1 36($sp)
+sw $s2 32($sp)
+sw $s3 28($sp)
+sw $s4 24($sp)
+sw $s5 20($sp)
+sw $s6 16($sp)
+sw $s7 12($sp)
 label_0:
-lw $t0 104($sp)	#n
-lw $t1 108($sp)	#k
-# writeBack
-sw $t0 104($sp)	# n
-sw $t1 108($sp)	# k
-# end writeBack
-bgt $t0 $t1 label_1
-# writeBack
-# end writeBack
-label_2:
-li $v0 1	#const_int_5
-j f_fib_return
-# writeBack
-# end writeBack
+li $s0 0	# i
 # writeBack
 # end writeBack
 label_1:
-li $s1 0	# res
-lw $t0 104($sp)	#n
-lw $t1 108($sp)	#k
-subu $t2 $t0 $t1 	# sub_0
-move $s0 $t2	# i
+lw $t0 global_four	#four
+# small_array
+move $t8  $s0
+sll $t8 $t8 2
+sw $t0 global_small_array($t8 )
+addiu $t1 $s0 1 	# add_0
+move $s0 $t1	# i
+lw $t2 global_One	#One
 # writeBack
-sw $t0 104($sp)	# n
-sw $t1 108($sp)	# k
-sw $t2 12($sp)	# sub_0
+sw $t0  global_four	#four
+sw $t1 4($sp)	# add_0
+sw $t2  global_One	#One
+# end writeBack
+beq $s0 $t2 label_2
+# writeBack
+# end writeBack
+j label_1
+# writeBack
+# end writeBack
+label_2:
+li $t0 97	#const_char_17
+# small_array
+li $t8 10	#const_int_16
+sll $t8 $t8 2
+sw $t0 global_small_array($t8 )
+li $s0 0	# i
+# writeBack
 # end writeBack
 label_3:
-lw $t0 104($sp)	#n
+li $t0 11	#const_int_22
 # writeBack
-sw $t0 104($sp)	# n
 # end writeBack
 bge $s0 $t0 label_4
-# call func: fib
-addiu $sp $sp -8
-move $a0 $s0
-lw $a1 116($sp)	#k
+li $v0 4  # printf string
+la $a0 string_0
+syscall
+li $v0 1  # printf int
+move $a0  $s0
+sll $a0 $a0 2
+lw $a0 global_small_array($a0 )
+syscall
+li $v0 4  # printf string
+la $a0 string_1
+syscall
+addiu $t0 $s0 1 	# add_1
+move $s0 $t0	# i
+# writeBack
+sw $t0 0($sp)	# add_1
+# end writeBack
+j label_3
+# writeBack
+# end writeBack
+label_4:
+li $v0 4  # printf string
+la $a0 string_2
+syscall
+f_pro_start_return:
+lw $s0 40($sp)
+lw $s1 36($sp)
+lw $s2 32($sp)
+lw $s3 28($sp)
+lw $s4 24($sp)
+lw $s5 20($sp)
+lw $s6 16($sp)
+lw $s7 12($sp)
+lw $ra 48($sp)
+lw $fp 44($sp)
+addiu $sp $sp 52
+jr $ra
+
+
+f_init_array:
+addiu $sp $sp -52
+sw $ra 48($sp)
+sw $fp 44($sp)
+sw $s0 40($sp)
+sw $s1 36($sp)
+sw $s2 32($sp)
+sw $s3 28($sp)
+sw $s4 24($sp)
+sw $s5 20($sp)
+sw $s6 16($sp)
+sw $s7 12($sp)
+sw $a0 84($sp)
+label_5:
+lw $t0 84($sp)	#number
+li $t1 5	#const_int_37
+# writeBack
+sw $t0 84($sp)	# number
+# end writeBack
+bgt $t0 $t1 label_6
+# writeBack
+# end writeBack
+label_7:
+lw $t0 84($sp)	#number
+addiu $t1 $t0 1 	# add_2
+move $t0 $t1	# number
+# call func: init_array
+addiu $sp $sp -4
+move $a0 $t0
 addiu $sp $sp -32
 sw $t0 0($sp)
 sw $t1 4($sp)
@@ -89,7 +159,7 @@ sw $t4 16($sp)
 sw $t5 20($sp)
 sw $t6 24($sp)
 sw $t7 28($sp)
-jal f_fib
+jal f_init_array
 lw $t0 0($sp)
 lw $t1 4($sp)
 lw $t2 8($sp)
@@ -99,241 +169,43 @@ lw $t5 20($sp)
 lw $t6 24($sp)
 lw $t7 28($sp)
 addiu $sp $sp 32
-addiu $sp $sp 8
-lw $a0 104($sp)
-lw $a1 108($sp)
-move $t0 $v0
-# back from func: fib
-addu $t1 $s1 $t0 	# add_1
-move $s1 $t1	# res
-addiu $t2 $s0 1 	# add_2
-move $s0 $t2	# i
+addiu $sp $sp 4
+lw $a0 84($sp)
+move $t2 $v0
+# back from func: init_array
+move $v0 $t2
+j f_init_array_return
 # writeBack
-sw $t0 8($sp)	# fcall_22
-sw $t1 4($sp)	# add_1
-sw $t2 0($sp)	# add_2
-# end writeBack
-j label_3
-# writeBack
-# end writeBack
-label_4:
-move $v0 $s1
-j f_fib_return
-# writeBack
+sw $t0 84($sp)	# number
+sw $t1 4($sp)	# add_2
+sw $t2 0($sp)	# fcall_45
 # end writeBack
 # writeBack
 # end writeBack
-label_5:
-f_fib_return:
-lw $s0 60($sp)
-lw $s1 56($sp)
-lw $s2 52($sp)
-lw $s3 48($sp)
-lw $s4 44($sp)
-lw $s5 40($sp)
-lw $s6 36($sp)
-lw $s7 32($sp)
-lw $ra 68($sp)
-lw $fp 64($sp)
-addiu $sp $sp 72
-jr $ra
-
-
-f_print:
-addiu $sp $sp -48
-sw $ra 44($sp)
-sw $fp 40($sp)
-sw $s0 36($sp)
-sw $s1 32($sp)
-sw $s2 28($sp)
-sw $s3 24($sp)
-sw $s4 20($sp)
-sw $s5 16($sp)
-sw $s6 12($sp)
-sw $s7 8($sp)
 label_6:
-li $s0 32	# i
+lw $v0 84($sp)	#number
+j f_init_array_return
 # writeBack
 # end writeBack
-label_7:
-li $t0 34	#const_int_36
-# writeBack
-# end writeBack
-beq $s0 $t0 label_8
-# writeBack
-# end writeBack
-label_9:
-li $v0 11  # printf char
-move $a0 $s0
-syscall
-# writeBack
-# end writeBack
-j label_10
 # writeBack
 # end writeBack
 label_8:
-# writeBack
-# end writeBack
-label_10:
-addiu $t0 $s0 1 	# add_3
-move $s0 $t0	# i
-li $t1 127	#const_int_48
-# writeBack
-sw $t0 0($sp)	# add_3
-# end writeBack
-bge $s0 $t1 label_11
-# writeBack
-# end writeBack
-j label_7
-# writeBack
-# end writeBack
-label_11:
-f_print_return:
-lw $s0 36($sp)
-lw $s1 32($sp)
-lw $s2 28($sp)
-lw $s3 24($sp)
-lw $s4 20($sp)
-lw $s5 16($sp)
-lw $s6 12($sp)
-lw $s7 8($sp)
-lw $ra 44($sp)
-lw $fp 40($sp)
-addiu $sp $sp 48
+f_init_array_return:
+lw $s0 40($sp)
+lw $s1 36($sp)
+lw $s2 32($sp)
+lw $s3 28($sp)
+lw $s4 24($sp)
+lw $s5 20($sp)
+lw $s6 16($sp)
+lw $s7 12($sp)
+lw $ra 48($sp)
+lw $fp 44($sp)
+addiu $sp $sp 52
 jr $ra
 
 
-f_toUpperCase:
-addiu $sp $sp -56
-sw $ra 52($sp)
-sw $fp 48($sp)
-sw $s0 44($sp)
-sw $s1 40($sp)
-sw $s2 36($sp)
-sw $s3 32($sp)
-sw $s4 28($sp)
-sw $s5 24($sp)
-sw $s6 20($sp)
-sw $s7 16($sp)
-sw $a0 88($sp)
-label_12:
-lb $t0 88($sp)	#x
-lb $t1 global_firstLowerCase	#firstLowerCase
-# writeBack
-sb $t0 88($sp)	# x
-sb $t1  global_firstLowerCase	#firstLowerCase
-# end writeBack
-blt $t0 $t1 label_13
-# writeBack
-# end writeBack
-label_14:
-lb $t0 88($sp)	#x
-lb $t1 global_lastLowerCase	#lastLowerCase
-# writeBack
-sb $t0 88($sp)	# x
-sb $t1  global_lastLowerCase	#lastLowerCase
-# end writeBack
-bgt $t0 $t1 label_15
-# writeBack
-# end writeBack
-label_16:
-lb $t0 88($sp)	#x
-lb $t1 global_firstLowerCase	#firstLowerCase
-subu $t2 $t0 $t1 	# sub_4
-lb $t3 global_firstUpperCase	#firstUpperCase
-addu $t4 $t2 $t3 	# add_5
-move $s0 $t4	# c
-move $v0 $s0
-j f_toUpperCase_return
-# writeBack
-sb $t0 88($sp)	# x
-sb $t1  global_firstLowerCase	#firstLowerCase
-sw $t2 4($sp)	# sub_4
-sb $t3  global_firstUpperCase	#firstUpperCase
-sw $t4 0($sp)	# add_5
-# end writeBack
-# writeBack
-# end writeBack
-label_15:
-lb $v0 88($sp)	#x
-j f_toUpperCase_return
-# writeBack
-# end writeBack
-# writeBack
-# end writeBack
-label_17:
-# writeBack
-# end writeBack
-j label_18
-# writeBack
-# end writeBack
-label_13:
-lb $v0 88($sp)	#x
-j f_toUpperCase_return
-# writeBack
-# end writeBack
-# writeBack
-# end writeBack
-label_18:
-f_toUpperCase_return:
-lw $s0 44($sp)
-lw $s1 40($sp)
-lw $s2 36($sp)
-lw $s3 32($sp)
-lw $s4 28($sp)
-lw $s5 24($sp)
-lw $s6 20($sp)
-lw $s7 16($sp)
-lw $ra 52($sp)
-lw $fp 48($sp)
-addiu $sp $sp 56
-jr $ra
-
-
-f_changeGlobal:
-addiu $sp $sp -40
-sw $ra 36($sp)
-sw $fp 32($sp)
-sw $s0 28($sp)
-sw $s1 24($sp)
-sw $s2 20($sp)
-sw $s3 16($sp)
-sw $s4 12($sp)
-sw $s5 8($sp)
-sw $s6 4($sp)
-sw $s7 0($sp)
-label_19:
-li $v0 4  # printf string
-la $a0 string_0
-syscall
-li $v0 1  # printf int
-lw $a0 global_globalInt	#globalInt
-syscall
-li $t0 16	#const_int_80
-	# globalInt
-sw $t0  global_globalInt	#globalInt
-li $v0 4  # printf string
-la $a0 string_1
-syscall
-li $v0 1  # printf int
-lw $a0 global_globalInt	#globalInt
-syscall
-f_changeGlobal_return:
-lw $s0 28($sp)
-lw $s1 24($sp)
-lw $s2 20($sp)
-lw $s3 16($sp)
-lw $s4 12($sp)
-lw $s5 8($sp)
-lw $s6 4($sp)
-lw $s7 0($sp)
-lw $ra 36($sp)
-lw $fp 32($sp)
-addiu $sp $sp 40
-jr $ra
-
-
-f_dealRequest:
+f_save_in_array:
 addiu $sp $sp -76
 sw $ra 72($sp)
 sw $fp 68($sp)
@@ -346,253 +218,100 @@ sw $s5 44($sp)
 sw $s6 40($sp)
 sw $s7 36($sp)
 sw $a0 108($sp)
-li $s1 120
-label_20:
-li $v0 4  # printf string
-la $a0 string_2
-syscall
-li $s2 121	# y
-lw $t0 108($sp)	#operation
-li $t1 0	#const_int_89
-# writeBack
-sw $t0 108($sp)	# operation
-# end writeBack
-bne $t0 $t1 label_21
+label_9:
+li $s0 0	# i
 # writeBack
 # end writeBack
-label_22:
-li $s0 1	# i
+label_10:
+li $t0 5	#const_int_54
 # writeBack
 # end writeBack
-label_23:
-lw $t0 global_length	#length
+bge $s0 $t0 label_11
+li $s1 0	# j
 # writeBack
-sw $t0  global_length	#length
 # end writeBack
-bgt $s0 $t0 label_24
-li $t0 2 	# sub_6
-# call func: fib
-addiu $sp $sp -8
-move $a0 $s0
-move $a1 $t0
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_fib
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 8
-lw $a0 108($sp)
-move $t1 $v0
-# back from func: fib
+label_12:
+li $t0 5	#const_int_60
+# writeBack
+# end writeBack
+bgt $s1 $t0 label_13
+addu $t0 $s0 $s1 	# add_3
+lb $t1 108($sp)	#ch
+# large_array
+move $t8  $t0
+sll $t8 $t8 2
+sw $t1 global_large_array($t8 )
+addiu $t2 $s1 1 	# add_4
+move $s1 $t2	# j
+# writeBack
+sw $t0 16($sp)	# add_3
+sb $t1 108($sp)	# ch
+sw $t2 12($sp)	# add_4
+# end writeBack
+j label_12
+# writeBack
+# end writeBack
+label_13:
+addiu $t0 $s0 1 	# add_5
+move $s0 $t0	# i
+# writeBack
+sw $t0 8($sp)	# add_5
+# end writeBack
+j label_10
+# writeBack
+# end writeBack
+label_11:
+li $s0 10	# i
+# writeBack
+# end writeBack
+label_14:
+li $t0 51	#const_int_83
+# writeBack
+# end writeBack
+bge $s0 $t0 label_15
+lb $t0 108($sp)	#ch
+# large_array
+move $t8  $s0
+sll $t8 $t8 2
+sw $t0 global_large_array($t8 )
+addiu $t1 $t0 1 	# add_6
+move $t0 $t1	# ch
+addiu $t2 $s0 1 	# add_7
+move $s0 $t2	# i
+# writeBack
+sb $t0 108($sp)	# ch
+sw $t1 4($sp)	# add_6
+sw $t2 0($sp)	# add_7
+# end writeBack
+j label_14
+# writeBack
+# end writeBack
+label_15:
 li $v0 4  # printf string
 la $a0 string_3
 syscall
 li $v0 1  # printf int
-move $a0 $t1
+li $t0 10	#const_int_99
+move $a0  $t0
+sll $a0 $a0 2
+lw $a0 global_large_array($a0 )
 syscall
-addiu $t2 $s0 1 	# add_7
-move $s0 $t2	# i
-# writeBack
-sw $t0 16($sp)	# sub_6
-sw $t1 12($sp)	# fcall_102
-sw $t2 8($sp)	# add_7
-# end writeBack
-j label_23
-# writeBack
-# end writeBack
-label_24:
-# writeBack
-# end writeBack
-j label_25
-# writeBack
-# end writeBack
-label_21:
-lw $t0 108($sp)	#operation
-li $t1 1	#const_int_113
-# writeBack
-sw $t0 108($sp)	# operation
-# end writeBack
-bne $t0 $t1 label_26
-# writeBack
-# end writeBack
-label_27:
-# call voidfunc: print
-addiu $sp $sp -0
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_print
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 0
-lw $a0 108($sp)
-# back from voidfunc: print
-# writeBack
-# end writeBack
-j label_28
-# writeBack
-# end writeBack
-label_26:
-lw $t0 108($sp)	#operation
-li $t1 2	#const_int_120
-# writeBack
-sw $t0 108($sp)	# operation
-# end writeBack
-bne $t0 $t1 label_29
-# writeBack
-# end writeBack
-label_30:
-# call func: toUpperCase
-addiu $sp $sp -4
-move $a0 $s1
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_toUpperCase
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 4
-lw $a0 108($sp)
-move $t0 $v0
-# back from func: toUpperCase
 li $v0 4  # printf string
 la $a0 string_4
 syscall
-li $v0 11  # printf char
-move $a0 $t0
-syscall
-# call func: toUpperCase
-addiu $sp $sp -4
-li $a0 116	#const_char_126
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_toUpperCase
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 4
-lw $a0 108($sp)
-move $t1 $v0
-# back from func: toUpperCase
-li $v0 11  # printf char
-move $a0 $t1
-syscall
-# writeBack
-sb $t0 4($sp)	# fcall_124
-sb $t1 0($sp)	# fcall_127
-# end writeBack
-j label_31
-# writeBack
-# end writeBack
-label_29:
-lw $t0 108($sp)	#operation
-li $t1 3	#const_int_132
-# writeBack
-sw $t0 108($sp)	# operation
-# end writeBack
-bne $t0 $t1 label_32
-# writeBack
-# end writeBack
-label_33:
-# call voidfunc: changeGlobal
-addiu $sp $sp -0
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $t4 16($sp)
-sw $t5 20($sp)
-sw $t6 24($sp)
-sw $t7 28($sp)
-jal f_changeGlobal
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $t4 16($sp)
-lw $t5 20($sp)
-lw $t6 24($sp)
-lw $t7 28($sp)
-addiu $sp $sp 32
-addiu $sp $sp 0
-lw $a0 108($sp)
-# back from voidfunc: changeGlobal
-# writeBack
-# end writeBack
-j label_34
-# writeBack
-# end writeBack
-label_32:
 li $v0 4  # printf string
 la $a0 string_5
 syscall
-# writeBack
-# end writeBack
-label_34:
-# writeBack
-# end writeBack
-label_31:
-# writeBack
-# end writeBack
-label_28:
-# writeBack
-# end writeBack
-label_25:
-f_dealRequest_return:
+li $v0 1  # printf int
+li $t1 50	#const_int_103
+move $a0  $t1
+sll $a0 $a0 2
+lw $a0 global_large_array($a0 )
+syscall
+li $v0 4  # printf string
+la $a0 string_6
+syscall
+f_save_in_array_return:
 lw $s0 64($sp)
 lw $s1 60($sp)
 lw $s2 56($sp)
@@ -608,24 +327,38 @@ jr $ra
 
 
 f_main:
-addiu $sp $sp -52
-label_35:
-li $t0 0	#const_int_139
-	# globalInt
-sw $t0  global_globalInt	#globalInt
-li $v0 5
-syscall
-move $s1 $v0
-li $s0 0	# i
+addiu $sp $sp -116
+li $t0 45
+sw $t0 72($sp)
+label_16:
+lb $t0 global_multi	#multi
+	# mul
+sb $t0  global_mul	#mul
+li $s1 97	# ch
+lb $t1 global_mul	#mul
+li $t2 43	#const_char_112
+# writeBack
+sb $t0  global_multi	#multi
+sb $t1  global_mul	#mul
+# end writeBack
+bne $t1 $t2 label_17
 # writeBack
 # end writeBack
-label_36:
+label_18:
 # writeBack
 # end writeBack
-bge $s0 $s1 label_37
-# call voidfunc: dealRequest
-addiu $sp $sp -4
-move $a0 $s0
+j label_19
+# writeBack
+# end writeBack
+label_17:
+j f_main_return
+# writeBack
+# end writeBack
+# writeBack
+# end writeBack
+label_19:
+# call voidfunc: pro_start
+addiu $sp $sp -0
 addiu $sp $sp -32
 sw $t0 0($sp)
 sw $t1 4($sp)
@@ -635,7 +368,56 @@ sw $t4 16($sp)
 sw $t5 20($sp)
 sw $t6 24($sp)
 sw $t7 28($sp)
-jal f_dealRequest
+jal f_pro_start
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 0
+# back from voidfunc: pro_start
+li $v0 4  # printf string
+la $a0 string_7
+syscall
+li $v0 4  # printf string
+la $a0 string_8
+syscall
+li $v0 1  # printf int
+li $a0 1	#const_int_120
+syscall
+li $v0 4  # printf string
+la $a0 string_9
+syscall
+li $v0 4  # printf string
+la $a0 string_10
+syscall
+li $v0 5
+syscall
+move $s2 $v0
+li $t0 0	#const_int_127
+# writeBack
+# end writeBack
+beq $s2 $t0 label_20
+# writeBack
+# end writeBack
+label_21:
+# call func: init_array
+addiu $sp $sp -4
+move $a0 $s2
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_init_array
 lw $t0 0($sp)
 lw $t1 4($sp)
 lw $t2 8($sp)
@@ -646,16 +428,109 @@ lw $t6 24($sp)
 lw $t7 28($sp)
 addiu $sp $sp 32
 addiu $sp $sp 4
-# back from voidfunc: dealRequest
+move $t0 $v0
+# back from func: init_array
+move $s0 $t0	# result
+# writeBack
+sw $t0 56($sp)	# fcall_131
+# end writeBack
+j label_22
+# writeBack
+# end writeBack
+label_20:
+# writeBack
+# end writeBack
+label_22:
 li $v0 4  # printf string
-la $a0 string_6
+la $a0 string_11
 syscall
-addiu $t0 $s0 1 	# add_8
-move $s0 $t0	# i
+li $v0 1  # printf int
+move $a0 $s0
+syscall
+li $t0 0 	# sub_8
+addiu $t1 $t0 1 	# add_9
+li $t2 49998 	# add_10
+div $t3 $s0 $s0 	# div_11
+lw $t4 global_Two	#Two
+subiu $t5 $t4 19 	# sub_12
+li $t6 1	#const_int_151
+mul $t7 $t6 $t5 	# mult_13
+sw $t4  global_Two	#Two
+lw $t4 global_two	#two
+sw $t4  global_two	#two
+subu $t4 $t4 $t7 	# sub_14
+sw $t0 52($sp)	# sub_8
+mul $t0 $t3 $t4 	# mult_15
+sw $t0 24($sp)	# mult_15
+li $t0 10000	#const_int_146
+sw $t1 48($sp)	# add_9
+lw $t1 24($sp)	#mult_15
+mul $t0 $t0 $t1 	# mult_16
+sw $t0 20($sp)	# mult_16
+subu $t0 $t2 $t0 	# sub_17
+sw $t0 16($sp)	# sub_17
+li $t0 1	#const_int_142
+sw $t1 24($sp)	# mult_15
+lw $t1 16($sp)	#sub_17
+mul $t0 $t0 $t1 	# mult_18
+sw $t0 12($sp)	# mult_18
+lw $t0 48($sp)	#add_9
+sw $t1 16($sp)	# sub_17
+lw $t1 12($sp)	#mult_18
+sw $t0 48($sp)	# add_9
+subu $t0 $t0 $t1 	# sub_19
+sw $t0 8($sp)	# sub_19
+addu $t0 $t0 $s0 	# add_20
+move $s0 $t0	# result
+li $v0 4  # printf string
+la $a0 string_12
+syscall
+li $v0 1  # printf int
+move $a0 $s0
+syscall
+sw $t0 4($sp)	# add_20
+lw $t0 global_one	#one
+sw $t0  global_one	#one
+addu $t0 $s1 $t0 	# add_21
+move $s1 $t0	# ch
+# call voidfunc: save_in_array
+addiu $sp $sp -4
+move $a0 $s1
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_save_in_array
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 4
+# back from voidfunc: save_in_array
+li $v0 4  # printf string
+la $a0 string_13
+syscall
+li $v0 1  # printf int
+move $a0 $s0
+syscall
+j f_main_return
 # writeBack
-sw $t0 0($sp)	# add_8
+sw $t0 0($sp)	# add_21
+sw $t1 12($sp)	# mult_18
+sw $t2 44($sp)	# add_10
+sw $t3 40($sp)	# div_11
+sw $t4 28($sp)	# sub_14
+sw $t5 36($sp)	# sub_12
+sw $t7 32($sp)	# mult_13
 # end writeBack
-j label_36
-# writeBack
-# end writeBack
-label_37:
+f_main_return:

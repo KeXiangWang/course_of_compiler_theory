@@ -37,8 +37,8 @@ ErrorHandler::ErrorHandler()
 }
 
 void ErrorHandler::report(int lineCount, string currentLine, ErrorType errortype) {
-	std::cout << "Error" << errortype << ": " << "Line: " << lineCount 
-		<< " \"" << currentLine << "\" " << errorToString[errortype] <<std::endl;
+	std::cout << "Error\t" << errortype << ": " << "\tLine: " << lineCount 
+		<< "\t \"" << currentLine << "\" " << errorToString[errortype] <<std::endl;
 	errorOccured = true;
 }
 
