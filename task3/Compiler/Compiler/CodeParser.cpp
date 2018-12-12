@@ -15,7 +15,7 @@ Quantity *CodeParser::parseExpression() {
 	OPCode opCode = OP_PLUS;
 	bool start = true;
 	if (token == PLUS || token == MINUS) {
-		// TODO add sign
+		// add sign
 		opCode = token == PLUS ? OP_PLUS : OP_SUB;
 		token = lexicon.nextToken();
 	}
@@ -37,7 +37,7 @@ Quantity *CodeParser::parseExpression() {
 			token = lexicon.nextToken();
 			return nullptr;
 		}
-		quantity = new Caculator(opCode, quantity, quantity_next); // TODO optimizer
+		quantity = new Caculator(opCode, quantity, quantity_next); // optimizer
 	}
 	return quantity;
 }
@@ -61,7 +61,7 @@ Quantity *CodeParser::parseTerm() {
 			token = lexicon.nextToken();
 			return nullptr;
 		}
-		quantity = new Caculator(opCode, quantity, quantity_next); // TODO optimizer
+		quantity = new Caculator(opCode, quantity, quantity_next); // optimizer
 	}
 	return quantity;
 
@@ -90,7 +90,7 @@ Quantity *CodeParser::parseFactor() {
 				reportAndJumpOver(WRONG_FUNCTION_CALL, RPARENTHESE);
 				return nullptr;
 			}
-			// TODO make a parameter list
+			// make a parameter list
 			vector<Quantity *> parameters;
 			do {
 				token = lexicon.nextToken();
@@ -101,7 +101,7 @@ Quantity *CodeParser::parseFactor() {
 				if (parameter == nullptr) {
 					return nullptr;
 				}
-				// TODO add to the parameter list
+				// add to the parameter list
 				parameters.push_back(parameter);
 			} while (token == COMMA);
 			if (token != RPARENTHESE) {
@@ -144,7 +144,7 @@ Quantity *CodeParser::parseFactor() {
 			}
 			else {
 				string varName = identifier;
-				quantity = new Variable(tableElement->dataType, tableElement->name); // TODO creat var;
+				quantity = new Variable(tableElement->dataType, tableElement->name); // creat var;
 				return quantity;
 			}
 		}
@@ -152,6 +152,11 @@ Quantity *CodeParser::parseFactor() {
 	case LPARENTHESE:
 		token = lexicon.nextToken();
 		quantity = parseExpression();
+		// temp for debug
+		if (quantity->dataType == TYPECHAR) {
+			quantity->dataType = TYPEINT;
+			cout << "Transfer to int compulsively because of the PARENTHESE" << endl;
+		}
 		if (token != RPARENTHESE) {
 			return nullptr;
 		}
@@ -228,7 +233,6 @@ void CodeParser::parseStatement() {
 					return;
 				}
 				index = parseExpression();
-				// TODO deal with index
 				if (index == nullptr) {
 					jumpToToken(SEMICOLON);
 					token = lexicon.nextToken();
@@ -244,6 +248,9 @@ void CodeParser::parseStatement() {
 				token = lexicon.nextToken();
 				Quantity *quantity;
 				quantity = parseExpression();
+				if (quantity->dataType != tableElement->dataType) {
+					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ASSIGNMENT_TYPE, true);
+				}
 				if (quantity == nullptr) {
 					jumpToToken(SEMICOLON);
 					token = lexicon.nextToken();
@@ -289,11 +296,11 @@ void CodeParser::parseStatement() {
 					reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
 					return;
 				}
-				if (parameters.size() != function->parameters.size()) { // TODO check number of args
+				if (parameters.size() != function->parameters.size()) { // check number of args
 					reportAndJumpOver(WRONG_ARGUMENT_LIST, SEMICOLON);
 					return;
 				}
-				for (auto i = 0; i < (int)parameters.size(); i++) { // TODO check type of args
+				for (auto i = 0; i < (int)parameters.size(); i++) { // check type of args
 					if (parameters[i]->dataType != function->parameters[i]->dataType) {
 						reportAndJumpOver(WRONG_ARGUMENT_LIST, SEMICOLON);
 						return;
@@ -316,7 +323,6 @@ void CodeParser::parseStatement() {
 			reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
 			return;
 		}
-		// TODO add become / func
 		break;
 	default:
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
@@ -431,13 +437,13 @@ Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 	if (quantity1 == nullptr) {
 		return VOIDSYM;
 	}
-	DataType type1;
 	cout << "quantity1 type:" << ((*quantity1)->dataType == TYPEINT ? "int" : "char") << endl;;
+	if ((*quantity1)->dataType != TYPEINT) {
+		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_QUANTITY_TYPE, true);
+	}
 	if (compareSet.find(token) == compareSet.end() ) {
 		if (token == RPARENTHESE) {
-			if ((*quantity1)->dataType != TYPEINT) {
-				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_QUANTITY_TYPE);
-			}
+
 			return NULLSYM;
 		}
 		else {
@@ -447,13 +453,13 @@ Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 	compareToken = token;
 	token = lexicon.nextToken();
 	*quantity2 = parseExpression();
-	// TODO set a compare 
+	// set a compare 
 	if (quantity2 == nullptr) {
 		return VOIDSYM;
 	}
 	cout << "quantity2 type:" << ((*quantity2)->dataType == TYPEINT ? "int" : "char") << endl;;
-	if ((*quantity1)->dataType != (*quantity2)->dataType) {
-		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_QUANTITY_TYPE);
+	if ((*quantity2)->dataType != TYPEINT) {
+		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_QUANTITY_TYPE, true);
 	}
 	return compareToken;
 }
@@ -677,7 +683,7 @@ void CodeParser::parseIf() {
 	Quantity *quantity1 = nullptr;
 	Quantity *quantity2 = nullptr;
 	Token gotCompareToken = parseCondition(&quantity1, &quantity2);
-	if (gotCompareToken == VOIDSYM) { // TODO deal with error
+	if (gotCompareToken == VOIDSYM) { // deal with error
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
 	}
 	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, elseTable);
@@ -695,7 +701,7 @@ void CodeParser::parseIf() {
 		if (printDetail) cout << "set a else " << endl;
 		token = lexicon.nextToken();	
 		parseStatement();
-		// TODO set else then 
+		// set else then 
 	}
 	elementCreater.setQuadTable(nextTable);
 }
@@ -723,7 +729,7 @@ void CodeParser::parseDoWhile() {
 	Token gotCompareToken = parseCondition(&quantity1, &quantity2);
 	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, nextTable);
 	elementCreater.createJump(new Label(loopTable)); // jump back loop
-	// TODO set jump next then
+	// set jump next then
 	if (token != RPARENTHESE) {
 		reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, RPARENTHESE);
 		return;
@@ -777,14 +783,14 @@ void CodeParser::parseFor() {
 
 	Token gotCompareToken = parseCondition(&quantity1, &quantity2); // parseCondition
 	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, nextTable);
-	// TODO set jump then next
+	// set jump then next
 
 	token = lexicon.nextToken();
 	if (token != IDENT) {
 		reportAndJumpOver(BECOME_EXPECTED, RBRACE);
 		return;
 	}
-	identifier = lexicon.getStringWord(); // TODO check whether the ident is legal
+	identifier = lexicon.getStringWord(); // check whether the ident is legal
 	TableElement *tableElement;
 	if ((tableElement = elementCreater.findElement(identifier)) == nullptr) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNDEFINED_IDENTIFIER);
@@ -855,7 +861,7 @@ void CodeParser::parseScanf() {
 			parameters.push_back(new Variable(tableElement->dataType, identifier));
 		}
 		if (printDetail) cout << "scan into " << identifier << endl;
-		// TODO add to scanf list
+		// add to scanf list
 		token = lexicon.nextToken();
 	} while (token == COMMA);
 	if (token != RPARENTHESE) {
@@ -882,7 +888,7 @@ void CodeParser::parsePrintf() {
 	if (token == STR) {
 		string stringPrintf = lexicon.getStringTemp();
 		if (printDetail) cout << "        print string \"" << stringPrintf << "\"" << endl;
-		// TODO add string
+		// add string
 		token = lexicon.nextToken();
 		if (token == COMMA) {
 			token = lexicon.nextToken();
@@ -944,7 +950,7 @@ void CodeParser::parseReturn() {
 	Function *function = elementCreater.getCurrentFunction();
 	token = lexicon.nextToken();
 	if (printDetail) cout << "return something " << endl;
-	// TODO talk about the type of function
+	// talk about the type of function
 	if (function->functionType == TYPEVOID) {
 		if (token != SEMICOLON) {
 			errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);

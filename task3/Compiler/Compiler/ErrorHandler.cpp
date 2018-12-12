@@ -34,8 +34,8 @@ ErrorHandler::ErrorHandler()
 	errorToString[MODIFY_CONST_VALUE			] = "encounter a modification of constant ";
 	errorToString[WRONG_MAIN_TYPE				] = "main expected to return void ";
 	errorToString[MAIN_REPEAT_DEFINE			] = "main have been defined ";
-	errorToString[WRONG_QUANTITY_TYPE			] = "the type does't meet the requirements ";
-	
+	errorToString[WRONG_QUANTITY_TYPE			] = "the type of quantity does't meet the requirements ";
+	errorToString[WRONG_ASSIGNMENT_TYPE			] = "the type of assignment does't meet the requirements ";
 }
 
 void ErrorHandler::report(int lineCount, string currentLine, ErrorType errortype, bool ignore) {
