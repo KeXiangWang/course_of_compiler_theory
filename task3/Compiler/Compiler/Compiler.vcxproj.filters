@@ -78,4 +78,8 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="resource.txt" />
+    <Text Include="output.txt" />
+  </ItemGroup>
 </Project>

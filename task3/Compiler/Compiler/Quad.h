@@ -31,7 +31,7 @@ public:
 	Quantity(OPCode opCode, DataType dataType) :Quad(opCode), dataType(dataType) {};
 	DataType dataType;
 };
-
+// Quantity: caculator, Constant, Variable, Array, FunctionCall
 class Caculator :public Quantity {
 public:
 	Caculator(OPCode opCode, Quantity *quantity1, Quantity *quantity2) : Quantity(opCode, TYPEINT), quantity1(quantity1), quantity2(quantity2) {

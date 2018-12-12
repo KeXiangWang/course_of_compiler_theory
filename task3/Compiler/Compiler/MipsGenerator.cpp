@@ -463,6 +463,9 @@ void MipsGenerator::generatePrintf(Function *function, Quad *quad) {
 			exertCode.push_back("syscall");
 		}
 	}
+	exertCode.push_back("li $v0 11  # char");
+	exertCode.push_back("li $a0 10");
+	exertCode.push_back("syscall");
 }
 
 void MipsGenerator::decreaseRef(Quantity *value) {
@@ -762,7 +765,7 @@ void MipsGenerator::storeValue(Function *function, Quad *quad, string reg) {
 		exertCode.push_back(instr + reg + to_string((long long)stackOffset[quad->id]) + "($sp)" + "\t# " + quad->id);
 	}
 	else {
-		std::cout << quad->opCode << "why" << std::endl;
+		//std::cout << quad->opCode << "why" << std::endl;
 	}
 }
 

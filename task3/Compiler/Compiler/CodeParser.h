@@ -20,6 +20,7 @@ private:
 	bool gotFunction; // whether have got function and finished var declaration
 	bool gotMain; // whether have got main
 	int arraySize; // size of array
+	bool printDetail;
 	ErrorHandler &errorHandler;
 	Lexicon &lexicon;
 	ElementCreater &elementCreater;
@@ -47,6 +48,7 @@ public:
 		compareSet.insert(GEQ);			// >=
 		compareSet.insert(NEQ);			// !=
 		compareSet.insert(EQU);			// ==
+		printDetail = false;
 	};
 
 	Quantity *parseExpression();
