@@ -110,6 +110,11 @@ Quantity *CodeParser::parseFactor() {
 			if (function->parameters.size() != parameters.size()) {
 				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST);
 			}
+			for (auto i = 0; i < (int)parameters.size(); i++) { // check type of args
+				if (parameters[i]->dataType != function->parameters[i]->dataType) {
+					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+				}
+			}
 			quantity = new FunctionCall(function->functionType, functionName, parameters);
 			token = lexicon.nextToken();
 			if (printDetail) cout << "call a function " << functionName << endl;
@@ -248,12 +253,12 @@ void CodeParser::parseStatement() {
 				token = lexicon.nextToken();
 				Quantity *quantity;
 				quantity = parseExpression();
-				if (quantity->dataType != tableElement->dataType) {
-					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ASSIGNMENT_TYPE, true);
-				}
 				if (quantity == nullptr) {
 					jumpToToken(SEMICOLON);
 					token = lexicon.nextToken();
+				}
+				if (quantity->dataType != tableElement->dataType) { // match assignment
+					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ASSIGNMENT_TYPE, true);
 				}
 				if (token != SEMICOLON) {
 					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
@@ -964,11 +969,17 @@ void CodeParser::parseReturn() {
 		if (token == LPARENTHESE) {
 			token = lexicon.nextToken();
 			Quantity *quantity = parseExpression();
+			if (quantity == nullptr) {
+				return;
+			}
 			if (token != RPARENTHESE) {
 				reportAndJumpOver(RIGHT_PARENTHESES_EXPECTED, SEMICOLON);
 				return;
 			}
 			token = lexicon.nextToken();
+			if (quantity->dataType != function->functionType) {
+				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_RETURN_TYPE, true);
+			}
 			if (token != SEMICOLON) {
 				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 			}
