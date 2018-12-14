@@ -29,7 +29,7 @@ class Quantity :public Quad {
 	friend class MipsGenerator;
 public:
 	Quantity(OPCode opCode, DataType dataType) :Quad(opCode), dataType(dataType) {};
-	virtual const bool operator==(const Quantity *quantity) { return true; };
+	virtual bool equals(Quantity *quantity) const;
 	DataType dataType;
 };
 // Quantity: caculator, Constant, Variable, Array, FunctionCall
@@ -53,6 +53,7 @@ public:
 		}
 		caculatorCount++;
 	};
+	virtual bool equals(Quantity *quantity) const;  
 	Quantity *quantity1;
 	Quantity *quantity2;
 	static int caculatorCount; // for name
@@ -68,21 +69,25 @@ public:
 			id = "const_char_" + std::to_string((long long)count);
 		}
 	};
-	virtual const bool operator==(const Constant *constant) { return true; };
+	virtual bool equals(Quantity *quantity) const;
 	int value;
 };
 
 class Variable :public Quantity {
 public:
 	Variable(DataType dataType, string name, Quantity *value = nullptr) :Quantity(OP_VAR, dataType), name(name), value(value) { id = name; };
+	virtual bool equals(Quantity *quantity) const;
 	string name;
 	Quantity *value;
 };
 
 class Array :public Quantity {
 public:
-	Array(DataType dataType, string name, Quantity *index, Quantity *value = nullptr) : 
-		Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) { id = "array_" + std::to_string((long long)count); };
+	Array(DataType dataType, string name, Quantity *index, Quantity *value = nullptr) :
+		Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) {
+		id = "array_" + std::to_string((long long)count);
+	};
+	virtual bool equals(Quantity *quantity) const;
 	string name;
 	Quantity *value; // the value of the array element
 	Quantity *index; // the index
@@ -90,8 +95,11 @@ public:
 
 class FunctionCall :public Quantity {
 public:
-	FunctionCall(DataType dataType, string name, vector<Quantity *> parameters) : 
-		Quantity(OP_FUNC, dataType), name(name), parameters(parameters) { id = "fcall_" + std::to_string((long long)count); };
+	FunctionCall(DataType dataType, string name, vector<Quantity *> parameters) :
+		Quantity(OP_FUNC, dataType), name(name), parameters(parameters) {
+		id = "fcall_" + std::to_string((long long)count);
+	};
+	virtual bool equals(Quantity *Quantity) const;
 	string name;
 	vector<Quantity *> parameters;
 };
@@ -137,7 +145,7 @@ public:
 
 class Branch :public Quad {
 public:
-	Branch(OPCode opCode, Quantity *quantity1, Quantity *quantity2, Label *label) 
+	Branch(OPCode opCode, Quantity *quantity1, Quantity *quantity2, Label *label)
 		:Quad(opCode), quantity1(quantity1), quantity2(quantity2), label(label) {};
 	Quantity *quantity1;
 	Quantity *quantity2;
