@@ -30,7 +30,9 @@ enum ErrorType {
 	WRONG_ARGUMENT_LIST,
 	MODIFY_CONST_VALUE,
 	WRONG_MAIN_TYPE,
-	MAIN_REPEAT_DEFINE
+	WRONG_QUANTITY_TYPE,
+	WRONG_ASSIGNMENT_TYPE,
+	MAIN_REPEAT_DEFINE,
 };
 
 using std::unordered_map;
@@ -40,7 +42,7 @@ class ErrorHandler {
 public:
 	ErrorHandler();
 	bool errorHaveOccured();
-	void report(int lineCount,string currentLine, ErrorType errortype);
+	void report(int lineCount,string currentLine, ErrorType errortype, bool ignore = false);
 	bool errorOccured;
 
 private:

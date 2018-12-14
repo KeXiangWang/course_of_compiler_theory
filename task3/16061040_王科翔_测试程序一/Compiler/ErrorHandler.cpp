@@ -34,12 +34,20 @@ ErrorHandler::ErrorHandler()
 	errorToString[MODIFY_CONST_VALUE			] = "encounter a modification of constant ";
 	errorToString[WRONG_MAIN_TYPE				] = "main expected to return void ";
 	errorToString[MAIN_REPEAT_DEFINE			] = "main have been defined ";
+	errorToString[WRONG_QUANTITY_TYPE			] = "the type of quantity does't meet the requirements ";
+	errorToString[WRONG_ASSIGNMENT_TYPE			] = "the type of assignment does't meet the requirements ";
 }
 
-void ErrorHandler::report(int lineCount, string currentLine, ErrorType errortype) {
-	std::cout << "Error" << errortype << ": " << "Line: " << lineCount 
-		<< " \"" << currentLine << "\" " << errorToString[errortype] <<std::endl;
-	errorOccured = true;
+void ErrorHandler::report(int lineCount, string currentLine, ErrorType errortype, bool ignore) {
+	string temp = "";
+	for (auto it = currentLine.begin(); it != currentLine.end(); it++) {
+		if (*it != '\n') {
+			temp += *it;
+		}
+	}
+	std::cout << "Error\t" << errortype << ": " << "\tLine: " << lineCount 
+		<< "\t \"" << temp << "\" " << errorToString[errortype] <<std::endl;
+	if (!ignore) errorOccured = true;
 }
 
 bool ErrorHandler::errorHaveOccured() {

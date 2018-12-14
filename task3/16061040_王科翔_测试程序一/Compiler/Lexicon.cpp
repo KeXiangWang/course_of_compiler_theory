@@ -76,7 +76,6 @@ Token Lexicon::nextToken() {
 		else {
 			currentToken = charToToken['/'];
 			currentString + '/';
-			nextChar();
 			return currentToken;
 		}
 	case '!':
@@ -200,9 +199,9 @@ Token Lexicon::nextToken() {
 				return currentToken;
 			}
 		}
-		else  if (isalpha(currentChar)) {
+		else  if (isalpha(currentChar) || currentChar == '_') {
 			stringWord.clear();
-			while (isalnum(currentChar)) {
+			while (isalnum(currentChar) || currentChar == '_') {
 				stringWord += currentChar;
 				currentString += currentChar;
 				nextChar();

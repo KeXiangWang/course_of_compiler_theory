@@ -79,7 +79,13 @@ void QuadTable::addQuad(Quad * quad) {
 		addQuad(print->quantity);
 		break;
 	}
-
+	case OP_ARRAY: {
+		Array *arr = static_cast<Array*>(quad);
+		addQuad(arr->index);
+		if (arr->value != nullptr)
+			addQuad(arr->value);
+		break;
+	}
 	default:
 		break;
 	}

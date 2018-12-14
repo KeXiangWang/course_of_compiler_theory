@@ -95,13 +95,6 @@ void MipsGenerator::generateFunction(Function * function) {
 			}
 		}
 	}
-	// init global
-	//for (auto quadTable = function->headQuadTable; quadTable != nullptr; quadTable = quadTable->next) {
-		//if (quadTableToLabel.find(quadTable) == quadTableToLabel.end()) {
-		//	quadTableToLabel[quadTable] = labelCount++;
-		//}
-		//exertCode.push_back("label_" + to_string(quadTableToLabel[quadTable]) + ":"); // each quadTable set a label
-		//vector<Quad *> *quads = &quadTable->quads; // 
 	for (auto quadTable = function->quadTableVector.begin(); quadTable != function->quadTableVector.end(); quadTable++) {
 		if (quadTableToLabel.find(*quadTable) == quadTableToLabel.end()) {
 			quadTableToLabel[*quadTable] = labelCount++;
@@ -177,8 +170,8 @@ void MipsGenerator::generateFunction(Function * function) {
 		}
 		std::cout << "# end a basicBlock " << std::endl;
 	}
+	exertCode.push_back("f_" + function->name + "_return:");
 	if (function->name != "main") {
-		exertCode.push_back("f_" + function->name + "_return:");
 		// load $s0~$s7
 		for (int i = 0; i < 8; i++) {
 			exertCode.push_back("lw $s" + to_string(i) + " " + to_string(-12 - (i << 2) + offset) + "($sp)");
@@ -187,6 +180,7 @@ void MipsGenerator::generateFunction(Function * function) {
 		exertCode.push_back("lw $ra " + to_string(-4 + offset) + "($sp)");
 		exertCode.push_back("lw $fp " + to_string(-8 + offset) + "($sp)");
 		exertCode.push_back("addiu $sp $sp " + to_string(offset));
+	
 		// return
 		exertCode.push_back("jr $ra");
 		//exertCode.push_back("nop");
@@ -469,6 +463,9 @@ void MipsGenerator::generatePrintf(Function *function, Quad *quad) {
 			exertCode.push_back("syscall");
 		}
 	}
+	exertCode.push_back("li $v0 11  # char");
+	exertCode.push_back("li $a0 10");
+	exertCode.push_back("syscall");
 }
 
 void MipsGenerator::decreaseRef(Quantity *value) {
@@ -768,7 +765,7 @@ void MipsGenerator::storeValue(Function *function, Quad *quad, string reg) {
 		exertCode.push_back(instr + reg + to_string((long long)stackOffset[quad->id]) + "($sp)" + "\t# " + quad->id);
 	}
 	else {
-		std::cout << quad->opCode << "why" << std::endl;
+		//std::cout << quad->opCode << "why" << std::endl;
 	}
 }
 

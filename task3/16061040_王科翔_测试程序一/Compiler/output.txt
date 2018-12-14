@@ -1,0 +1,121 @@
+.data
+.text
+j f_main
+
+
+
+
+f_get:
+addiu $sp $sp -56
+sw $ra 52($sp)
+sw $fp 48($sp)
+sw $s0 44($sp)
+sw $s1 40($sp)
+sw $s2 36($sp)
+sw $s3 32($sp)
+sw $s4 28($sp)
+sw $s5 24($sp)
+sw $s6 20($sp)
+sw $s7 16($sp)
+sw $a0 88($sp)
+sw $a1 92($sp)
+label_0:
+lw $t0 88($sp)	#a
+lw $t1 92($sp)	#b
+addu $t2 $t0 $t1 	# add_0
+move $s0 $t2	# g
+move $v0 $s0
+j f_get_return
+# writeBack
+sw $t0 88($sp)	# a
+sw $t1 92($sp)	# b
+sw $t2 0($sp)	# add_0
+# end writeBack
+f_get_return:
+lw $s0 44($sp)
+lw $s1 40($sp)
+lw $s2 36($sp)
+lw $s3 32($sp)
+lw $s4 28($sp)
+lw $s5 24($sp)
+lw $s6 20($sp)
+lw $s7 16($sp)
+lw $ra 52($sp)
+lw $fp 48($sp)
+addiu $sp $sp 56
+jr $ra
+
+
+f_main:
+addiu $sp $sp -56
+lw $s2 4($sp)	#c
+label_1:
+li $s0 97	# a
+li $s1 98	# b
+# writeBack
+# end writeBack
+bne $s0 $s1 label_2
+# writeBack
+# end writeBack
+label_3:
+li $v0 11  # printf char
+move $a0 $s0
+syscall
+li $v0 11  # char
+li $a0 10
+syscall
+# writeBack
+# end writeBack
+j label_4
+# writeBack
+# end writeBack
+label_2:
+li $v0 11  # printf char
+move $a0 $s0
+syscall
+li $v0 11  # char
+li $a0 10
+syscall
+li $v0 1  # printf int
+move $a0 $s0
+syscall
+li $v0 11  # char
+li $a0 10
+syscall
+# writeBack
+# end writeBack
+label_4:
+# call func: get
+addiu $sp $sp -8
+li $a0 97	#const_char_23
+li $a1 1	#const_int_24
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_get
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 8
+move $t0 $v0
+# back from func: get
+move $s1 $t0	# b
+li $v0 1  # printf int
+move $a0 $s2
+syscall
+li $v0 11  # char
+li $a0 10
+syscall
+f_main_return:
