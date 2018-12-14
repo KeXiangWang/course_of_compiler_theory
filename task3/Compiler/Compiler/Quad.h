@@ -29,6 +29,7 @@ class Quantity :public Quad {
 	friend class MipsGenerator;
 public:
 	Quantity(OPCode opCode, DataType dataType) :Quad(opCode), dataType(dataType) {};
+	virtual const bool operator==(const Quantity *quantity) { return true; };
 	DataType dataType;
 };
 // Quantity: caculator, Constant, Variable, Array, FunctionCall
@@ -67,6 +68,7 @@ public:
 			id = "const_char_" + std::to_string((long long)count);
 		}
 	};
+	virtual const bool operator==(const Constant *constant) { return true; };
 	int value;
 };
 
