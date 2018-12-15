@@ -92,33 +92,24 @@ void QuadTable::addQuad(Quad * quad) {
 	quads.push_back(quad);
 }
 
-bool Quantity::equals(Quantity *quantity) const {
-	return opCode == quantity->opCode;
-}
 
 bool Caculator::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;
 	Caculator *caculator = static_cast<Caculator *>(quantity);
+	return quantity1->equals(caculator->quantity1) && quantity2->equals(caculator->quantity2);
 }
 
 bool Constant::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;
 	Constant *constant = static_cast<Constant *>(quantity);
+	return dataType == constant->dataType && value == constant->value;
 }
 
 bool Variable::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;
-}
-
-bool Array::equals(Quantity *quantity) const {
-	if (quantity->opCode != opCode)
-		return false;
-}
-
-bool FunctionCall::equals(Quantity *quantity) const {
-	if (quantity->opCode != opCode)
-		return false;
+	Variable *variable = static_cast<Variable *>(quantity);
+	return dataType == variable->dataType && name == variable->name;
 }

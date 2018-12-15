@@ -29,7 +29,7 @@ class Quantity :public Quad {
 	friend class MipsGenerator;
 public:
 	Quantity(OPCode opCode, DataType dataType) :Quad(opCode), dataType(dataType) {};
-	virtual bool equals(Quantity *quantity) const;
+	virtual bool equals(Quantity *quantity) const { return opCode == quantity->opCode; };
 	DataType dataType;
 };
 // Quantity: caculator, Constant, Variable, Array, FunctionCall
@@ -87,7 +87,7 @@ public:
 		Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) {
 		id = "array_" + std::to_string((long long)count);
 	};
-	virtual bool equals(Quantity *quantity) const;
+	virtual bool equals(Quantity *quantity) const { return false; };
 	string name;
 	Quantity *value; // the value of the array element
 	Quantity *index; // the index
@@ -99,7 +99,7 @@ public:
 		Quantity(OP_FUNC, dataType), name(name), parameters(parameters) {
 		id = "fcall_" + std::to_string((long long)count);
 	};
-	virtual bool equals(Quantity *Quantity) const;
+	virtual bool equals(Quantity *Quantity) const { return false; };
 	string name;
 	vector<Quantity *> parameters;
 };
