@@ -1,22 +1,5 @@
-int get(int a, int b){
-	char g;
-	g = a + b;
-	return (g);
-}
-
 void main(){
-	char a;
-	char b;
-	int c;
-	a = 'a';
-	b = 'b';
-	if((a) == (b)){
-		printf(a);
-	}
-	else{
-		printf(a);
-		printf((a));
-	}
-	b = get(('a'), 1);
-	printf(c);
+	int a[5];
+	int b;
+	a[-1] = 8;
 }

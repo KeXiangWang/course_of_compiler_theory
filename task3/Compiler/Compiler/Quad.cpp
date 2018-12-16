@@ -92,7 +92,6 @@ void QuadTable::addQuad(Quad * quad) {
 	quads.push_back(quad);
 }
 
-
 bool Caculator::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;

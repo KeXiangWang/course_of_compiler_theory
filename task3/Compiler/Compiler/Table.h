@@ -10,11 +10,9 @@ class TableElement {
 public:
 	TableElement(ElementKind kind, DataType dataType, string name, int value = 0) :kind(kind), dataType(dataType), name(name), value(value) {};
 	string name;	// name
-	int addr;	// address
 	ElementKind kind;	// const or var or func
 	DataType dataType;	// datatype
-	int value;	// value
-	int number;	// number of parameter or array elements
+	int value;	// value or number of array elements
 };
 
 class Table{
