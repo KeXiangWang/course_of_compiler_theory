@@ -463,9 +463,9 @@ void MipsGenerator::generatePrintf(Function *function, Quad *quad) {
 			exertCode.push_back("syscall");
 		}
 	}
-	exertCode.push_back("li $v0 11  # char");
-	exertCode.push_back("li $a0 10");
-	exertCode.push_back("syscall");
+	//exertCode.push_back("li $v0 11  # char");
+	//exertCode.push_back("li $a0 10");
+	//exertCode.push_back("syscall");
 }
 
 void MipsGenerator::decreaseRef(Quantity *value) {

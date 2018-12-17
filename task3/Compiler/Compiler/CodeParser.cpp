@@ -1026,7 +1026,7 @@ void CodeParser::parseReturn() {
 
 void CodeParser::jumpToToken(Token token) {
 	Token tokenGot = NULLSYM;
-	while (tokenGot != token) {
+	while (tokenGot != token && tokenGot != EOFSYM) {
 		tokenGot = lexicon.nextToken();
 	}
 }

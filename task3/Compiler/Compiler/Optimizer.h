@@ -8,7 +8,7 @@ public:
 	Optimizer(ElementCreater *elementCreater) : elementCreater(elementCreater) {};
 	void optimize();
 	void deleteNode();
-	void dagAnalyze();
+	void dagAnalyze(QuadTable *quadTable);
 private:
 	QuadTable *quadTable;
 	ElementCreater *elementCreater;

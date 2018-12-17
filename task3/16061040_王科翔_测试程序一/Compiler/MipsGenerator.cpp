@@ -349,7 +349,7 @@ void MipsGenerator::generateFunc(Function *function, Quad *quad, int offset) {
 	int paraSize4 = func->parameters.size() << 2;
 	exertCode.push_back("# call func: " + func->name);
 	exertCode.push_back("addiu $sp $sp -" + to_string(paraSize4));
-	for (int i = 0; i < (int)(func->parameters.size()); i++) {
+	for (int i = 0; i < static_cast<int>(func->parameters.size()); i++) {
 		if (i < 4) { // front 4 para to $a0-3
 			moveToReg(function, func->parameters[i], "$a" + to_string(i), paraSize4);
 			decreaseRef(func->parameters[i]);
@@ -385,7 +385,7 @@ void MipsGenerator::generateVoidFunc(Function *function, Quad *quad, int offset)
 	int paraSize4 = func->parameters.size() << 2;
 	exertCode.push_back("# call voidfunc: " + func->name);
 	exertCode.push_back("addiu $sp $sp -" + to_string(paraSize4));
-	for (int i = 0; i < (int)(func->parameters.size()); i++) {
+	for (int i = 0; i < static_cast<int>(func->parameters.size()); i++) {
 		if (i < 4) { // front 4 para to $a0-3
 			moveToReg(function, func->parameters[i], "$a" + to_string(i), paraSize4);
 			decreaseRef(func->parameters[i]);
@@ -463,9 +463,9 @@ void MipsGenerator::generatePrintf(Function *function, Quad *quad) {
 			exertCode.push_back("syscall");
 		}
 	}
-	exertCode.push_back("li $v0 11  # char");
-	exertCode.push_back("li $a0 10");
-	exertCode.push_back("syscall");
+	//exertCode.push_back("li $v0 11  # char");
+	//exertCode.push_back("li $a0 10");
+	//exertCode.push_back("syscall");
 }
 
 void MipsGenerator::decreaseRef(Quantity *value) {

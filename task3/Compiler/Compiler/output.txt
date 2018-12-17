@@ -1,18 +1,163 @@
 .data
+global_ca: .word 1
+global_cb: .word 2
+global_cc: .word 97
+global_cd: .word 98
+global_a: .word 0
+global_b_: .word 0
+string_0: .asciiz  "ok"
+string_1: .asciiz  "no"
+string_2: .asciiz  "ok"
+string_3: .asciiz  "no"
+string_4: .asciiz  "ok"
+string_5: .asciiz  "no!!!"
 .text
 j f_main
 
 
 
 
-f_main:
-addiu $sp $sp -72
+f_testvar:
+addiu $sp $sp -80
+sw $ra 76($sp)
+sw $fp 72($sp)
+sw $s0 68($sp)
+sw $s1 64($sp)
+sw $s2 60($sp)
+sw $s3 56($sp)
+sw $s4 52($sp)
+sw $s5 48($sp)
+sw $s6 44($sp)
+sw $s7 40($sp)
+li $s3 2
+li $s1 95
 label_0:
-li $t0 -1 	# sub_0
-li $t1 8	#const_int_4
-# a
-move $t8  $t0
-sll $t8 $t8 2
-addu $t8 $t8 $sp
-sw $t1 8($t8 )
+li $s2 34	# b_
+move $s0 $s2	# testvar
+lw $t0 global_cb	#cb
+addu $t1 $s3 $t0 	# add_0
+li $t2 4	#const_int_8
+# writeBack
+sw $t0  global_cb	#cb
+sw $t1 20($sp)	# add_0
+# end writeBack
+bne $t1 $t2 label_1
+# writeBack
+# end writeBack
+label_2:
+li $v0 4  # printf string
+la $a0 string_0
+syscall
+# writeBack
+# end writeBack
+j label_3
+# writeBack
+# end writeBack
+label_1:
+# writeBack
+# end writeBack
+label_3:
+subu $t0 $0 $s1 	# -cc
+li $t1 -94 	# sub_2
+# writeBack
+sw $t0 16($sp)	# sub_1
+sw $t1 12($sp)	# sub_2
+# end writeBack
+bne $t0 $t1 label_4
+# writeBack
+# end writeBack
+label_5:
+li $v0 4  # printf string
+la $a0 string_1
+syscall
+# writeBack
+# end writeBack
+j label_6
+# writeBack
+# end writeBack
+label_4:
+subu $t0 $0 $s1 	# -cc
+li $v0 4  # printf string
+la $a0 string_2
+syscall
+li $v0 1  # printf int
+move $a0 $t0
+syscall
+# writeBack
+sw $t0 8($sp)	# sub_3
+# end writeBack
+label_6:
+li $t0 34	#const_int_30
+# writeBack
+# end writeBack
+beq $s0 $t0 label_7
+# writeBack
+# end writeBack
+label_8:
+li $v0 4  # printf string
+la $a0 string_3
+syscall
+# writeBack
+# end writeBack
+j label_9
+# writeBack
+# end writeBack
+label_7:
+addiu $t0 $s0 2 	# add_4
+subiu $t1 $t0 3 	# sub_5
+li $v0 4  # printf string
+la $a0 string_4
+syscall
+li $v0 1  # printf int
+move $a0 $t1
+syscall
+# writeBack
+sw $t0 4($sp)	# add_4
+sw $t1 0($sp)	# sub_5
+# end writeBack
+label_9:
+j f_testvar_return
+# writeBack
+# end writeBack
+f_testvar_return:
+lw $s0 68($sp)
+lw $s1 64($sp)
+lw $s2 60($sp)
+lw $s3 56($sp)
+lw $s4 52($sp)
+lw $s5 48($sp)
+lw $s6 44($sp)
+lw $s7 40($sp)
+lw $ra 76($sp)
+lw $fp 72($sp)
+addiu $sp $sp 80
+jr $ra
+
+
+f_main:
+addiu $sp $sp -40
+label_10:
+# call voidfunc: testvar
+addiu $sp $sp -0
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_testvar
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 0
+# back from voidfunc: testvar
 f_main_return:

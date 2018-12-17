@@ -134,6 +134,21 @@ Quantity *CodeParser::parseFactor() {
 					if (index == nullptr) {
 						return nullptr;
 					}
+					if (index->opCode == OP_CONST) {
+						Constant * constant = static_cast<Constant *>(index);
+						if (constant->value >= tableElement->value) {
+							errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), ARRAY_OVERFLOW);
+						}
+					}
+					if (index->opCode == OP_VAR) {
+						Variable * variable = static_cast<Variable *>(index);
+						TableElement *te = elementCreater.findElement(variable->name);
+						if (te->kind == KINDCONST) {
+							if (te->value >= tableElement->value) {
+								errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), ARRAY_OVERFLOW);
+							}
+						}
+					}
 					if (token != RBRACKET) {
 						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), RIGHT_BRACKET_EXPECTED);
 						return nullptr;
@@ -241,6 +256,21 @@ void CodeParser::parseStatement() {
 				if (index == nullptr) {
 					jumpToToken(SEMICOLON);
 					token = lexicon.nextToken();
+				}
+				if (index->opCode == OP_CONST) {
+					Constant * constant = static_cast<Constant *>(index);
+					if (constant->value >= tableElement->value || constant->value < 0) {
+						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), ARRAY_OVERFLOW);
+					}
+				}
+				if (index->opCode == OP_VAR) {
+					Variable * variable = static_cast<Variable *>(index);
+					TableElement *te = elementCreater.findElement(variable->name);
+					if (te->kind == KINDCONST) {
+						if (te->value >= tableElement->value || te->value < 0) {
+							errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), ARRAY_OVERFLOW);
+						}
+					}
 				}
 				if (token != RBRACKET) {
 					reportAndJumpOver(RIGHT_BRACKET_EXPECTED, SEMICOLON);
@@ -996,7 +1026,7 @@ void CodeParser::parseReturn() {
 
 void CodeParser::jumpToToken(Token token) {
 	Token tokenGot = NULLSYM;
-	while (tokenGot != token) {
+	while (tokenGot != token && tokenGot != EOFSYM) {
 		tokenGot = lexicon.nextToken();
 	}
 }

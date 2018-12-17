@@ -1,18 +1,8 @@
 #include "pch.h"
 #include "Optimizer.h"
 
-
-Optimizer::Optimizer()
+void Optimizer::optimize()
 {
-}
-
-
-Optimizer::~Optimizer()
-{
-}
-
-void Optimizer::optimize(Quad quad) {
-
 }
 
 void Optimizer::deleteNode() {
