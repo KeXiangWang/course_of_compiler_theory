@@ -99,6 +99,12 @@ bool Caculator::equals(Quantity *quantity) const {
 	return quantity1->equals(caculator->quantity1) && quantity2->equals(caculator->quantity2);
 }
 
+string Caculator::
+toString() const
+{
+	return string();
+}
+
 bool Constant::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;
@@ -106,9 +112,74 @@ bool Constant::equals(Quantity *quantity) const {
 	return dataType == constant->dataType && value == constant->value;
 }
 
+string Constant::toString() const
+{
+	return string();
+}
+
 bool Variable::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;
 	Variable *variable = static_cast<Variable *>(quantity);
 	return dataType == variable->dataType && name == variable->name;
+}
+
+string Variable::toString() const
+{
+	return string();
+}
+
+string Quad::toString() const
+{
+	return string();
+}
+
+string Quantity::toString() const
+{
+	return string();
+}
+
+string Array::toString() const
+{
+	return string();
+}
+
+string FunctionCall::toString() const
+{
+	return string();
+}
+
+string VoidCall::toString() const
+{
+	return string();
+}
+
+string Scanf::toString() const
+{
+	return string();
+}
+
+string Printf::toString() const
+{
+	return string();
+}
+
+string Return::toString() const
+{
+	return string();
+}
+
+string Label::toString() const
+{
+	return string();
+}
+
+string Jump::toString() const
+{
+	return string();
+}
+
+string Branch::toString() const
+{
+	return string();
 }
