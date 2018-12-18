@@ -6,21 +6,21 @@ j f_main
 
 
 f_main:
-addiu $sp $sp -80
+addiu $sp $sp -84
 label_0:
-li $t0 16 	# add_0
-li $t1 4	#const_int_1
-mul $t2 $t1 $t0 	# mult_1
-addu $t3 $t2 $t2 	# add_4
-li $t4 5	#const_int_12
-mul $t5 $t3 $t4 	# mult_5
-addu $t6 $t5 $t2 	# add_8
-addu $t7 $t6 $t2 	# add_11
-move $s0 $t7	# a
-sw $t2 16($sp)	# mult_1
-lw $t2 0($sp)	#mult_13
-move $s2 $t2	# b
-sw $t0 20($sp)	# add_0
-lw $t0 0($sp)	#mult_19
-move $s1 $t0	# c
+li $s0 5	# a
+li $s1 4	# b
+li $t0 5	#const_int_6
+# e
+li $t8 2	#const_int_5
+sll $t8 $t8 2
+addu $t8 $t8 $sp
+sw $t0 16($t8 )
+li $t2 2	#const_int_8
+move $t1  $t2
+sll $t1 $t1 2
+addu $t1 $t1 $sp
+lw $t1 16($t1 )
+addu $t2 $t1 $s0 	# add_0
+move $s0 $t2	# a
 f_main_return:

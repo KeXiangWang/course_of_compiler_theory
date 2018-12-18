@@ -7,6 +7,7 @@ void Optimizer::optimize() {
 		for (auto quadTable = (*function)->quadTableVector.begin();
 			quadTable != (*function)->quadTableVector.end(); quadTable++) {
 			dagAnalyze((*quadTable));
+			std::cout << 1;
 		}
 	}
 }
@@ -25,13 +26,27 @@ Quantity * Optimizer::traceNode(Quantity * quantity) {
 	switch (quantity->opCode) {
 	case OP_CONST:
 		return quantity;
-	//case OP_VAR: 
-	//	return currentToBefore[quantity];
+	case OP_VAR: {
+		Variable *variable = static_cast<Variable *>(quantity);
+		auto pare = currentToBefore.begin();
+		for (; pare != currentToBefore.end(); pare++) {
+			if (variable->equals((*pare).first)) {
+				return (*pare).second;
+				break;
+			}
+		}
+		if (pare == currentToBefore.end()) {
+			currentToBefore[quantity] = variable;
+		}
+		return currentToBefore[quantity];
+	}
 	case OP_MULT:
 	case OP_DIV:
 	case OP_PLUS:
 	case OP_SUB:
 		return currentToBefore[quantity];
+	default:
+		return quantity;
 	}
 	return nullptr;
 }
@@ -63,19 +78,28 @@ void Optimizer::dagAnalyze(QuadTable *quadTable) {
 			break;
 		}
 		case OP_VAR: {
-			//Variable *variable = static_cast<Variable *>(*quad);
-			//auto pare = currentToBefore.begin();
-			//for (; pare != currentToBefore.end(); pare++) {
-			//	if (variable->equals((*pare).first)) {
-			//		currentToBefore[variable] = (*pare).second;
+			Variable *variable = static_cast<Variable *>(*quad);
+			variable->value = traceNode(variable->value);
+			for (auto pare = currentToBefore.begin(); pare != currentToBefore.end(); pare++) {
+				if (variable->equals((*pare).first)) {
+					(*pare).second = variable->value;
+					break;
+				}
+			}
+			break;
+		}
+		case OP_ARRAY:
+			Array *arr = static_cast<Array*>(*quad);
+			arr->value = traceNode(arr->value);
+			arr->index = traceNode(arr->index);
+
+			//for (auto pare = currentToBefore.begin(); pare != currentToBefore.end(); pare++) {
+			//	if (arr->equals((*pare).first)) {
+			//		(*pare).second = arr->value;
 			//		break;
 			//	}
 			//}
-			//if (pare == currentToBefore.end()) {
-			//	currentToBefore[variable] = variable;
-			//}
-			//break;
-		}
+			break;
 		}
 	}
 	for (auto quad = quadTable->quads.begin(); quad != quadTable->quads.end(); quad++) {

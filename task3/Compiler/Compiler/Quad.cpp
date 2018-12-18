@@ -49,6 +49,9 @@ void QuadTable::addQuad(Quad * quad) {
 		if (variable->value != nullptr) {
 			addQuad(variable->value);
 		}
+		else {
+			return;
+		}
 		break;
 	}
 
@@ -82,8 +85,12 @@ void QuadTable::addQuad(Quad * quad) {
 	case OP_ARRAY: {
 		Array *arr = static_cast<Array*>(quad);
 		addQuad(arr->index);
-		if (arr->value != nullptr)
+		if (arr->value != nullptr) {
 			addQuad(arr->value);
+		}
+		else { // TODO check this
+			return;
+		}
 		break;
 	}
 	default:
@@ -96,13 +103,8 @@ bool Caculator::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;
 	Caculator *caculator = static_cast<Caculator *>(quantity);
+	//if(quantity1->opCode!=OP_CONST)
 	return quantity1->equals(caculator->quantity1) && quantity2->equals(caculator->quantity2);
-}
-
-string Caculator::
-toString() const
-{
-	return string();
 }
 
 bool Constant::equals(Quantity *quantity) const {
@@ -112,16 +114,21 @@ bool Constant::equals(Quantity *quantity) const {
 	return dataType == constant->dataType && value == constant->value;
 }
 
-string Constant::toString() const
-{
-	return string();
-}
-
 bool Variable::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;
 	Variable *variable = static_cast<Variable *>(quantity);
 	return dataType == variable->dataType && name == variable->name;
+}
+
+string Caculator::toString() const
+{
+	return string();
+}
+
+string Constant::toString() const
+{
+	return string();
 }
 
 string Variable::toString() const
