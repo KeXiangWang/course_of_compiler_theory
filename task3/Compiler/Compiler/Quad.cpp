@@ -121,6 +121,13 @@ bool Variable::equals(Quantity *quantity) const {
 	return dataType == variable->dataType && name == variable->name;
 }
 
+bool Array::equals(Quantity * quantity) const { // TODO test if expression convert to int, whether dag ok
+	if (quantity->opCode != opCode)
+		return false;
+	Array *arr = static_cast<Array *>(quantity);
+	return dataType == arr->dataType && index->equals(arr->index);
+}
+
 string Caculator::toString() const
 {
 	return string();

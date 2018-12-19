@@ -21,7 +21,7 @@ void Optimizer::recordNode() {
 
 }
 
-
+// Quantity: caculator, Constant, Variable, Array, FunctionCall
 Quantity * Optimizer::traceNode(Quantity * quantity) {
 	switch (quantity->opCode) {
 	case OP_CONST:
@@ -31,7 +31,7 @@ Quantity * Optimizer::traceNode(Quantity * quantity) {
 		auto pare = currentToBefore.begin();
 		for (; pare != currentToBefore.end(); pare++) {
 			if (variable->equals((*pare).first)) {
-				return (*pare).second;
+				currentToBefore[quantity] = (*pare).second;
 				break;
 			}
 		}
@@ -40,11 +40,27 @@ Quantity * Optimizer::traceNode(Quantity * quantity) {
 		}
 		return currentToBefore[quantity];
 	}
+	case OP_ARRAY: {
+		Array *arr = static_cast<Array *>(quantity);
+		auto pare = currentToBefore.begin();
+		for (; pare != currentToBefore.end(); pare++) {
+			if (arr->equals((*pare).first)) {
+				currentToBefore[quantity] = (*pare).second;
+				break;
+			}
+		}
+		if (pare == currentToBefore.end()) {
+			currentToBefore[quantity] = arr;
+		}
+		return currentToBefore[quantity];
+	}
 	case OP_MULT:
 	case OP_DIV:
 	case OP_PLUS:
 	case OP_SUB:
 		return currentToBefore[quantity];
+	case OP_FUNC:
+		return quantity;
 	default:
 		return quantity;
 	}
@@ -88,19 +104,36 @@ void Optimizer::dagAnalyze(QuadTable *quadTable) {
 			}
 			break;
 		}
-		case OP_ARRAY:
+		case OP_ARRAY: {
 			Array *arr = static_cast<Array*>(*quad);
 			arr->value = traceNode(arr->value);
 			arr->index = traceNode(arr->index);
-
-			//for (auto pare = currentToBefore.begin(); pare != currentToBefore.end(); pare++) {
-			//	if (arr->equals((*pare).first)) {
-			//		(*pare).second = arr->value;
-			//		break;
-			//	}
-			//}
+			for (auto pare = currentToBefore.begin(); pare != currentToBefore.end(); pare++) {
+				if (arr->equals((*pare).first)) {
+					(*pare).second = arr->value;
+					break;
+				}
+			}
 			break;
 		}
+		case OP_FUNC: {
+			FunctionCall *func = static_cast<FunctionCall *>(*quad);
+			for (auto para = func->parameters.begin(); para != func->parameters.end(); para++) {
+				*para = traceNode(*para);
+			}
+			currentToBefore.clear();
+			break;
+		}
+		case OP_VOIDFUNC: {
+			VoidCall *func = static_cast<VoidCall *>(*quad);
+			for (auto para = func->parameters.begin(); para != func->parameters.end(); para++) {
+				*para = traceNode(*para);
+			}
+			currentToBefore.clear();
+			break;
+		}
+		}
+
 	}
 	for (auto quad = quadTable->quads.begin(); quad != quadTable->quads.end(); quad++) {
 		switch ((*quad)->opCode) {

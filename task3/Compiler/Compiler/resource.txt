@@ -1,9 +1,18 @@
+int k;
 void main(){
 	int a;
 	int e[5];
 	int b,c,d;
+	//k = 10;
 	a = 5;
-	b = 4;
+	//b = 4;
+	//k = k + 6;
+	//k = k + 6;
+	//k = k + 6;
 	e[2] = 5;
-	a = e[2] + a;
+	e[2] = e[2] + a;
+	e[2] = e[2] + a;
+	b = e[2] + a;
+	printf(e[2]);
+	printf(b);
 }

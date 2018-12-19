@@ -93,7 +93,7 @@ public:
 		Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) {
 		id = "array_" + std::to_string((long long)count);
 	};
-	virtual bool equals(Quantity *quantity) const { return false; };
+	virtual bool equals(Quantity *quantity) const ;
 	virtual string toString() const;
 	string name;
 	Quantity *value; // the value of the array element
