@@ -1,45 +1,106 @@
 .data
-global_k: .word 0
+global_er: .word 0
+string_0: .asciiz  "%d"
+string_1: .asciiz  "%d"
 .text
 j f_main
 
 
 
 
-f_main:
-addiu $sp $sp -92
+f_add:
+addiu $sp $sp -52
+sw $ra 48($sp)
+sw $fp 44($sp)
+sw $s0 40($sp)
+sw $s1 36($sp)
+sw $s2 32($sp)
+sw $s3 28($sp)
+sw $s4 24($sp)
+sw $s5 20($sp)
+sw $s6 16($sp)
+sw $s7 12($sp)
+sw $a0 84($sp)
+sw $a1 88($sp)
 label_0:
-li $s0 5	# a
-li $t0 5	#const_int_4
-li $t8 2	#const_int_3
-sll $t8 $t8 2
-addu $t8 $t8 $sp
-sw $t0 24($t8 )
-li $t2 2	#const_int_7
-move $t1  $t2
-sll $t1 $t1 2
-addu $t1 $t1 $sp
-lw $t1 24($t1 )
-addu $t2 $t1 $s0 	# add_0
-li $t8 2	#const_int_6
-sll $t8 $t8 2
-addu $t8 $t8 $sp
-sw $t2 24($t8 )
-addu $t3 $t2 $s0 	# add_1
-li $t8 2	#const_int_12
-sll $t8 $t8 2
-addu $t8 $t8 $sp
-sw $t3 24($t8 )
-addu $t4 $t3 $s0 	# add_2
-move $s1 $t4	# b
-li $v0 1  # printf int
-li $t5 2	#const_int_23
-move $a0  $t5
-sll $a0 $a0 2
-addu $a0 $a0 $sp
-lw $a0 24($a0 )
+li $t0 6	#const_int_1
+	# er
+sw $t0  global_er	#er
+lw $t1 84($sp)	#a
+lw $t2 88($sp)	#b
+addu $t3 $t1 $t2 	# add_0
+move $v0 $t3
+j f_add_return
+# writeBack
+sw $t1 84($sp)	# a
+sw $t2 88($sp)	# b
+sw $t3 0($sp)	# add_0
+# end writeBack
+f_add_return:
+lw $s0 40($sp)
+lw $s1 36($sp)
+lw $s2 32($sp)
+lw $s3 28($sp)
+lw $s4 24($sp)
+lw $s5 20($sp)
+lw $s6 16($sp)
+lw $s7 12($sp)
+lw $ra 48($sp)
+lw $fp 44($sp)
+addiu $sp $sp 52
+jr $ra
+
+
+f_main:
+addiu $sp $sp -72
+label_1:
+li $t0 5	#const_int_7
+	# er
+sw $t0  global_er	#er
+li $s0 3	# a
+lw $t1 global_er	#er
+addiu $t2 $t1 4 	# add_1
+move $s3 $t2	# b
+# call func: add
+addiu $sp $sp -8
+move $a0 $s0
+move $a1 $s0
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_add
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 8
+move $t3 $v0
+# back from func: add
+move $s1 $t3	# c
+lw $t1 global_er	#er
+addiu $t4 $t1 4 	# add_2
+move $s2 $t4	# d
+li $v0 4  # printf string
+la $a0 string_0
 syscall
 li $v0 1  # printf int
 move $a0 $s1
+syscall
+li $v0 4  # printf string
+la $a0 string_1
+syscall
+li $v0 1  # printf int
+move $a0 $s2
 syscall
 f_main_return:

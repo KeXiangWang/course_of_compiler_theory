@@ -4,8 +4,10 @@
 void Optimizer::optimize() {
 	for (auto function = elementCreater->functionTable.functionVector.begin();
 		function != elementCreater->functionTable.functionVector.end(); function++) {
+		currentFunction = *function;
 		for (auto quadTable = (*function)->quadTableVector.begin();
 			quadTable != (*function)->quadTableVector.end(); quadTable++) {
+			currentToBefore.clear();
 			dagAnalyze((*quadTable));
 			std::cout << 1;
 		}
@@ -13,8 +15,19 @@ void Optimizer::optimize() {
 }
 
 
-void Optimizer::deleteNode() {
-
+void Optimizer::deleteGlobal() {
+	auto pare = currentToBefore.begin();
+	while ( pare != currentToBefore.end()) {
+		if ((*pare).second->opCode == OP_VAR) {
+			Variable * var = static_cast<Variable *>((*pare).first);
+			//if (currentFunction->elementTable.find(var->name) == nullptr) { // judge global
+				pare = currentToBefore.erase(pare);
+				continue;
+			//}
+		}
+		pare++;
+	}
+	
 }
 
 void Optimizer::recordNode() {
@@ -42,6 +55,7 @@ Quantity * Optimizer::traceNode(Quantity * quantity) {
 	}
 	case OP_ARRAY: {
 		Array *arr = static_cast<Array *>(quantity);
+		arr->index = traceNode(arr->index);
 		auto pare = currentToBefore.begin();
 		for (; pare != currentToBefore.end(); pare++) {
 			if (arr->equals((*pare).first)) {
@@ -60,6 +74,7 @@ Quantity * Optimizer::traceNode(Quantity * quantity) {
 	case OP_SUB:
 		return currentToBefore[quantity];
 	case OP_FUNC:
+		deleteGlobal();
 		return quantity;
 	default:
 		return quantity;
@@ -72,6 +87,7 @@ Quantity * Optimizer::find(Quantity * quantity) {
 }
 
 void Optimizer::dagAnalyze(QuadTable *quadTable) {
+	currentToBefore.clear();
 	for (auto quad = quadTable->quads.begin(); quad != quadTable->quads.end(); quad++) {
 		switch ((*quad)->opCode) {
 		case OP_MULT:
@@ -121,6 +137,7 @@ void Optimizer::dagAnalyze(QuadTable *quadTable) {
 			for (auto para = func->parameters.begin(); para != func->parameters.end(); para++) {
 				*para = traceNode(*para);
 			}
+			deleteGlobal();
 			currentToBefore.clear();
 			break;
 		}
@@ -129,25 +146,34 @@ void Optimizer::dagAnalyze(QuadTable *quadTable) {
 			for (auto para = func->parameters.begin(); para != func->parameters.end(); para++) {
 				*para = traceNode(*para);
 			}
+			deleteGlobal();
 			currentToBefore.clear();
 			break;
 		}
 		}
 
 	}
-	for (auto quad = quadTable->quads.begin(); quad != quadTable->quads.end(); quad++) {
+	auto quad = quadTable->quads.begin();
+	while(quad != quadTable->quads.end()) {
 		switch ((*quad)->opCode) {
 		case OP_MULT:
 		case OP_DIV:
 		case OP_PLUS:
-		case OP_SUB:
+		case OP_SUB: {
 			Caculator *caculator = static_cast<Caculator *>(*quad);
 			if (currentToBefore[caculator] != caculator) {
 				//delete (*quad);
 				quad = quadTable->quads.erase(quad);
-				quad--;
+			}
+			else {
+				quad++;
 			}
 			break;
+		}
+		default: {
+			quad++;
+			break;
+		}
 		}
 	}
 }

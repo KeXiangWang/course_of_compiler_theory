@@ -41,6 +41,7 @@ void MipsGenerator::initData() {
 		default:
 			break;
 		}
+		globalElements.push_back((*element)->name);
 	}
 	for (auto strInt = 0; strInt != elementCreater->constStringVector.size(); strInt++) {
 		finalCode.push_back("string_" + std::to_string((long long)strInt) +
@@ -392,6 +393,7 @@ void MipsGenerator::generateFunc(Function *function, Quad *quad, int offset) {
 	string reg = getReg(function, func, true);
 	exertCode.push_back("move " + reg + " $v0");
 	exertCode.push_back("# back from func: " + func->name);
+	clearGlobalInTempRegs(function);
 }
 
 void MipsGenerator::generateVoidFunc(Function *function, Quad *quad, int offset) {
@@ -426,6 +428,7 @@ void MipsGenerator::generateVoidFunc(Function *function, Quad *quad, int offset)
 		exertCode.push_back("lw $a" + to_string(i) + " " + to_string(tmp) + "($sp)");
 	}
 	exertCode.push_back("# back from voidfunc: " + func->name);
+	clearGlobalInTempRegs(function);
 }
 
 void MipsGenerator::generateScanf(Function *function, Quad *quad) {
@@ -673,13 +676,25 @@ void MipsGenerator::writeBack(Function * function) {
 	exertCode.push_back("# writeBack");
 	for (auto i = usedTempRegs.begin(); i != usedTempRegs.end(); i++) {
 		auto& reg = *i;
-		if (!reg.free&&refCount[reg.quantity->id] > 0) {
+		if (!reg.free && refCount[reg.quantity->id] > 0) {
 			tempRegs.erase(reg.quantity->id);
 			storeValue(function, reg.quantity, reg.name);
 			reg.free = true;
 		}
 	}
 	exertCode.push_back("# end writeBack");
+}
+
+void MipsGenerator::clearGlobalInTempRegs(Function * function){ // TODO finish
+	for (auto i = usedTempRegs.begin(); i != usedTempRegs.end(); i++) {
+		if (!(*i).free) {
+			auto foundGlobalElement = find(globalElements.begin(), globalElements.end(), (*i).quantity->id);
+			if (foundGlobalElement != globalElements.end() && function->elementTable.find((*i).quantity->id) == nullptr) {
+				tempRegs.erase((*i).quantity->id);
+				(*i).free = true;
+			}
+		}
+	}
 }
 
 void MipsGenerator::loadValue(Function *function, Quad *quad, string reg, int temp) {

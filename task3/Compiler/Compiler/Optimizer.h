@@ -9,7 +9,7 @@ class Optimizer
 public:
 	Optimizer(ElementCreater *elementCreater) : elementCreater(elementCreater) {};
 	void optimize();
-	void deleteNode();
+	void deleteGlobal();
 	void recordNode();
 	Quantity *traceNode(Quantity *quantity);
 	Quantity *find(Quantity *quantity);
@@ -18,5 +18,6 @@ private:
 	QuadTable *quadTable;
 	ElementCreater *elementCreater;
 	unordered_map<Quantity *, Quantity*> currentToBefore;
+	Function *currentFunction;
 };
 

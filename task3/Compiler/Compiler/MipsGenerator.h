@@ -43,11 +43,13 @@ public:
 	void allocateGloabal(Function * function);
 	int getVarNumber(Function * function);
 	void writeBack(Function * function);
+	void clearGlobalInTempRegs(Function *functoin);
 	void loadValue(Function *function, Quad *quad, string reg, int temp);
 	void loadValueGlobal(Function *function, Quad *quad, string reg, int temp);
 	void storeValue(Function *function, Quad *quad, string reg);
 	void storeValueArray(Function *function, Array *arr, string reg, string freeReg);
 	void moveToReg(Function *functoin, Quantity *value, string reg, int temp = 0);
+	
 	void printCode(std::fstream &output);
 
 private:
@@ -57,6 +59,7 @@ private:
 	vector<string> initCode;
 	vector<string> exertCode;
 	vector<Reg> usedTempRegs;
+	vector<string> globalElements;
 
 	unordered_map<QuadTable *, int> quadTableToLabel;
 	unordered_map<string, Reg*> storeRegs; // $s: used (var)

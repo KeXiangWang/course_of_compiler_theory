@@ -1,11 +1,11 @@
-//#include<stdio.h>
+#include<stdio.h>
 int er;
 int add(int a, int b){
 	er = 6;
 	return (a+b);
 	
 }
-void main(){
+int main(){
 	int a;
 	int b;
 	int c,d,e;
