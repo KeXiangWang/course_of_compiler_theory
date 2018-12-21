@@ -105,14 +105,16 @@ Quantity *CodeParser::parseFactor() {
 				if (parameter == nullptr) {
 					return nullptr;
 				}
-				TableElement *tableElement;
-				if ((tableElement = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR) {
-					if (!elementCreater.createVar(tableElement->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
-						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+				TableElement *te;
+				if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR && parameter->opCode == OP_ARRAY) {
+					if (te->kind != KINDCONST) {
+						if (!elementCreater.createVar(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
+							errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+						}
+						Variable *var = new Variable(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows), parameter);
+						parameter = var;
+						shadows++;
 					}
-					Variable *var = new Variable(tableElement->dataType, "shadow_"+ parameter->id + "_" + to_string(shadows), parameter);
-					parameter = var;
-					shadows++;
 				}
 				// add to the parameter list
 				parameters.push_back(parameter);
@@ -328,7 +330,6 @@ void CodeParser::parseStatement() {
 				vector<Quantity *> parameters;
 				if (function->withParameters) {
 					Quantity *parameter;
-					int shadows = 0;
 					do {
 						token = lexicon.nextToken();
 						if (token == RPARENTHESE) {
@@ -338,14 +339,16 @@ void CodeParser::parseStatement() {
 						if (parameter == nullptr) {
 							jumpToToken(SEMICOLON);
 						}
-						TableElement *tableElement;
-						if ((tableElement = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR) {
-							if (!elementCreater.createVar(tableElement->dataType, "shadow_" + parameter->id + to_string(shadows))) { // creat var
-								errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+						TableElement *te;
+						if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR && parameter->opCode == OP_ARRAY) {
+							if (te->kind != KINDCONST) {
+								if (!elementCreater.createVar(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
+									errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+								}
+								Variable *var = new Variable(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows), parameter);
+								parameter = var;
+								shadows++;
 							}
-							Variable *var = new Variable(tableElement->dataType, "shadow_" + parameter->id + to_string(shadows), parameter);
-							parameter = var;
-							shadows++;
 						}
 						parameters.push_back(parameter);
 					} while (token == COMMA);
@@ -495,7 +498,7 @@ Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 	cout << "cope with condition " << endl;
 	*quantity1 = parseExpression();
 	Token compareToken;
-	if (quantity1 == nullptr) {
+	if (*quantity1 == nullptr) {
 		return VOIDSYM;
 	}
 	cout << "quantity1 type:" << ((*quantity1)->dataType == TYPEINT ? "int" : "char") << endl;;
@@ -510,11 +513,22 @@ Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 			return BECOME;
 		}
 	}
+	TableElement *te;
+	if ((te = elementCreater.findElementFromGlobal((*quantity1)->id)) != nullptr && (*quantity1)->opCode == OP_VAR && (*quantity1)->opCode == OP_ARRAY) {
+		if (te->kind != KINDCONST) {
+			if (!elementCreater.createVar(te->dataType, "shadow_" + (*quantity1)->id + "_" + to_string(shadows))) { // creat var
+				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+			}
+			Variable *var = new Variable(te->dataType, "shadow_" + (*quantity1)->id + "_" + to_string(shadows), (*quantity1));
+			*quantity1 = var;
+			shadows++;
+		}
+	}
 	compareToken = token;
 	token = lexicon.nextToken();
 	*quantity2 = parseExpression();
 	// set a compare 
-	if (quantity2 == nullptr) {
+	if (*quantity2 == nullptr) {
 		return VOIDSYM;
 	}
 	cout << "quantity2 type:" << ((*quantity2)->dataType == TYPEINT ? "int" : "char") << endl;;
@@ -789,6 +803,11 @@ void CodeParser::parseDoWhile() {
 	}
 	token = lexicon.nextToken();
 	Token gotCompareToken = parseCondition(&quantity1, &quantity2);
+	if (gotCompareToken == VOIDSYM) { // deal with error
+		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
+		jumpToSet(statementHeadSet);
+		return;
+	}
 	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, nextTable);
 	elementCreater.createJump(new Label(loopTable)); // jump back loop
 	// set jump next then
@@ -844,6 +863,11 @@ void CodeParser::parseFor() {
 	elementCreater.setQuadTable(loopTable); // set label loop
 
 	Token gotCompareToken = parseCondition(&quantity1, &quantity2); // parseCondition
+	if (gotCompareToken == VOIDSYM) { // deal with error
+		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
+		jumpToSet(statementHeadSet);
+		return;
+	}
 	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, nextTable);
 	// set jump then next
 
