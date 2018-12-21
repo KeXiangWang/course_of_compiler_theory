@@ -49,6 +49,9 @@ void QuadTable::addQuad(Quad * quad) {
 		if (variable->value != nullptr) {
 			addQuad(variable->value);
 		}
+		else {
+			return;
+		}
 		break;
 	}
 
@@ -82,8 +85,12 @@ void QuadTable::addQuad(Quad * quad) {
 	case OP_ARRAY: {
 		Array *arr = static_cast<Array*>(quad);
 		addQuad(arr->index);
-		if (arr->value != nullptr)
+		if (arr->value != nullptr) {
 			addQuad(arr->value);
+		}
+		else { // TODO check this
+			return;
+		}
 		break;
 	}
 	default:
@@ -96,6 +103,7 @@ bool Caculator::equals(Quantity *quantity) const {
 	if (quantity->opCode != opCode)
 		return false;
 	Caculator *caculator = static_cast<Caculator *>(quantity);
+	//if(quantity1->opCode!=OP_CONST)
 	return quantity1->equals(caculator->quantity1) && quantity2->equals(caculator->quantity2);
 }
 
@@ -111,4 +119,81 @@ bool Variable::equals(Quantity *quantity) const {
 		return false;
 	Variable *variable = static_cast<Variable *>(quantity);
 	return dataType == variable->dataType && name == variable->name;
+}
+
+bool Array::equals(Quantity * quantity) const { // TODO test if expression convert to int, whether dag ok
+	if (quantity->opCode != opCode)
+		return false;
+	Array *arr = static_cast<Array *>(quantity);
+	return dataType == arr->dataType && index->equals(arr->index);
+}
+
+string Caculator::toString() const
+{
+	return string();
+}
+
+string Constant::toString() const
+{
+	return string();
+}
+
+string Variable::toString() const
+{
+	return string();
+}
+
+string Quad::toString() const
+{
+	return string();
+}
+
+string Quantity::toString() const
+{
+	return string();
+}
+
+string Array::toString() const
+{
+	return string();
+}
+
+string FunctionCall::toString() const
+{
+	return string();
+}
+
+string VoidCall::toString() const
+{
+	return string();
+}
+
+string Scanf::toString() const
+{
+	return string();
+}
+
+string Printf::toString() const
+{
+	return string();
+}
+
+string Return::toString() const
+{
+	return string();
+}
+
+string Label::toString() const
+{
+	return string();
+}
+
+string Jump::toString() const
+{
+	return string();
+}
+
+string Branch::toString() const
+{
+	return string();
 }

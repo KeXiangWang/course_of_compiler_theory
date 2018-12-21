@@ -1,70 +1,293 @@
 .data
-global_er: .word 0
-string_0: .asciiz  "%d"
-string_1: .asciiz  "%d"
+global_x: .word 0
+string_0: .asciiz  "func1"
+string_1: .asciiz  "func2"
+string_2: .asciiz  "func3"
+string_3: .asciiz  "func4"
+string_4: .asciiz  "fun"
 .text
 j f_main
 
 
 
 
-f_add:
-addiu $sp $sp -52
-sw $ra 48($sp)
-sw $fp 44($sp)
-sw $s0 40($sp)
-sw $s1 36($sp)
-sw $s2 32($sp)
-sw $s3 28($sp)
-sw $s4 24($sp)
-sw $s5 20($sp)
-sw $s6 16($sp)
-sw $s7 12($sp)
-sw $a0 84($sp)
-sw $a1 88($sp)
+f_func1:
+addiu $sp $sp -64
+sw $ra 60($sp)
+sw $fp 56($sp)
+sw $s0 52($sp)
+sw $s1 48($sp)
+sw $s2 44($sp)
+sw $s3 40($sp)
+sw $s4 36($sp)
+sw $s5 32($sp)
+sw $s6 28($sp)
+sw $s7 24($sp)
+sw $a0 96($sp)
+sw $a1 100($sp)
+sw $a2 104($sp)
 label_0:
-li $t0 6	#const_int_1
-	# er
-sw $t0  global_er	#er
-lw $t1 84($sp)	#a
-lw $t2 88($sp)	#b
-addu $t3 $t1 $t2 	# add_0
-move $v0 $t3
-j f_add_return
+li $v0 4  # printf string
+la $a0 string_0
+syscall
+lw $t0 global_x	#x
+addiu $t1 $t0 1 	# add_0
+	# x
+sw $t1  global_x	#x
+lw $t0 96($sp)	#a
+lw $t2 100($sp)	#b
+addu $t3 $t0 $t2 	# add_1
+lw $t4 104($sp)	#c
+addu $t5 $t3 $t4 	# add_2
+move $v0 $t5
+j f_func1_return
 # writeBack
-sw $t1 84($sp)	# a
-sw $t2 88($sp)	# b
-sw $t3 0($sp)	# add_0
+sw $t0 96($sp)	# a
+sw $t1 8($sp)	# add_0
+sw $t2 100($sp)	# b
+sw $t3 4($sp)	# add_1
+sw $t4 104($sp)	# c
+sw $t5 0($sp)	# add_2
 # end writeBack
-f_add_return:
-lw $s0 40($sp)
-lw $s1 36($sp)
-lw $s2 32($sp)
-lw $s3 28($sp)
-lw $s4 24($sp)
-lw $s5 20($sp)
-lw $s6 16($sp)
-lw $s7 12($sp)
-lw $ra 48($sp)
-lw $fp 44($sp)
-addiu $sp $sp 52
+f_func1_return:
+lw $s0 52($sp)
+lw $s1 48($sp)
+lw $s2 44($sp)
+lw $s3 40($sp)
+lw $s4 36($sp)
+lw $s5 32($sp)
+lw $s6 28($sp)
+lw $s7 24($sp)
+lw $ra 60($sp)
+lw $fp 56($sp)
+addiu $sp $sp 64
+jr $ra
+
+
+f_func2:
+addiu $sp $sp -64
+sw $ra 60($sp)
+sw $fp 56($sp)
+sw $s0 52($sp)
+sw $s1 48($sp)
+sw $s2 44($sp)
+sw $s3 40($sp)
+sw $s4 36($sp)
+sw $s5 32($sp)
+sw $s6 28($sp)
+sw $s7 24($sp)
+sw $a0 96($sp)
+sw $a1 100($sp)
+sw $a2 104($sp)
+label_1:
+li $v0 4  # printf string
+la $a0 string_1
+syscall
+lw $t0 global_x	#x
+li $t1 2	#const_int_14
+mul $t2 $t0 $t1 	# mult_3
+	# x
+sw $t2  global_x	#x
+lw $t0 96($sp)	#a
+lw $t3 100($sp)	#b
+subu $t4 $t0 $t3 	# sub_4
+lw $t5 104($sp)	#c
+addu $t6 $t4 $t5 	# add_5
+move $v0 $t6
+j f_func2_return
+# writeBack
+sw $t0 96($sp)	# a
+sw $t2 8($sp)	# mult_3
+sw $t3 100($sp)	# b
+sw $t4 4($sp)	# sub_4
+sw $t5 104($sp)	# c
+sw $t6 0($sp)	# add_5
+# end writeBack
+f_func2_return:
+lw $s0 52($sp)
+lw $s1 48($sp)
+lw $s2 44($sp)
+lw $s3 40($sp)
+lw $s4 36($sp)
+lw $s5 32($sp)
+lw $s6 28($sp)
+lw $s7 24($sp)
+lw $ra 60($sp)
+lw $fp 56($sp)
+addiu $sp $sp 64
+jr $ra
+
+
+f_func3:
+addiu $sp $sp -64
+sw $ra 60($sp)
+sw $fp 56($sp)
+sw $s0 52($sp)
+sw $s1 48($sp)
+sw $s2 44($sp)
+sw $s3 40($sp)
+sw $s4 36($sp)
+sw $s5 32($sp)
+sw $s6 28($sp)
+sw $s7 24($sp)
+sw $a0 96($sp)
+sw $a1 100($sp)
+sw $a2 104($sp)
+label_2:
+li $v0 4  # printf string
+la $a0 string_2
+syscall
+lw $t0 global_x	#x
+subiu $t1 $t0 3 	# sub_6
+	# x
+sw $t1  global_x	#x
+lw $t0 100($sp)	#b
+lw $t2 104($sp)	#c
+mul $t3 $t0 $t2 	# mult_7
+lw $t4 96($sp)	#a
+addu $t5 $t4 $t3 	# add_8
+move $v0 $t5
+j f_func3_return
+# writeBack
+sw $t0 100($sp)	# b
+sw $t1 8($sp)	# sub_6
+sw $t2 104($sp)	# c
+sw $t3 4($sp)	# mult_7
+sw $t4 96($sp)	# a
+sw $t5 0($sp)	# add_8
+# end writeBack
+f_func3_return:
+lw $s0 52($sp)
+lw $s1 48($sp)
+lw $s2 44($sp)
+lw $s3 40($sp)
+lw $s4 36($sp)
+lw $s5 32($sp)
+lw $s6 28($sp)
+lw $s7 24($sp)
+lw $ra 60($sp)
+lw $fp 56($sp)
+addiu $sp $sp 64
+jr $ra
+
+
+f_func4:
+addiu $sp $sp -64
+sw $ra 60($sp)
+sw $fp 56($sp)
+sw $s0 52($sp)
+sw $s1 48($sp)
+sw $s2 44($sp)
+sw $s3 40($sp)
+sw $s4 36($sp)
+sw $s5 32($sp)
+sw $s6 28($sp)
+sw $s7 24($sp)
+sw $a0 96($sp)
+sw $a1 100($sp)
+sw $a2 104($sp)
+label_3:
+li $v0 4  # printf string
+la $a0 string_3
+syscall
+lw $t0 global_x	#x
+addiu $t1 $t0 4 	# add_9
+	# x
+sw $t1  global_x	#x
+lw $t0 96($sp)	#a
+lw $t2 100($sp)	#b
+addu $t3 $t0 $t2 	# add_10
+lw $t4 104($sp)	#c
+subu $t5 $t3 $t4 	# sub_11
+move $v0 $t5
+j f_func4_return
+# writeBack
+sw $t0 96($sp)	# a
+sw $t1 8($sp)	# add_9
+sw $t2 100($sp)	# b
+sw $t3 4($sp)	# add_10
+sw $t4 104($sp)	# c
+sw $t5 0($sp)	# sub_11
+# end writeBack
+f_func4_return:
+lw $s0 52($sp)
+lw $s1 48($sp)
+lw $s2 44($sp)
+lw $s3 40($sp)
+lw $s4 36($sp)
+lw $s5 32($sp)
+lw $s6 28($sp)
+lw $s7 24($sp)
+lw $ra 60($sp)
+lw $fp 56($sp)
+addiu $sp $sp 64
+jr $ra
+
+
+f_func:
+addiu $sp $sp -60
+sw $ra 56($sp)
+sw $fp 52($sp)
+sw $s0 48($sp)
+sw $s1 44($sp)
+sw $s2 40($sp)
+sw $s3 36($sp)
+sw $s4 32($sp)
+sw $s5 28($sp)
+sw $s6 24($sp)
+sw $s7 20($sp)
+sw $a0 92($sp)
+sw $a1 96($sp)
+label_4:
+li $v0 4  # printf string
+la $a0 string_4
+syscall
+lw $t0 global_x	#x
+addiu $t1 $t0 50 	# add_12
+subiu $t2 $t1 48 	# sub_13
+	# x
+sw $t2  global_x	#x
+lw $t0 92($sp)	#a
+lw $t3 96($sp)	#b
+addu $t4 $t0 $t3 	# add_14
+move $v0 $t4
+j f_func_return
+# writeBack
+sw $t0 92($sp)	# a
+sw $t1 8($sp)	# add_12
+sw $t2 4($sp)	# sub_13
+sw $t3 96($sp)	# b
+sw $t4 0($sp)	# add_14
+# end writeBack
+f_func_return:
+lw $s0 48($sp)
+lw $s1 44($sp)
+lw $s2 40($sp)
+lw $s3 36($sp)
+lw $s4 32($sp)
+lw $s5 28($sp)
+lw $s6 24($sp)
+lw $s7 20($sp)
+lw $ra 56($sp)
+lw $fp 52($sp)
+addiu $sp $sp 60
 jr $ra
 
 
 f_main:
-addiu $sp $sp -72
-label_1:
-li $t0 5	#const_int_7
-	# er
-sw $t0  global_er	#er
-li $s0 3	# a
-lw $t1 global_er	#er
-addiu $t2 $t1 4 	# add_1
-move $s3 $t2	# b
-# call func: add
-addiu $sp $sp -8
-move $a0 $s0
-move $a1 $s0
+addiu $sp $sp -96
+label_5:
+li $t0 1	#const_int_56
+	# x
+sw $t0  global_x	#x
+lw $t1 global_x	#x
+move $s1 $t1	# shadow_x0
+move $s2 $t1	# shadow_x1
+# call func: func1
+addiu $sp $sp -12
+move $a0 $s2
+li $a1 4	#const_int_62
+li $a2 5	#const_int_63
 addiu $sp $sp -32
 sw $t0 0($sp)
 sw $t1 4($sp)
@@ -74,7 +297,150 @@ sw $t4 16($sp)
 sw $t5 20($sp)
 sw $t6 24($sp)
 sw $t7 28($sp)
-jal f_add
+jal f_func1
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 12
+move $t2 $v0
+# back from func: func1
+lw $t1 global_x	#x
+move $s3 $t1	# shadow_x2
+move $s0 $t1	# shadow_x3
+# call func: func1
+addiu $sp $sp -12
+move $a0 $s0
+li $a1 2	#const_int_69
+li $a2 3	#const_int_70
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_func1
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 12
+move $t3 $v0
+# back from func: func1
+lw $t1 global_x	#x
+move $s4 $t1	# shadow_x4
+# call func: func3
+addiu $sp $sp -12
+li $a0 2	#const_int_72
+li $a1 5	#const_int_73
+move $a2 $s4
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_func3
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 12
+move $t4 $v0
+# back from func: func3
+# call func: func2
+addiu $sp $sp -12
+move $a0 $s3
+move $a1 $t3
+move $a2 $t4
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_func2
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 12
+move $t1 $v0
+# back from func: func2
+addu $t5 $t2 $t1 	# add_15
+lw $t6 global_x	#x
+move $s5 $t6	# shadow_x5
+# call func: func4
+addiu $sp $sp -12
+move $a0 $s5
+li $a1 5	#const_int_81
+li $a2 6	#const_int_82
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_func4
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $t4 16($sp)
+lw $t5 20($sp)
+lw $t6 24($sp)
+lw $t7 28($sp)
+addiu $sp $sp 32
+addiu $sp $sp 12
+move $t7 $v0
+# back from func: func4
+subu $t6 $t5 $t7 	# sub_16
+# call func: func
+addiu $sp $sp -8
+move $a0 $s1
+move $a1 $t6
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $t4 16($sp)
+sw $t5 20($sp)
+sw $t6 24($sp)
+sw $t7 28($sp)
+jal f_func
 lw $t0 0($sp)
 lw $t1 4($sp)
 lw $t2 8($sp)
@@ -85,22 +451,9 @@ lw $t6 24($sp)
 lw $t7 28($sp)
 addiu $sp $sp 32
 addiu $sp $sp 8
-move $t3 $v0
-# back from func: add
-move $s1 $t3	# c
-lw $t1 global_er	#er
-addiu $t4 $t1 4 	# add_2
-move $s2 $t4	# d
-li $v0 4  # printf string
-la $a0 string_0
-syscall
+move $t0 $v0
+# back from func: func
 li $v0 1  # printf int
-move $a0 $s1
-syscall
-li $v0 4  # printf string
-la $a0 string_1
-syscall
-li $v0 1  # printf int
-move $a0 $s2
+move $a0 $t0
 syscall
 f_main_return:

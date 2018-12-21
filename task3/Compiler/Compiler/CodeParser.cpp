@@ -8,7 +8,10 @@
 using std::cout;
 using std::endl;
 using std::vector;
+using std::to_string;
 
+
+int CodeParser::shadows = 0;
 Quantity *CodeParser::parseExpression() {
 	if(printDetail) cout << "parse an expression " << endl;
 	Quantity *quantity;
@@ -92,6 +95,7 @@ Quantity *CodeParser::parseFactor() {
 			}
 			// make a parameter list
 			vector<Quantity *> parameters;
+			
 			do {
 				token = lexicon.nextToken();
 				if (token == RPARENTHESE) {
@@ -100,6 +104,15 @@ Quantity *CodeParser::parseFactor() {
 				Quantity *parameter = parseExpression();
 				if (parameter == nullptr) {
 					return nullptr;
+				}
+				TableElement *tableElement;
+				if ((tableElement = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR) {
+					if (!elementCreater.createVar(tableElement->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
+						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+					}
+					Variable *var = new Variable(tableElement->dataType, "shadow_"+ parameter->id + "_" + to_string(shadows), parameter);
+					parameter = var;
+					shadows++;
 				}
 				// add to the parameter list
 				parameters.push_back(parameter);
@@ -162,7 +175,7 @@ Quantity *CodeParser::parseFactor() {
 					return nullptr;
 				}
 			}
-			else {
+			else { // TODO simplify if KINDCONST
 				string varName = identifier;
 				quantity = new Variable(tableElement->dataType, tableElement->name); // creat var;
 				return quantity;
@@ -245,6 +258,9 @@ void CodeParser::parseStatement() {
 		TableElement *tableElement;
 		Function *function;
 		if ((tableElement = elementCreater.findElement(identifier)) != nullptr) {
+			if (tableElement->kind == KINDCONST) {
+				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_ASSIGNMENT);
+			}
 			Quantity *index = nullptr;
 			if (token == LBRACKET) { // parse array
 				token = lexicon.nextToken();
@@ -312,6 +328,7 @@ void CodeParser::parseStatement() {
 				vector<Quantity *> parameters;
 				if (function->withParameters) {
 					Quantity *parameter;
+					int shadows = 0;
 					do {
 						token = lexicon.nextToken();
 						if (token == RPARENTHESE) {
@@ -320,6 +337,15 @@ void CodeParser::parseStatement() {
 						parameter = parseExpression();
 						if (parameter == nullptr) {
 							jumpToToken(SEMICOLON);
+						}
+						TableElement *tableElement;
+						if ((tableElement = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR) {
+							if (!elementCreater.createVar(tableElement->dataType, "shadow_" + parameter->id + to_string(shadows))) { // creat var
+								errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+							}
+							Variable *var = new Variable(tableElement->dataType, "shadow_" + parameter->id + to_string(shadows), parameter);
+							parameter = var;
+							shadows++;
 						}
 						parameters.push_back(parameter);
 					} while (token == COMMA);
@@ -478,7 +504,6 @@ Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 	}
 	if (compareSet.find(token) == compareSet.end() ) {
 		if (token == RPARENTHESE) {
-
 			return NULLSYM;
 		}
 		else {
@@ -720,6 +745,8 @@ void CodeParser::parseIf() {
 	Token gotCompareToken = parseCondition(&quantity1, &quantity2);
 	if (gotCompareToken == VOIDSYM) { // deal with error
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
+		jumpToSet(statementHeadSet);
+		return;
 	}
 	elementCreater.createBranch(gotCompareToken, quantity1, quantity2, elseTable);
 	if (token != RPARENTHESE) {
@@ -1024,9 +1051,9 @@ void CodeParser::parseReturn() {
 	}
 }
 
-void CodeParser::jumpToToken(Token token) {
+void CodeParser::jumpToToken(Token innerToken) {
 	Token tokenGot = NULLSYM;
-	while (tokenGot != token && tokenGot != EOFSYM) {
+	while (tokenGot != innerToken && tokenGot != EOFSYM) {
 		tokenGot = lexicon.nextToken();
 	}
 }
@@ -1038,9 +1065,8 @@ Token CodeParser::reportAndJumpOver(ErrorType errorType, Token targetToken) {
 	return token;
 }
 
-Token CodeParser::jumpToSet(unordered_set<Token> &tokenSet)
-{
-	while (statementHeadSet.find(token) != statementHeadSet.end()) {
+Token CodeParser::jumpToSet(unordered_set<Token> &tokenSet) {
+	while (statementHeadSet.find(token) != statementHeadSet.end() && token != EOFSYM) {
 		token = lexicon.nextToken();
 	}
 	return token;

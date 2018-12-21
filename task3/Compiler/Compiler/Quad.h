@@ -29,10 +29,11 @@ public:
 class Quantity :public Quad {
 	friend class MipsGenerator;
 public:
-	Quantity(OPCode opCode, DataType dataType) :Quad(opCode), dataType(dataType) {};
+	Quantity(OPCode opCode, DataType dataType) :Quad(opCode), dataType(dataType) { isGlobalVarPara = false; };
 	virtual bool equals(Quantity *quantity) const { return opCode == quantity->opCode; };
 	virtual string toString() const;
 	DataType dataType;
+	bool isGlobalVarPara;
 };
 // Quantity: caculator, Constant, Variable, Array, FunctionCall
 class Caculator :public Quantity {

@@ -6,6 +6,7 @@
 class ElementCreater
 {
 	friend class MipsGenerator;
+	friend class Optimizer;
 public:
 	ElementCreater() { currentTable = &globalTable; };
 	bool createConst(DataType dataType, string name, int value);

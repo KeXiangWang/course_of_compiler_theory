@@ -10,6 +10,7 @@ class Quad
 public:
 
 	Quad(OPCode opCode) : opCode(opCode) { count++; id = ""; };
+	virtual string toString() const;
 	OPCode opCode;
 	string id; // for distinguish
 protected:
@@ -30,6 +31,7 @@ class Quantity :public Quad {
 public:
 	Quantity(OPCode opCode, DataType dataType) :Quad(opCode), dataType(dataType) {};
 	virtual bool equals(Quantity *quantity) const { return opCode == quantity->opCode; };
+	virtual string toString() const;
 	DataType dataType;
 };
 // Quantity: caculator, Constant, Variable, Array, FunctionCall
@@ -54,6 +56,7 @@ public:
 		caculatorCount++;
 	};
 	virtual bool equals(Quantity *quantity) const;  
+	virtual string toString() const;
 	Quantity *quantity1;
 	Quantity *quantity2;
 	static int caculatorCount; // for name
@@ -70,6 +73,7 @@ public:
 		}
 	};
 	virtual bool equals(Quantity *quantity) const;
+	virtual string toString() const;
 	int value;
 };
 
@@ -77,6 +81,8 @@ class Variable :public Quantity {
 public:
 	Variable(DataType dataType, string name, Quantity *value = nullptr) :Quantity(OP_VAR, dataType), name(name), value(value) { id = name; };
 	virtual bool equals(Quantity *quantity) const;
+	virtual string toString() const;
+
 	string name;
 	Quantity *value;
 };
@@ -87,7 +93,8 @@ public:
 		Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) {
 		id = "array_" + std::to_string((long long)count);
 	};
-	virtual bool equals(Quantity *quantity) const { return false; };
+	virtual bool equals(Quantity *quantity) const ;
+	virtual string toString() const;
 	string name;
 	Quantity *value; // the value of the array element
 	Quantity *index; // the index
@@ -100,6 +107,7 @@ public:
 		id = "fcall_" + std::to_string((long long)count);
 	};
 	virtual bool equals(Quantity *Quantity) const { return false; };
+	virtual string toString() const;
 	string name;
 	vector<Quantity *> parameters;
 };
@@ -107,6 +115,7 @@ public:
 class VoidCall :public Quad {
 public:
 	VoidCall(string name, vector<Quantity *> parameters) :Quad(OP_VOIDFUNC), name(name), parameters(parameters) {};
+	virtual string toString() const;
 	string name;
 	vector<Quantity *> parameters;
 };
@@ -114,6 +123,7 @@ public:
 class Scanf :public Quad {
 public:
 	Scanf(vector<Variable *> parameters) :Quad(OP_SCANF), parameters(parameters) {};
+	virtual string toString() const;
 	vector<Variable *> parameters;
 };
 
@@ -121,6 +131,7 @@ class Printf :public Quad {
 public:
 	Printf(Quantity *quantity) :Quad(OP_PRINTF), quantity(quantity) { stringInt = -1; };
 	Printf(int stringInt, Quantity *quantity = nullptr) :Quad(OP_PRINTF), stringInt(stringInt), quantity(quantity) {};
+	virtual string toString() const;
 	int stringInt;
 	Quantity *quantity;
 };
@@ -128,18 +139,21 @@ public:
 class Return :public Quad {
 public:
 	Return(Quantity *quantity = nullptr) :Quad(OP_RETURN), quantity(quantity) {};
+	virtual string toString() const;
 	Quantity *quantity;
 };
 
 class Label :public Quad {
 public:
 	Label(QuadTable *quadTable = nullptr) :Quad(OP_LABEL), labelQuadTable(quadTable) {};
+	virtual string toString() const;
 	QuadTable *labelQuadTable;
 };
 
 class Jump :public Quad {
 public:
 	Jump(Label *label) :Quad(OP_JUMP), label(label) {};
+	virtual string toString() const;
 	Label *label;
 };
 
@@ -147,6 +161,7 @@ class Branch :public Quad {
 public:
 	Branch(OPCode opCode, Quantity *quantity1, Quantity *quantity2, Label *label)
 		:Quad(opCode), quantity1(quantity1), quantity2(quantity2), label(label) {};
+	virtual string toString() const;
 	Quantity *quantity1;
 	Quantity *quantity2;
 	Label *label;

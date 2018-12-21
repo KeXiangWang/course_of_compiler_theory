@@ -26,7 +26,8 @@ private:
 	ElementCreater &elementCreater;
 
 	unordered_set<Token> statementHeadSet;
-	unordered_set<Token> compareSet;
+	unordered_set<Token> compareSet; 
+	static int shadows;
 
 public:
 	CodeParser(ErrorHandler &errorHandler, Lexicon &lexicon, ElementCreater &elementCreater)
@@ -70,7 +71,7 @@ public:
 	void parseCode();
 	void parseReturn();
 
-	void jumpToToken(Token token);
+	void jumpToToken(Token innerToken);
 	Token reportAndJumpOver(ErrorType errorType, Token targetToken);
 	Token jumpToSet(unordered_set<Token> &tokenSet);
 

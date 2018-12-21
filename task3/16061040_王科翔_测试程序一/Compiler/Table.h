@@ -44,6 +44,7 @@ public:
 
 class FunctionTable {
 	friend class MipsGenerator;
+	friend class Optimizer;
 public:
 	Function *find(string name);
 	void insert(Function * function);

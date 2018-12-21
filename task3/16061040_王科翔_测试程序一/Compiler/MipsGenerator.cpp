@@ -41,6 +41,7 @@ void MipsGenerator::initData() {
 		default:
 			break;
 		}
+		globalElements.push_back((*element)->name);
 	}
 	for (auto strInt = 0; strInt != elementCreater->constStringVector.size(); strInt++) {
 		finalCode.push_back("string_" + std::to_string((long long)strInt) +
@@ -270,7 +271,7 @@ void MipsGenerator::generateVar(Function *function, Quad *quad) {
 				exertCode.push_back("move " + lReg + " " + rReg + "\t# " + variable->id);
 		}
 		else {
-			exertCode.push_back("\t# " + variable->id);
+			exertCode.push_back("\t# " + variable->id); // global
 			storeValue(function, variable, rReg);
 		}
 	}
@@ -280,9 +281,23 @@ void MipsGenerator::generateArray(Function *function, Quad *quad) {
 	Array *arr = static_cast<Array *>(quad);
 	if (arr->value != nullptr) {
 		string reg = getReg(function, arr->value);
-		decreaseRef(arr->value);
-		exertCode.push_back("# " + arr->name);
-		storeValueArray(function, arr, reg, "$t1");
+		//exertCode.push_back("# " + arr->name);
+		//storeValueArray(function, arr, reg, "$t1");
+		string instr = (arr->dataType == TYPEINT) ? "sw " : "sb ";
+		string name = arr->name;
+		Quantity *offset = arr->index;
+		string offReg = "$t8 ";
+		moveToReg(function, offset, offReg);
+		decreaseRef(offset);
+		if (function->elementTable.find(name) != nullptr) {
+			exertCode.push_back("sll " + offReg + offReg + to_string(2));											  // reg is address offset
+			exertCode.push_back("addu " + offReg + offReg + "$sp");													  // reg = $sp + address offset
+			exertCode.push_back(instr + reg + " " + to_string(stackOffset[name]) + "(" + offReg + ")"); // reg += base address
+		}
+		else {
+			exertCode.push_back("sll " + offReg + offReg + to_string(2));
+			exertCode.push_back(instr + reg + " global_" + name + "(" + offReg + ")");
+		}
 	}
 }
 
@@ -378,6 +393,7 @@ void MipsGenerator::generateFunc(Function *function, Quad *quad, int offset) {
 	string reg = getReg(function, func, true);
 	exertCode.push_back("move " + reg + " $v0");
 	exertCode.push_back("# back from func: " + func->name);
+	clearGlobalInTempRegs(function);
 }
 
 void MipsGenerator::generateVoidFunc(Function *function, Quad *quad, int offset) {
@@ -412,6 +428,7 @@ void MipsGenerator::generateVoidFunc(Function *function, Quad *quad, int offset)
 		exertCode.push_back("lw $a" + to_string(i) + " " + to_string(tmp) + "($sp)");
 	}
 	exertCode.push_back("# back from voidfunc: " + func->name);
+	clearGlobalInTempRegs(function);
 }
 
 void MipsGenerator::generateScanf(Function *function, Quad *quad) {
@@ -659,13 +676,25 @@ void MipsGenerator::writeBack(Function * function) {
 	exertCode.push_back("# writeBack");
 	for (auto i = usedTempRegs.begin(); i != usedTempRegs.end(); i++) {
 		auto& reg = *i;
-		if (!reg.free&&refCount[reg.quantity->id] > 0) {
+		if (!reg.free && refCount[reg.quantity->id] > 0) {
 			tempRegs.erase(reg.quantity->id);
 			storeValue(function, reg.quantity, reg.name);
 			reg.free = true;
 		}
 	}
 	exertCode.push_back("# end writeBack");
+}
+
+void MipsGenerator::clearGlobalInTempRegs(Function * function){ // TODO finish
+	for (auto i = usedTempRegs.begin(); i != usedTempRegs.end(); i++) {
+		if (!(*i).free) {
+			auto foundGlobalElement = find(globalElements.begin(), globalElements.end(), (*i).quantity->id);
+			if (foundGlobalElement != globalElements.end() && function->elementTable.find((*i).quantity->id) == nullptr) {
+				tempRegs.erase((*i).quantity->id);
+				(*i).free = true;
+			}
+		}
+	}
 }
 
 void MipsGenerator::loadValue(Function *function, Quad *quad, string reg, int temp) {
@@ -779,7 +808,7 @@ void MipsGenerator::storeValueArray(Function *function, Array *arr, string reg, 
 	if (function->elementTable.find(name) != nullptr) {
 		exertCode.push_back("sll " + offReg + offReg + to_string(2));											  // reg is address offset
 		exertCode.push_back("addu " + offReg + offReg + "$sp");													  // reg = $sp + address offset
-		exertCode.push_back(instr + reg + " " + to_string((long long)stackOffset[name]) + "(" + offReg + ")"); // reg += base address
+		exertCode.push_back(instr + reg + " " + to_string(stackOffset[name]) + "(" + offReg + ")"); // reg += base address
 	}
 	else {
 		exertCode.push_back("sll " + offReg + offReg + to_string(2));
