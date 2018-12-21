@@ -7,6 +7,7 @@ ErrorHandler::ErrorHandler()
 	errorOccured = false;
 	errorToString[TYPE_OF_IDENTIFIER_EXPECTED	] = "expect the type of the declared identifier ";
 	errorToString[UNEXPECTED_IDENTIFIER			] = "unexpected identifier appear ";
+	errorToString[UNEXPECTED_ASSIGNMENT			] = "unexpected assignment to constant appear ";
 	errorToString[UNDEFINED_IDENTIFIER			] = "undefined identifier appear ";
 	errorToString[UNEXPECTED_VAR_DECLARE		] = "unexpected variable declare appear";
 	errorToString[UNEXPECTED_SIGN				] = "unexpected sign appear ";

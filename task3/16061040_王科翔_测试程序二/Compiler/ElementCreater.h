@@ -20,6 +20,7 @@ public:
 	Function *findFunc(string identifier);
 	Function *getCurrentFunction();
 	TableElement *findElement(string identifier);
+	TableElement *findElementFromGlobal(string identifier);
 	void actStatement(Quad *quad);
 	void setQuadTable(QuadTable *quadTable);
 

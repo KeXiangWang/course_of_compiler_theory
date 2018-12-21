@@ -273,6 +273,7 @@ void MipsGenerator::generateVar(Function *function, Quad *quad) {
 		else {
 			exertCode.push_back("\t# " + variable->id); // global
 			storeValue(function, variable, rReg);
+			clearGlobalInTempRegs(function);
 		}
 	}
 }
@@ -706,10 +707,12 @@ void MipsGenerator::loadValue(Function *function, Quad *quad, string reg, int te
 	}
 	else if (quad->opCode == OP_VAR) {
 		string name = static_cast<Variable *>(quad)->name;
-		if (function->elementTable.find(name) != nullptr) // local var
+		if (function->elementTable.find(name) != nullptr) { // local var
 			exertCode.push_back(instr + reg + to_string((long long)stackOffset[name] + temp) + "($sp)" + "\t#" + name);
-		else // global var
+		}
+		else { // global var
 			exertCode.push_back(instr + reg + "global_" + name + "\t#" + name);
+		}
 	}
 	else if (quad->opCode == OP_ARRAY) {
 		string name = static_cast<Array *>(quad)->name;

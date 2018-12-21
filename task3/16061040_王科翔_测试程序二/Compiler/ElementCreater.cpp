@@ -108,6 +108,14 @@ TableElement * ElementCreater::findElement(string identifier) {
 	return nullptr;
 }
 
+TableElement * ElementCreater::findElementFromGlobal(string identifier) {
+	TableElement * tableElement;
+	if ((tableElement = globalTable.find(identifier)) != nullptr) {
+		return tableElement;
+	}
+	return nullptr;
+}
+
 void ElementCreater::actStatement(Quad * quad) {
 	currentQuadTable->addQuad(quad);
 }
