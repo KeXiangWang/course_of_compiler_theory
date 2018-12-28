@@ -252,7 +252,7 @@ void Lexicon::reportError() {
 }
 
 inline bool Lexicon::isDefineChar(char c) {
-	return c == '*' || c == '/' || c == '+' || c == '-' || isalnum(c);
+	return c == '*' || c == '/' || c == '+' || c == '-' || isalnum(c) || c == '_';
 }
 
 inline bool Lexicon::isCharInString(char c) {

@@ -1,19 +1,22 @@
 #include "pch.h"
 #include "Optimizer.h"
 
+bool forDagOptimize = true;
+
 void Optimizer::optimize() {
-	for (auto function = elementCreater->functionTable.functionVector.begin();
-		function != elementCreater->functionTable.functionVector.end(); function++) {
-		currentFunction = *function;
-		for (auto quadTable = (*function)->quadTableVector.begin();
-			quadTable != (*function)->quadTableVector.end(); quadTable++) {
-			currentToBefore.clear();
-			dagAnalyze((*quadTable));
-			std::cout << 1;
+	if (forDagOptimize) {
+		for (auto function = elementCreater->functionTable.functionVector.begin();
+			function != elementCreater->functionTable.functionVector.end(); function++) {
+			currentFunction = *function;
+			for (auto quadTable = (*function)->quadTableVector.begin();
+				quadTable != (*function)->quadTableVector.end(); quadTable++) {
+				currentToBefore.clear();
+				dagAnalyze((*quadTable));
+				std::cout << 1;
+			}
 		}
 	}
 }
-
 
 void Optimizer::deleteGlobal() {
 	auto pare = currentToBefore.begin();
@@ -32,6 +35,10 @@ void Optimizer::deleteGlobal() {
 
 void Optimizer::recordNode() {
 
+}
+
+Quantity * Optimizer::find(Quantity * quantity) {
+	return nullptr;
 }
 
 // Quantity: caculator, Constant, Variable, Array, FunctionCall
@@ -79,10 +86,6 @@ Quantity * Optimizer::traceNode(Quantity * quantity) {
 	default:
 		return quantity;
 	}
-	return nullptr;
-}
-
-Quantity * Optimizer::find(Quantity * quantity) {
 	return nullptr;
 }
 

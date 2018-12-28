@@ -10,6 +10,8 @@ using std::endl;
 using std::vector;
 using std::to_string;
 
+bool forParametersSequenceRequirement = true;
+
 
 int CodeParser::shadows = 0;
 Quantity *CodeParser::parseExpression() {
@@ -105,15 +107,17 @@ Quantity *CodeParser::parseFactor() {
 				if (parameter == nullptr) {
 					return nullptr;
 				}
-				TableElement *te;
-				if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR && parameter->opCode == OP_ARRAY) {
-					if (te->kind != KINDCONST) {
-						if (!elementCreater.createVar(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
-							errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+				if (forParametersSequenceRequirement) {
+					TableElement *te;
+					if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR && parameter->opCode == OP_ARRAY) {
+						if (te->kind != KINDCONST) {
+							if (!elementCreater.createVar(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
+								errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+							}
+							Variable *var = new Variable(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows), parameter);
+							parameter = var;
+							shadows++;
 						}
-						Variable *var = new Variable(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows), parameter);
-						parameter = var;
-						shadows++;
 					}
 				}
 				// add to the parameter list
@@ -339,15 +343,17 @@ void CodeParser::parseStatement() {
 						if (parameter == nullptr) {
 							jumpToToken(SEMICOLON);
 						}
-						TableElement *te;
-						if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR && parameter->opCode == OP_ARRAY) {
-							if (te->kind != KINDCONST) {
-								if (!elementCreater.createVar(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
-									errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+						if (forParametersSequenceRequirement) {
+							TableElement *te;
+							if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR && parameter->opCode == OP_ARRAY) {
+								if (te->kind != KINDCONST) {
+									if (!elementCreater.createVar(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
+										errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+									}
+									Variable *var = new Variable(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows), parameter);
+									parameter = var;
+									shadows++;
 								}
-								Variable *var = new Variable(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows), parameter);
-								parameter = var;
-								shadows++;
 							}
 						}
 						parameters.push_back(parameter);

@@ -1,4 +1,5 @@
 #pragma once
+
 enum DataType {
 	TYPEINT,
 	TYPECHAR,
