@@ -693,6 +693,7 @@ void MipsGenerator::clearGlobalInTempRegs(Function * function){ // TODO finish
 			if (foundGlobalElement != globalElements.end() && function->elementTable.find((*i).quantity->id) == nullptr) {
 				tempRegs.erase((*i).quantity->id);
 				(*i).free = true;
+				std::cout << "delate global ! " << std::endl;
 			}
 		}
 	}

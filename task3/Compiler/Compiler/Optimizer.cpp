@@ -12,7 +12,7 @@ void Optimizer::optimize() {
 				quadTable != (*function)->quadTableVector.end(); quadTable++) {
 				currentToBefore.clear();
 				dagAnalyze((*quadTable));
-				std::cout << 1;
+				//std::cout << 1;
 			}
 		}
 	}
@@ -41,7 +41,7 @@ Quantity * Optimizer::find(Quantity * quantity) {
 	return nullptr;
 }
 
-// Quantity: caculator, Constant, Variable, Array, FunctionCall
+
 Quantity * Optimizer::traceNode(Quantity * quantity) {
 	switch (quantity->opCode) {
 	case OP_CONST:

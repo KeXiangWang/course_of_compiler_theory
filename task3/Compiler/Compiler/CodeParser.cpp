@@ -12,7 +12,6 @@ using std::to_string;
 
 bool forParametersSequenceRequirement = true;
 
-
 int CodeParser::shadows = 0;
 Quantity *CodeParser::parseExpression() {
 	if(printDetail) cout << "parse an expression " << endl;
@@ -1002,7 +1001,7 @@ void CodeParser::parsePrintf() {
 		}
 		token = lexicon.nextToken();
 		int stringInt = elementCreater.addString(stringPrintf);
-		elementCreater.actStatement(new Printf(stringInt, quantity));
+		elementCreater.actStatement(new Printf(stringInt, stringPrintf, quantity));
 	}
 	else {
 		if (printDetail) cout << "        print expression " << endl;

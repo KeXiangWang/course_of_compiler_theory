@@ -14,7 +14,7 @@ int main(){
 	b = 4 + er;
 	c = add(a, a);
 	d = 4 + er;
-	printf("%d", c);
-	printf("%d", d);
+	printf(" %d", c);
+	printf(" %d", d);
 	
 }

@@ -128,72 +128,109 @@ bool Array::equals(Quantity * quantity) const { // TODO test if expression conve
 	return dataType == arr->dataType && index->equals(arr->index);
 }
 
-string Caculator::toString() const
-{
-	return string();
+string getStandardQuad(string s1, string s2 = "", string s3 = "", string s4 = "") {
+	return s1 + " \t" + s2 + " \t" + s3 + " \t" + s4;
 }
 
-string Constant::toString() const
-{
-	return string();
+// Quantity: caculator, Constant, Variable, Array, FunctionCall
+string Caculator::toString() const {
+	return getStandardQuad(id, quantity1->id, quantity2->id);
 }
 
-string Variable::toString() const
-{
-	return string();
+string Constant::toString() const {
+	return getStandardQuad(id, "=", std::to_string(value));
 }
 
-string Quad::toString() const
-{
-	return string();
+string Variable::toString() const {
+	if (value == nullptr) {
+		return getStandardQuad("PARSED", "VARIABLE", name);
+	}
+	else {
+		return getStandardQuad("VAR_" + id, "=", value->id);
+	}
 }
 
-string Quantity::toString() const
-{
-	return string();
+string Array::toString() const {
+	if (value == nullptr) {
+		return getStandardQuad("PARSED", "ARRAY", name, index->id);
+	}
+	else {
+		return getStandardQuad("ARR_" + id, "[" + index->id + "]", "=", value->id);
+	}
 }
 
-string Array::toString() const
-{
-	return string();
+string FunctionCall::toString() const {
+	string s = "";
+	s = s + "FUNCCALL " + name + " (";
+	for (auto para = parameters.begin(); para != parameters.end(); para++) {
+		s += (*para)->id + ",";
+	}
+	s += ")";
+	return s;
 }
 
-string FunctionCall::toString() const
-{
-	return string();
+string Quad::toString() const {
+	return id;
 }
 
-string VoidCall::toString() const
-{
-	return string();
+string Quantity::toString() const {
+	return id;
 }
 
-string Scanf::toString() const
-{
-	return string();
+string VoidCall::toString() const {
+	string s = "";
+	s = s + "VOIDCALL " + name + " (";
+	for (auto para = parameters.begin(); para != parameters.end(); para++) {
+		s += (*para)->id + ",";
+	}
+	s += ")";
+	return s;
 }
 
-string Printf::toString() const
-{
-	return string();
+string Scanf::toString() const {
+	string s = "";
+	s = s + "SCANF (";
+	for (auto para = parameters.begin(); para != parameters.end(); para++) {
+		s += (*para)->id + ",";
+	}
+	s += ")";
+	return s;
 }
 
-string Return::toString() const
-{
-	return string();
+string Printf::toString() const {
+	return getStandardQuad("PRINTF", stringPrintf, quantity->id);
 }
 
-string Label::toString() const
-{
-	return string();
+string Return::toString() const {
+	return getStandardQuad("RETURN", quantity->id);
 }
 
-string Jump::toString() const
-{
-	return string();
+string Label::toString() const {
+	return "Label" + label_number;
 }
 
-string Branch::toString() const
-{
-	return string();
+string Jump::toString() const {
+	return "JUMPTO " + label->toString();
 }
+
+string Branch::toString() const {
+	switch (opCode)
+	{
+	case OP_BEQZ:
+		return getStandardQuad("beqz " + quantity1->id, label->toString());
+	case OP_BGE:
+		return getStandardQuad("BGE ", quantity1->id, quantity2->id, label->toString());
+	case OP_BGT:
+		return getStandardQuad("BGT ", quantity1->id, quantity2->id, label->toString());
+	case OP_BEQ:
+		return getStandardQuad("BEQ ", quantity1->id, quantity2->id, label->toString());
+	case OP_BLE:
+		return getStandardQuad("BLE ", quantity1->id, quantity2->id, label->toString());
+	case OP_BLT:
+		return getStandardQuad("BLT ", quantity1->id, quantity2->id, label->toString());
+	case OP_BNE:
+		return getStandardQuad("BNE ", quantity1->id, quantity2->id, label->toString());
+	}
+	return "wrong branch";
+}
+

@@ -131,9 +131,10 @@ public:
 class Printf :public Quad {
 public:
 	Printf(Quantity *quantity) :Quad(OP_PRINTF), quantity(quantity) { stringInt = -1; };
-	Printf(int stringInt, Quantity *quantity = nullptr) :Quad(OP_PRINTF), stringInt(stringInt), quantity(quantity) {};
+	Printf(int stringInt, string stringPrintf, Quantity *quantity = nullptr) :Quad(OP_PRINTF), stringInt(stringInt), stringPrintf(stringPrintf), quantity(quantity) {};
 	virtual string toString() const;
 	int stringInt;
+	string stringPrintf;
 	Quantity *quantity;
 };
 
@@ -146,9 +147,10 @@ public:
 
 class Label :public Quad {
 public:
-	Label(QuadTable *quadTable = nullptr) :Quad(OP_LABEL), labelQuadTable(quadTable) {};
+	Label(QuadTable *quadTable = nullptr) :Quad(OP_LABEL), labelQuadTable(quadTable) { label_number = count; };
 	virtual string toString() const;
 	QuadTable *labelQuadTable;
+	int label_number;
 };
 
 class Jump :public Quad {
