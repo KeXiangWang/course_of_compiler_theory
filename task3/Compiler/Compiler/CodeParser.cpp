@@ -11,6 +11,8 @@ using std::vector;
 using std::to_string;
 
 bool forParametersSequenceRequirement = true;
+bool forCaculatorSequenceRequirement = true;
+bool forEnforceCopeErrror = false;
 
 int CodeParser::shadows = 0;
 Quantity *CodeParser::parseExpression() {
@@ -29,6 +31,19 @@ Quantity *CodeParser::parseExpression() {
 		token = lexicon.nextToken();
 		return nullptr;
 	}
+	if (forCaculatorSequenceRequirement) {
+		TableElement *te;
+		if ((te = elementCreater.findElementFromGlobal(quantity->id)) != nullptr && (quantity->opCode == OP_VAR || quantity->opCode == OP_ARRAY)) {
+			if (te->kind != KINDCONST) {
+				if (!elementCreater.createVar(te->dataType, "shadow_" + quantity->id + "_" + to_string(shadows))) { // creat var
+					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
+				}
+				Variable *var = new Variable(te->dataType, "shadow_" + quantity->id + "_" + to_string(shadows), quantity);
+				quantity = var;
+				shadows++;
+			}
+		}
+	}
 	if (opCode == OP_SUB) { // deal with -+
 		quantity = new Caculator(opCode, new Constant(TYPEINT, 0), quantity);
 	}
@@ -41,6 +56,7 @@ Quantity *CodeParser::parseExpression() {
 			token = lexicon.nextToken();
 			return nullptr;
 		}
+
 		quantity = new Caculator(opCode, quantity, quantity_next); // optimizer
 	}
 	return quantity;
@@ -108,7 +124,7 @@ Quantity *CodeParser::parseFactor() {
 				}
 				if (forParametersSequenceRequirement) {
 					TableElement *te;
-					if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR && parameter->opCode == OP_ARRAY) {
+					if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && (parameter->opCode == OP_VAR || parameter->opCode == OP_ARRAY)) {
 						if (te->kind != KINDCONST) {
 							if (!elementCreater.createVar(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
 								errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
@@ -267,37 +283,42 @@ void CodeParser::parseStatement() {
 				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_ASSIGNMENT);
 			}
 			Quantity *index = nullptr;
-			if (token == LBRACKET) { // parse array
-				token = lexicon.nextToken();
-				if (tableElement->kind != KINDARRAY) {
-					reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
-					return;
-				}
-				index = parseExpression();
-				if (index == nullptr) {
-					jumpToToken(SEMICOLON);
+			if (tableElement->kind == KINDARRAY) {
+				if (token == LBRACKET) { // parse array
 					token = lexicon.nextToken();
-				}
-				if (index->opCode == OP_CONST) {
-					Constant * constant = static_cast<Constant *>(index);
-					if (constant->value >= tableElement->value || constant->value < 0) {
-						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), ARRAY_OVERFLOW);
+					if (tableElement->kind != KINDARRAY) {
+						reportAndJumpOver(UNDEFINED_IDENTIFIER, SEMICOLON);
+						return;
 					}
-				}
-				if (index->opCode == OP_VAR) {
-					Variable * variable = static_cast<Variable *>(index);
-					TableElement *te = elementCreater.findElement(variable->name);
-					if (te->kind == KINDCONST) {
-						if (te->value >= tableElement->value || te->value < 0) {
+					index = parseExpression();
+					if (index == nullptr) {
+						jumpToToken(SEMICOLON);
+						token = lexicon.nextToken();
+					}
+					if (index->opCode == OP_CONST) {
+						Constant * constant = static_cast<Constant *>(index);
+						if (constant->value >= tableElement->value || constant->value < 0) {
 							errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), ARRAY_OVERFLOW);
 						}
 					}
+					if (index->opCode == OP_VAR) {
+						Variable * variable = static_cast<Variable *>(index);
+						TableElement *te = elementCreater.findElement(variable->name);
+						if (te->kind == KINDCONST) {
+							if (te->value >= tableElement->value || te->value < 0) {
+								errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), ARRAY_OVERFLOW);
+							}
+						}
+					}
+					if (token != RBRACKET) {
+						reportAndJumpOver(RIGHT_BRACKET_EXPECTED, SEMICOLON);
+						return;
+					}
+					token = lexicon.nextToken();
 				}
-				if (token != RBRACKET) {
-					reportAndJumpOver(RIGHT_BRACKET_EXPECTED, SEMICOLON);
-					return;
+				else {
+					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), LEFT_BRACKET_EXPECTED);
 				}
-				token = lexicon.nextToken();
 			}
 			if (token == BECOME) { // parse become
 				if (printDetail) cout << "assign a value to ident " << identifier << endl;
@@ -344,7 +365,7 @@ void CodeParser::parseStatement() {
 						}
 						if (forParametersSequenceRequirement) {
 							TableElement *te;
-							if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && parameter->opCode == OP_VAR && parameter->opCode == OP_ARRAY) {
+							if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && (parameter->opCode == OP_VAR || parameter->opCode == OP_ARRAY)) {
 								if (te->kind != KINDCONST) {
 									if (!elementCreater.createVar(te->dataType, "shadow_" + parameter->id + "_" + to_string(shadows))) { // creat var
 										errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
@@ -519,7 +540,7 @@ Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 		}
 	}
 	TableElement *te;
-	if ((te = elementCreater.findElementFromGlobal((*quantity1)->id)) != nullptr && (*quantity1)->opCode == OP_VAR && (*quantity1)->opCode == OP_ARRAY) {
+	if ((te = elementCreater.findElementFromGlobal((*quantity1)->id)) != nullptr && ((*quantity1)->opCode == OP_VAR || (*quantity1)->opCode == OP_ARRAY)) {
 		if (te->kind != KINDCONST) {
 			if (!elementCreater.createVar(te->dataType, "shadow_" + (*quantity1)->id + "_" + to_string(shadows))) { // creat var
 				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ARGUMENT_LIST, true);
@@ -1083,6 +1104,11 @@ void CodeParser::parseReturn() {
 void CodeParser::jumpToToken(Token innerToken) {
 	Token tokenGot = NULLSYM;
 	while (tokenGot != innerToken && tokenGot != EOFSYM) {
+		if (forEnforceCopeErrror) {
+			if (tokenGot == SEMICOLON) {
+				break;
+			}
+		}
 		tokenGot = lexicon.nextToken();
 	}
 }

@@ -19,6 +19,11 @@ public:
 class MipsGenerator
 {
 public:
+	bool shutAll = bool(0);
+	bool optimizeTempRegs = !shutAll && (bool)1;
+	bool optimizeGlobalRegs = !shutAll && (bool)1;
+	bool seperateCodeByBlock = !shutAll && (bool)0;
+	bool changeGlobal = !shutAll && (bool)1;
 	MipsGenerator(ElementCreater *elementCreater) :elementCreater(elementCreater) { labelCount = 0; };
 	void generate();
 	void initData();
@@ -47,7 +52,6 @@ public:
 	void loadValue(Function *function, Quad *quad, string reg, int temp);
 	void loadValueGlobal(Function *function, Quad *quad, string reg, int temp);
 	void storeValue(Function *function, Quad *quad, string reg);
-	void storeValueArray(Function *function, Array *arr, string reg, string freeReg);
 	void moveToReg(Function *functoin, Quantity *value, string reg, int temp = 0);
 	
 	void printCode(std::fstream &output);
@@ -69,5 +73,6 @@ private:
 	unordered_map<string, int> refCount;  // used (var mid-var direct-const)
 	unordered_map<string, int> stackOffset; // all (para declared-const var)
 	int labelCount;
+	int globalVariableCount;
 };
 

@@ -9,6 +9,7 @@ int sum(int a, int b, int c, int d) {
 }
 
 void main() {
-    x = 1;
+    x = 1 + 0; 
+    x = 1 + 0; 
     printf(sum(x, add(), x, add()));
 }

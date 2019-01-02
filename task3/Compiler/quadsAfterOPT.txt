@@ -1,0 +1,165 @@
+Funtion: factorial
+BasicBlock: 
+	BGT 	n 	const_int_2 : 1 	Label_3
+BasicBlock: 
+	RETURN 	const_int_5 : 1 	 	
+	JUMPTO 	Label_7
+BasicBlock: 
+	sub_0 	n 	const_int_11 : 1 	
+	FUNCCALL 	fcall_13 (sub_0,)
+	mult_1 	n 	fcall_13 	
+	RETURN 	mult_1 	 	
+BasicBlock: 
+Funtion: mod
+BasicBlock: 
+	div_2 	x 	y 	
+	mult_3 	div_2 	y 	
+	sub_4 	x 	mult_3 	
+	VAR_x 	= 	sub_4 	
+	RETURN 	sub_4 	 	
+Funtion: swap
+BasicBlock: 
+	PRINTF 	 x =  	x 	
+	PRINTF 	 y =  	y 	
+	VAR_temp 	= 	x 	
+	VAR_x 	= 	y 	
+	VAR_y 	= 	x 	
+	PRINTF 	 SWAP x =  	y 	
+	PRINTF 	 SWAP y =  	x 	
+Funtion: complete_num
+BasicBlock: 
+	VAR_j 	= 	val 	
+BasicBlock: 
+	sub_5 	const_int_43 : 0 	const_int_42 : 1 	
+	VAR_n 	= 	sub_5 	
+	VAR_s 	= 	j 	
+	VAR_i 	= 	const_int_48 : 1 	
+BasicBlock: 
+	div_6 	j 	i 	
+	mult_7 	div_6 	i 	
+	VAR_x1 	= 	mult_7 	
+	FUNCCALL 	fcall_58 (j,i,)
+	BNE 	fcall_58 	const_int_59 : 0 	Label_60
+BasicBlock: 
+	add_8 	n 	const_int_63 : 1 	
+	VAR_n 	= 	add_8 	
+	sub_9 	s 	i 	
+	VAR_s 	= 	sub_9 	
+	BLT 	add_8 	const_int_71 : 128 	Label_72
+BasicBlock: 
+	PRINTF 	 OVERFLOW!           	 	
+	JUMPTO 	Label_75
+BasicBlock: 
+	ARR_array_79_k 	[n] 	= 	i
+BasicBlock: 
+	JUMPTO 	Label_80
+BasicBlock: 
+BasicBlock: 
+	add_10 	i 	const_int_83 : 1 	
+	VAR_i 	= 	add_10 	
+	BGE 	add_10 	j 	Label_88
+	JUMPTO 	Label_90
+BasicBlock: 
+	BNE 	s 	const_int_93 : 0 	Label_94
+BasicBlock: 
+	PRINTF 	 complete number:  	j 	
+	VAR_i 	= 	const_int_98 : 0 	
+BasicBlock: 
+	PRINTF 	   	array_101_k 	
+	add_11 	i 	const_int_104 : 1 	
+	VAR_i 	= 	add_11 	
+	BGT 	add_11 	n 	Label_109
+	JUMPTO 	Label_111
+BasicBlock: 
+	PRINTF 	           	 	
+	JUMPTO 	Label_114
+BasicBlock: 
+BasicBlock: 
+	add_12 	j 	const_int_117 : 1 	
+	VAR_j 	= 	add_12 	
+	BGE 	add_12 	MAX_NUM 	Label_122
+	JUMPTO 	Label_124
+BasicBlock: 
+	PRINTF 	 ---------------------------------------------------------------           	 	
+	VAR_a 	= 	const_int_127 : 0 	
+	VAR_i 	= 	const_int_129 : 0 	
+BasicBlock: 
+	mult_13 	a 	i 	
+	VAR_b 	= 	mult_13 	
+	mult_14 	j 	n 	
+	VAR_c 	= 	mult_14 	
+	VAR_a 	= 	mult_13 	
+	add_16 	mult_13 	mult_13 	
+	add_17 	add_16 	mult_14 	
+	VAR_a 	= 	add_17 	
+	add_18 	i 	const_int_150 : 1 	
+	VAR_i 	= 	add_18 	
+	BGE 	add_18 	MAX_NUM 	Label_155
+	JUMPTO 	Label_157
+BasicBlock: 
+	VAR_b 	= 	a 	
+	VAR_i 	= 	const_int_161 : 0 	
+BasicBlock: 
+	add_19 	b 	i 	
+	VAR_b 	= 	add_19 	
+	add_20 	i 	const_int_168 : 1 	
+	VAR_i 	= 	add_20 	
+	BGE 	add_20 	MAX_NUM 	Label_173
+	JUMPTO 	Label_175
+BasicBlock: 
+	PRINTF 	 b =  	b 	
+	PRINTF 	 ---------------------------------------------------------------           	 	
+	VAR_h 	= 	const_int_180 : 0 	
+	VAR_leap 	= 	const_int_182 : 1 	
+	VAR_m 	= 	const_int_184 : 2 	
+BasicBlock: 
+	div_21 	m 	const_int_187 : 2 	
+	VAR_k2 	= 	div_21 	
+	VAR_i 	= 	const_int_190 : 2 	
+BasicBlock: 
+	div_22 	m 	i 	
+	mult_23 	div_22 	i 	
+	VAR_x2 	= 	mult_23 	
+	FUNCCALL 	fcall_200 (m,i,)
+	BNE 	fcall_200 	const_int_201 : 0 	Label_202
+BasicBlock: 
+	VAR_leap 	= 	const_int_204 : 0 	
+	JUMPTO 	Label_206
+BasicBlock: 
+BasicBlock: 
+	add_24 	i 	const_int_209 : 1 	
+	VAR_i 	= 	add_24 	
+	BGT 	add_24 	k2 	Label_214
+	JUMPTO 	Label_216
+BasicBlock: 
+	BNE 	leap 	const_int_219 : 1 	Label_220
+BasicBlock: 
+	PRINTF 	  	m 	
+	add_25 	h 	const_int_225 : 1 	
+	VAR_h 	= 	add_25 	
+	div_26 	add_25 	const_int_229 : 10 	
+	mult_27 	div_26 	const_int_231 : 10 	
+	VAR_x2 	= 	mult_27 	
+	BNE 	mult_27 	add_25 	Label_236
+BasicBlock: 
+	PRINTF 	           	 	
+	JUMPTO 	Label_239
+BasicBlock: 
+BasicBlock: 
+	JUMPTO 	Label_241
+BasicBlock: 
+BasicBlock: 
+	VAR_leap 	= 	const_int_243 : 1 	
+	add_28 	m 	const_int_246 : 1 	
+	VAR_m 	= 	add_28 	
+	BGT 	add_28 	MAX_NUM 	Label_251
+	JUMPTO 	Label_253
+BasicBlock: 
+	PRINTF 	          The total is  	h 	
+Funtion: main
+BasicBlock: 
+	FUNCCALL 	fcall_258 (const_int_257 : 10,)
+	VAR_n 	= 	fcall_258 	
+	PRINTF 	 10! =  	fcall_258 	
+	VOIDCALL 	swap (const_int_262 : 5,const_int_263 : 10,)
+	VOIDCALL 	complete_num (const_int_265 : 2,)

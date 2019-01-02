@@ -161,7 +161,7 @@ string Array::toString() const {
 
 string FunctionCall::toString() const {
 	string s = "";
-	s = s + "FUNCCALL " + name + " (";
+	s = s + "FUNCCALL \t" + id + " (";
 	for (auto para = parameters.begin(); para != parameters.end(); para++) {
 		s += (*para)->id + ",";
 	}
@@ -179,7 +179,7 @@ string Quantity::toString() const {
 
 string VoidCall::toString() const {
 	string s = "";
-	s = s + "VOIDCALL " + name + " (";
+	s = s + "VOIDCALL \t" + name + " (";
 	for (auto para = parameters.begin(); para != parameters.end(); para++) {
 		s += (*para)->id + ",";
 	}
@@ -189,16 +189,21 @@ string VoidCall::toString() const {
 
 string Scanf::toString() const {
 	string s = "";
-	s = s + "SCANF (";
+	s = s + "SCANF \t(";
 	for (auto para = parameters.begin(); para != parameters.end(); para++) {
-		s += (*para)->id + ",";
+		s = s + (*para)->id + ",";
 	}
-	s += ")";
+	s = s + ")";
 	return s;
 }
 
 string Printf::toString() const {
-	return getStandardQuad("PRINTF", stringPrintf, quantity->id);
+	if (quantity == nullptr) {
+		return getStandardQuad("PRINTF", stringPrintf);
+	}
+	else {
+		return getStandardQuad("PRINTF", stringPrintf, quantity->id);
+	}
 }
 
 string Return::toString() const {
@@ -206,31 +211,31 @@ string Return::toString() const {
 }
 
 string Label::toString() const {
-	return "Label" + label_number;
+	return id;
 }
 
 string Jump::toString() const {
-	return "JUMPTO " + label->toString();
+	return "JUMPTO \t" + label->toString();
 }
 
 string Branch::toString() const {
 	switch (opCode)
 	{
 	case OP_BEQZ:
-		return getStandardQuad("beqz " + quantity1->id, label->toString());
+		return getStandardQuad("BEQZ", quantity1->id, label->toString());
 	case OP_BGE:
-		return getStandardQuad("BGE ", quantity1->id, quantity2->id, label->toString());
+		return getStandardQuad("BGE", quantity1->id, quantity2->id, label->toString());
 	case OP_BGT:
-		return getStandardQuad("BGT ", quantity1->id, quantity2->id, label->toString());
+		return getStandardQuad("BGT", quantity1->id, quantity2->id, label->toString());
 	case OP_BEQ:
-		return getStandardQuad("BEQ ", quantity1->id, quantity2->id, label->toString());
+		return getStandardQuad("BEQ", quantity1->id, quantity2->id, label->toString());
 	case OP_BLE:
-		return getStandardQuad("BLE ", quantity1->id, quantity2->id, label->toString());
+		return getStandardQuad("BLE", quantity1->id, quantity2->id, label->toString());
 	case OP_BLT:
-		return getStandardQuad("BLT ", quantity1->id, quantity2->id, label->toString());
+		return getStandardQuad("BLT", quantity1->id, quantity2->id, label->toString());
 	case OP_BNE:
-		return getStandardQuad("BNE ", quantity1->id, quantity2->id, label->toString());
+		return getStandardQuad("BNE", quantity1->id, quantity2->id, label->toString());
 	}
-	return "wrong branch";
+	return "Wrong Branch!!!";
 }
 

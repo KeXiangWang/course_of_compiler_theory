@@ -56,7 +56,7 @@ public:
 		}
 		caculatorCount++;
 	};
-	virtual bool equals(Quantity *quantity) const;  
+	virtual bool equals(Quantity *quantity) const;
 	virtual string toString() const;
 	Quantity *quantity1;
 	Quantity *quantity2;
@@ -67,10 +67,10 @@ class Constant :public Quantity {
 public:
 	Constant(DataType dataType, int value) : Quantity(OP_CONST, dataType), value(value) {
 		if (dataType == TYPEINT) {
-			id = "const_int_" + std::to_string((long long)count);
+			id = "const_int_" + std::to_string((long long)count) + " : " + std::to_string((long long)value);
 		}
 		else {
-			id = "const_char_" + std::to_string((long long)count);
+			id = "const_char_" + std::to_string((long long)count) + " : " + char(value);
 		}
 	};
 	virtual bool equals(Quantity *quantity) const;
@@ -92,9 +92,9 @@ class Array :public Quantity {
 public:
 	Array(DataType dataType, string name, Quantity *index, Quantity *value = nullptr) :
 		Quantity(OP_ARRAY, dataType), index(index), name(name), value(value) {
-		id = "array_" + std::to_string((long long)count);
+		id = "array_" + std::to_string((long long)count) + "_" + name;
 	};
-	virtual bool equals(Quantity *quantity) const ;
+	virtual bool equals(Quantity *quantity) const;
 	virtual string toString() const;
 	string name;
 	Quantity *value; // the value of the array element
@@ -106,10 +106,12 @@ public:
 	FunctionCall(DataType dataType, string name, vector<Quantity *> parameters) :
 		Quantity(OP_FUNC, dataType), name(name), parameters(parameters) {
 		id = "fcall_" + std::to_string((long long)count);
+		functionCount = count;
 	};
 	virtual bool equals(Quantity *Quantity) const { return false; };
 	virtual string toString() const;
 	string name;
+	int functionCount;
 	vector<Quantity *> parameters;
 };
 
@@ -147,10 +149,9 @@ public:
 
 class Label :public Quad {
 public:
-	Label(QuadTable *quadTable = nullptr) :Quad(OP_LABEL), labelQuadTable(quadTable) { label_number = count; };
+	Label(QuadTable *quadTable = nullptr) :Quad(OP_LABEL), labelQuadTable(quadTable) { id = "Label_" + std::to_string((long long)count); };
 	virtual string toString() const;
 	QuadTable *labelQuadTable;
-	int label_number;
 };
 
 class Jump :public Quad {

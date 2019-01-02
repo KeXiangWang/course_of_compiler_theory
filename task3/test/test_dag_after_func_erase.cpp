@@ -12,9 +12,9 @@ int main(){
 	er = 5;
 	a = 3;
 	b = 4 + er;
-	c = add(a, a);
+//	c = add(a, a);
 	d = 4 + er;
-	printf(" %d", c);
+	printf(" %d", b);
 	printf(" %d", d);
 	
 }
