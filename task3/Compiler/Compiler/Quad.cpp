@@ -134,6 +134,9 @@ string getStandardQuad(string s1, string s2 = "", string s3 = "", string s4 = ""
 
 // Quantity: caculator, Constant, Variable, Array, FunctionCall
 string Caculator::toString() const {
+	if (quantity1 == nullptr || quantity2 == nullptr) {
+		return "Wrong Caculator";
+	}
 	return getStandardQuad(id, quantity1->id, quantity2->id);
 }
 
@@ -207,7 +210,12 @@ string Printf::toString() const {
 }
 
 string Return::toString() const {
-	return getStandardQuad("RETURN", quantity->id);
+	if (quantity != nullptr) {
+		return getStandardQuad("RETURN", quantity->id);
+	}
+	else {
+		return getStandardQuad("RETURN Nothing");
+	}
 }
 
 string Label::toString() const {
@@ -219,6 +227,9 @@ string Jump::toString() const {
 }
 
 string Branch::toString() const {
+	if (quantity1 == nullptr) {
+		return "Wrong Branch!!!";
+	}
 	switch (opCode)
 	{
 	case OP_BEQZ:

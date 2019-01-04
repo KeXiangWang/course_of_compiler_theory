@@ -60,7 +60,7 @@ void MipsGenerator::generateFunction(Function * function) {
 	tempRegs.clear();
 	globalVariableCount = 0;
 	int offset = getVarNumber(function);
-	allocateGloabal(function);
+	allocStoreRegs(function);
 	initCode.push_back("\n");
 	initCode.push_back("f_" + function->name + ":");
 	vector<TableElement *> &elementVector = function->elementTable.elementVector;
@@ -238,8 +238,6 @@ void MipsGenerator::generateAddSub(Function *function, Quad *quad, OPCode opCode
 		usedTempRegs[reg1[2] - '0'].fixed = true;
 		string reg2 = getReg(function, caculator->quantity2) + " ";
 		usedTempRegs[reg1[2] - '0'].fixed = false;
-		decreaseRef(caculator->quantity1);
-		decreaseRef(caculator->quantity2);
 		string reg0 = getReg(function, caculator, true) + " ";
 		if (opCode == OP_PLUS)
 			exertCode.push_back("addu " + reg0 + reg1 + reg2 + "\t# " + caculator->id);
@@ -266,8 +264,6 @@ void MipsGenerator::generateMultDiv(Function *function, Quad *quad, OPCode opCod
 	usedTempRegs[reg1[2] - '0'].fixed = true;
 	string reg2 = getReg(function, caculator->quantity2) + " ";
 	usedTempRegs[reg1[2] - '0'].fixed = false;
-	decreaseRef(caculator->quantity1);
-	decreaseRef(caculator->quantity2);
 	string reg0 = getReg(function, caculator, true) + " ";;
 	if (opCode == OP_MULT)
 		exertCode.push_back("mul " + reg0 + reg1 + reg2 + "\t# " + caculator->id);
@@ -285,10 +281,8 @@ void MipsGenerator::generateVar(Function *function, Quad *quad) {
 			return;
 		}
 		string rReg = getReg(function, variable->value);
-		decreaseRef(variable->value);
 		if (function->elementTable.find(variable->name) != nullptr) {
 			string lReg = getReg(function, variable, true);
-			decreaseRef(variable);
 			if (rReg != lReg)
 				exertCode.push_back("move " + lReg + " " + rReg + "\t# " + variable->id);
 		}
@@ -311,7 +305,6 @@ void MipsGenerator::generateArray(Function *function, Quad *quad) {
 		Quantity *offset = arr->index;
 		string offReg = "$t8 ";
 		moveToReg(function, offset, offReg);
-		decreaseRef(offset);
 		if (function->elementTable.find(name) != nullptr) {
 			exertCode.push_back("sll " + offReg + offReg + to_string(2));											  // reg is address offset
 			exertCode.push_back("addu " + offReg + offReg + "$sp");													  // reg = $sp + address offset
@@ -330,8 +323,6 @@ void MipsGenerator::generateBranch(Function *function, Quad *quad, string branch
 	usedTempRegs[reg1[2] - '0'].fixed = true;
 	string reg2 = getReg(function, branch->quantity2) + " ";
 	usedTempRegs[reg1[2] - '0'].fixed = false;
-	decreaseRef(branch->quantity1);
-	decreaseRef(branch->quantity2);
 	writeBack(function);
 	if (quadTableToLabel.find(branch->label->labelQuadTable) != quadTableToLabel.end()) {
 		exertCode.push_back(branchName + reg1 + reg2 + "label_" + to_string(quadTableToLabel[branch->label->labelQuadTable]));
@@ -346,7 +337,6 @@ void MipsGenerator::generateBranch(Function *function, Quad *quad, string branch
 void MipsGenerator::generateBranchZ(Function *function, Quad *quad) {
 	Branch *branch = static_cast<Branch *>(quad);
 	string reg = getReg(function, branch->quantity1) + " ";
-	decreaseRef(branch->quantity1);
 	writeBack(function);
 	if (quadTableToLabel.find(branch->label->labelQuadTable) != quadTableToLabel.end()) {
 		exertCode.push_back("beqz " + reg + " label_" + to_string(quadTableToLabel[branch->label->labelQuadTable]));
@@ -375,7 +365,6 @@ void MipsGenerator::generateReturn(Function *function, Quad *quad) {
 	Return *ret = static_cast<Return *>(quad);
 	if (ret->quantity != nullptr) {
 		moveToReg(function, ret->quantity, "$v0");
-		decreaseRef(ret->quantity);
 	}
 	exertCode.push_back("j f_" + function->name + "_return");
 	//exertCode.push_back("nop");
@@ -391,11 +380,9 @@ void MipsGenerator::generateFunc(Function *function, Quad *quad, int offset) {
 	for (int i = 0; i < static_cast<int>(func->parameters.size()); i++) {
 		if (i < 4) { // front 4 para to $a0-3
 			moveToReg(function, func->parameters[i], "$a" + to_string(i), paraSize4);
-			decreaseRef(func->parameters[i]);
 		}
 		else { // para more than 4 to ram
 			moveToReg(function, func->parameters[i], "$t8", paraSize4);
-			decreaseRef(func->parameters[i]);
 			exertCode.push_back("sw $t8 " + to_string(i << 2) + "($sp)");
 		}
 	}
@@ -432,11 +419,9 @@ void MipsGenerator::generateVoidFunc(Function *function, Quad *quad, int offset)
 	for (int i = 0; i < static_cast<int>(func->parameters.size()); i++) {
 		if (i < 4) { // front 4 para to $a0-3
 			moveToReg(function, func->parameters[i], "$a" + to_string(i), paraSize4);
-			decreaseRef(func->parameters[i]);
 		}
 		else { // para more than 4 to ram
 			moveToReg(function, func->parameters[i], "$t8", paraSize4);
-			decreaseRef(func->parameters[i]);
 			exertCode.push_back("sw $t8 " + to_string(i << 2) + "($sp)");
 		}
 	}
@@ -502,24 +487,17 @@ void MipsGenerator::generatePrintf(Function *function, Quad *quad) {
 		if (prin->quantity->dataType == TYPEINT) {
 			exertCode.push_back("li $v0 1  # printf int");
 			moveToReg(function, prin->quantity, "$a0");
-			decreaseRef(prin->quantity);
 			exertCode.push_back("syscall");
 		}
 		else if (prin->quantity->dataType == TYPECHAR) {
 			exertCode.push_back("li $v0 11  # printf char");
 			moveToReg(function, prin->quantity, "$a0");
-			decreaseRef(prin->quantity);
 			exertCode.push_back("syscall");
 		}
 	}
 	//exertCode.push_back("li $v0 11  # char");
 	//exertCode.push_back("li $a0 10");
 	//exertCode.push_back("syscall");
-}
-
-void MipsGenerator::decreaseRef(Quantity *value) {
-	//std::cout << "decrease " << value->id << "  " << refCount[value->id] - 1 << std::endl;
-	refCount[value->id];
 }
 
 string MipsGenerator::getReg(Function *function, Quantity *quantity, bool write, int temp) {
@@ -584,7 +562,7 @@ Reg * MipsGenerator::overflow(Function *function) {
 bool cmp(std::pair<string, int> &a, std::pair<string, int> &b) {
 	return a.second > b.second;
 }
-void MipsGenerator::allocateGloabal(Function * function) {
+void MipsGenerator::allocStoreRegs(Function * function) {
 	vector<std::pair<string, int>> vec;
 	for (auto var = refCount.begin(); var != refCount.end(); var++)
 		vec.emplace_back(std::make_pair(var->first, var->second));
@@ -598,6 +576,7 @@ void MipsGenerator::allocateGloabal(Function * function) {
 			continue;
 		storeRegs[vec[i].first] = new Reg("$s" + to_string(regNum));
 		regNum++;
+		// globalVariableCount = regNum; // TODO  check this
 	}
 }
 
@@ -755,7 +734,6 @@ void MipsGenerator::loadValue(Function *function, Quad *quad, string reg, int te
 		Quantity *offset = static_cast<Array *>(quad)->index;
 		if (offset->opCode != OP_ARRAY) {
 			auto offReg = getReg(function, offset, false, temp);
-			decreaseRef(offset);
 			moveToReg(function, offset, reg);
 		}
 		else {
@@ -795,7 +773,6 @@ void MipsGenerator::loadValueGlobal(Function *function, Quad *quad, string reg, 
 		Quantity *offset = static_cast<Array *>(quad)->index;
 		if (offset->opCode != OP_ARRAY) {
 			auto offReg = getReg(function, offset, false, temp);
-			decreaseRef(offset);
 			moveToReg(function, offset, reg);
 		}
 		else {

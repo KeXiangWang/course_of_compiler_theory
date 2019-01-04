@@ -328,19 +328,24 @@ void CodeParser::parseStatement() {
 				if (quantity == nullptr) {
 					jumpToToken(SEMICOLON);
 					token = lexicon.nextToken();
+					return ;
 				}
-				if (quantity->dataType != tableElement->dataType) { // match assignment
-					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ASSIGNMENT_TYPE, true);
+				else {
+					if (quantity->dataType != tableElement->dataType) { // match assignment
+						errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_ASSIGNMENT_TYPE, true);
+					}
 				}
 				if (token != SEMICOLON) {
 					errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
 				}
 				token = lexicon.nextToken();
-				if (tableElement->kind == KINDARRAY) {
-					elementCreater.actStatement(new Array(tableElement->dataType, tableElement->name, index, quantity)); // array[index] = quantity
-				}
-				else {
-					elementCreater.actStatement(new Variable(tableElement->dataType, tableElement->name, quantity));
+				if (quantity != nullptr) {
+					if (tableElement->kind == KINDARRAY) {
+						elementCreater.actStatement(new Array(tableElement->dataType, tableElement->name, index, quantity)); // array[index] = quantity
+					}
+					else {
+						elementCreater.actStatement(new Variable(tableElement->dataType, tableElement->name, quantity));
+					}
 				}
 			}
 			else { // not become
@@ -363,6 +368,7 @@ void CodeParser::parseStatement() {
 						if (parameter == nullptr) {
 							jumpToToken(SEMICOLON);
 						}
+
 						if (forParametersSequenceRequirement) {
 							TableElement *te;
 							if ((te = elementCreater.findElementFromGlobal(parameter->id)) != nullptr && (parameter->opCode == OP_VAR || parameter->opCode == OP_ARRAY)) {
@@ -521,13 +527,13 @@ void CodeParser::parseFunction() {
 }
 
 Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
-	cout << "cope with condition " << endl;
+	if (printDetail) cout << "cope with condition " << endl;
 	*quantity1 = parseExpression();
 	Token compareToken;
 	if (*quantity1 == nullptr) {
 		return VOIDSYM;
 	}
-	cout << "quantity1 type:" << ((*quantity1)->dataType == TYPEINT ? "int" : "char") << endl;;
+	if(printDetail) cout << "quantity1 type:" << ((*quantity1)->dataType == TYPEINT ? "int" : "char") << endl;;
 	if ((*quantity1)->dataType != TYPEINT) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_QUANTITY_TYPE, true);
 	}
@@ -557,7 +563,7 @@ Token CodeParser::parseCondition(Quantity **quantity1, Quantity **quantity2) {
 	if (*quantity2 == nullptr) {
 		return VOIDSYM;
 	}
-	cout << "quantity2 type:" << ((*quantity2)->dataType == TYPEINT ? "int" : "char") << endl;;
+	if (printDetail) cout << "quantity2 type:" << ((*quantity2)->dataType == TYPEINT ? "int" : "char") << endl;;
 	if ((*quantity2)->dataType != TYPEINT) {
 		errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), WRONG_QUANTITY_TYPE, true);
 	}
@@ -1066,17 +1072,21 @@ void CodeParser::parseReturn() {
 	if (function->functionType == TYPEVOID) {
 		if (token != SEMICOLON) {
 			errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), SEMICOLON_EXPECTED);
+			jumpToSet(statementHeadSet);
+			return;
 		}
 		else {
 			token = lexicon.nextToken();
+			elementCreater.actStatement(new Return());
 		}
-		elementCreater.actStatement(new Return());
 	}
 	else {
 		if (token == LPARENTHESE) {
 			token = lexicon.nextToken();
 			Quantity *quantity = parseExpression();
 			if (quantity == nullptr) {
+				errorHandler.report(lexicon.getLineCount(), lexicon.getCurrentLine(), UNEXPECTED_SIGN);
+				jumpToSet(statementHeadSet);
 				return;
 			}
 			if (token != RPARENTHESE) {
@@ -1121,7 +1131,7 @@ Token CodeParser::reportAndJumpOver(ErrorType errorType, Token targetToken) {
 }
 
 Token CodeParser::jumpToSet(unordered_set<Token> &tokenSet) {
-	while (statementHeadSet.find(token) != statementHeadSet.end() && token != EOFSYM) {
+	while (statementHeadSet.find(token) == statementHeadSet.end() && token != EOFSYM) {
 		token = lexicon.nextToken();
 	}
 	return token;

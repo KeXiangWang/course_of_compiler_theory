@@ -20,7 +20,7 @@ private:
 	bool gotFunction; // whether have got function and finished var declaration
 	bool gotMain; // whether have got main
 	int arraySize; // size of array
-	bool printDetail;
+	bool printDetail = false;
 	ErrorHandler &errorHandler;
 	Lexicon &lexicon;
 	ElementCreater &elementCreater;
@@ -34,6 +34,9 @@ public:
 		: errorHandler(errorHandler), lexicon(lexicon), elementCreater(elementCreater)
 	{
 		statementHeadSet.insert(IDENT); // ＜有返回值函数调用语句＞；/＜无返回值函数调用语句＞；/＜赋值语句＞;
+		statementHeadSet.insert(INTSYM); // ＜有返回值函数调用语句＞；/＜无返回值函数调用语句＞；/＜赋值语句＞;
+		statementHeadSet.insert(CHARSYM); // ＜有返回值函数调用语句＞；/＜无返回值函数调用语句＞；/＜赋值语句＞;
+		statementHeadSet.insert(VOIDSYM); // ＜有返回值函数调用语句＞；/＜无返回值函数调用语句＞；/＜赋值语句＞;
 		statementHeadSet.insert(IFSYM); // ＜条件语句＞；
 		statementHeadSet.insert(DOSYM); // ＜循环语句＞；
 		statementHeadSet.insert(FORSYM); // ＜循环语句＞；
@@ -49,7 +52,6 @@ public:
 		compareSet.insert(GEQ);			// >=
 		compareSet.insert(NEQ);			// !=
 		compareSet.insert(EQU);			// ==
-		printDetail = false;
 	};
 
 	Quantity *parseExpression();

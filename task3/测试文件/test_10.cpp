@@ -36,3 +36,4 @@ void main(){
 	printf("             ");
 	none(90, 100, 88, 4);
 }
+

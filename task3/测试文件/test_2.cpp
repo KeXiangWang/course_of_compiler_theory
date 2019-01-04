@@ -10,14 +10,14 @@ void none(int a, int b, int c){
 	printf(a);
 	printf("    ", b);
 	printf("    ", c);
+	return;
 	printf("    ", c);
-	return (a);
 }
 void main(){
 	int n ,k, i, c;
 	k = 0;
 	n = 50;
-	C = 20;
+	c = 20;
 	i = 10;
 	do{
 		listInt[i] = c;
@@ -34,5 +34,6 @@ void main(){
 	printf("             ");
 	printf("%d", c);
 	printf("             ");
-	none(90, 100, 88, 4);
+	none(90, 100, 88);
 }
+

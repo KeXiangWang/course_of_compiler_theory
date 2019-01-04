@@ -12,4 +12,6 @@ void main() {
     x = 1 + 0; 
     x = 1 + 0; 
     printf(sum(x, add(), x, add()));
+    x = x + 1;
+	printf(x); 
 }

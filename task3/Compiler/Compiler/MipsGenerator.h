@@ -43,9 +43,8 @@ public:
 	void generatePrintf(Function *function, Quad *quad);
 
 	string getReg(Function *function, Quantity *quantity, bool write = false, int temp = 0);
-	void decreaseRef(Quantity * value);
 	Reg * overflow(Function *function);
-	void allocateGloabal(Function * function);
+	void allocStoreRegs(Function * function);
 	int getVarNumber(Function * function);
 	void writeBack(Function * function);
 	void clearGlobalInTempRegs(Function *functoin);
