@@ -1,0 +1,14 @@
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_grammar_2.txt
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_grammar.txt
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\simplest.cpp
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_grammar_3.txt
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_var.c
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_array.c
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_dowhile.c
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_transfer_char.cpp
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_sign.cpp
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_for_beqz.cpp
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_xuyu.cpp
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_xuyu_fac4.cpp
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_geshihao.cpp
+D:\OneDrive\CLionProjects\course_of_compiler_theory\task3\test\test_panxuchen.cpp

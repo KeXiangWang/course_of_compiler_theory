@@ -1,0 +1,16 @@
+.data
+.text
+j f_main
+
+
+
+
+f_main:
+addiu $sp $sp -60
+label_0:
+li $t0 0 	# div_0
+move $s0 $t0	# i
+li $v0 1  # printf int
+move $a0 $t0
+syscall
+f_main_return:

@@ -1,0 +1,5 @@
+Funtion: main
+BasicBlock: 
+	div_0 	const_int_1 : 5 	const_int_2 : 6 	
+	VAR_i 	= 	div_0 	
+	PRINTF 	 	i 	

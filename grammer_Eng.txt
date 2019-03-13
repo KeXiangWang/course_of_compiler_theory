@@ -1,0 +1,41 @@
+£¼plusMinus£¾ 	::= +£ü-
+£¼multDiv£¾  	::= *£ü/
+£¼relationOption£¾  ::=  <£ü<=£ü>£ü>=£ü!=£ü==
+£¼letter£¾   	::= £ß£üa£ü£®£®£®£üz£üA£ü£®£®£®£üZ
+£¼number£¾   	::= £°£ü£¼notZeroInt£¾
+£¼notZeroInt£¾  	::= £±£ü£®£®£®£ü£¹
+£¼char£¾    		::=  '£¼plusMinus£¾'£ü'£¼multDiv£¾'£ü'£¼letter£¾'£ü'£¼number£¾'
+£¼string£¾   	::=  "£ûASCII char, of which decimal presentation pertain to 32,33,35-126£ý"                              
+£¼program£¾    		::= £Û£¼constDeclaration£¾£Ý£Û£¼varDeclaration£¾£Ý{£¼retFuncDefination£¾|£¼voidFuncDefination£¾}£¼mainFunc£¾
+£¼constDeclaration£¾	::=  const£¼constDefination£¾;{ const£¼constDefination£¾;}
+£¼constDefination£¾	::=   int£¼ident£¾£½£¼integer£¾{,£¼ident£¾£½£¼integer£¾}
+                            | char£¼ident£¾£½£¼char£¾{,£¼ident£¾£½£¼char£¾}
+£¼unsignedNum£¾	::= £¼notZeroInt£¾£û£¼number£¾£ý£ü£°
+£¼integer£¾		::= £Û£«£ü£­£Ý£¼unsignedNum£¾
+£¼ident£¾		::=  £¼letter£¾£û£¼letter£¾£ü£¼number£¾£ý
+£¼headDeclaration£¾		::=  int£¼ident£¾|char£¼ident£¾
+£¼varDeclaration£¾ 	::= £¼varDefination£¾;{£¼varDefination£¾;}
+£¼varDefination£¾	::= £¼type£¾(£¼ident£¾|£¼ident£¾'['£¼unsignedNum£¾']'){,(£¼ident£¾|£¼ident£¾'['£¼unsignedNum£¾']') }  // £¼unsignedNum£¾ shows the amount of element of array, which should bigger than 0.
+£¼type£¾      	::=  int | char
+£¼retFuncDefination£¾	::=  £¼headDeclaration£¾'('£¼paraList£¾')' '{'£¼compoundStatement£¾'}'
+£¼voidFuncDefination£¾	::= void£¼ident£¾'('£¼paraList£¾')''{'£¼compoundStatement£¾'}'
+£¼compoundStatement£¾	::=  £Û£¼constDeclaration£¾£Ý£Û£¼varDeclaration£¾£Ý£¼stmtSequence£¾
+£¼paraList£¾ 		::=  £¼type£¾£¼ident£¾{,£¼type£¾£¼ident£¾}| £¼NULL£¾
+£¼mainFunc£¾ 		::= void main'('')' '{'£¼compoundStatement£¾'}'
+£¼expression£¾ 	::= £Û£«£ü£­£Ý£¼term£¾{£¼plusMinus£¾£¼term£¾}   //[+|-]only serve the first <term>
+£¼term£¾ 		::= £¼factor£¾{£¼multDiv£¾£¼factor£¾}
+£¼factor£¾ 		::= £¼ident£¾£ü£¼ident£¾'['£¼expression£¾']'£ü£¼integer£¾|£¼char£¾£ü£¼retFuncCall£¾|'('£¼expression£¾')'
+£¼statement£¾ 	::= £¼ifStatement£¾£ü£¼loopStatement£¾| '{'£¼stmtSequence£¾'}'£ü£¼retFuncCall£¾; 
+                      |£¼voidFuncCall£¾;£ü£¼assignStatement£¾;£ü£¼readStatement£¾;£ü£¼writeStatement£¾;£ü£¼NULL£¾;£ü£¼returnStatement£¾;
+£¼assignStatement£¾	::=  £¼ident£¾£½£¼expression£¾|£¼ident£¾'['£¼expression£¾']'=£¼expression£¾
+£¼ifStatement£¾  ::=  if '('£¼condition£¾')'£¼statement£¾£Ûelse£¼statement£¾£Ý
+£¼condition£¾    ::=  £¼expression£¾£¼relationOption£¾£¼expression£¾£ü£¼expression£¾  // condition is false if only expression == 0
+£¼loopStatement£¾	::=  do£¼statement£¾while '('£¼condition£¾')' |for'('£¼ident£¾£½£¼expression£¾;£¼condition£¾;£¼ident£¾£½£¼ident£¾(+|-)£¼step£¾')'£¼statement£¾
+£¼step£¾::= £¼unsignedNum£¾  
+£¼retFuncCall£¾ 	::= £¼ident£¾'('£¼valueParaList£¾')'
+£¼voidFuncCall£¾	::= £¼ident£¾'('£¼valueParaList£¾')'
+£¼valueParaList£¾::= £¼expression£¾{,£¼expression£¾}£ü£¼NULL£¾
+£¼stmtSequence£¾	::=£û£¼statement£¾£ý
+£¼readStatement£¾	::=  scanf '('£¼ident£¾{,£¼ident£¾}')'
+£¼writeStatement£¾	::=  printf'('£¼string£¾,£¼expression£¾')'|printf '('£¼string£¾')'|printf '('£¼expression£¾')'
+£¼returnStatement£¾	::=  return['('£¼expression£¾')']

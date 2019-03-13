@@ -1,0 +1,19 @@
+4
+4
+4
+4
+4
+4
+4
+4
+4
+4
+97
+prepare finished.
+PROGRAM START!!!
+your lucky number is:
+choose your branch(from number 1 to 2):
+1
+res:6 res:-39991 98
+-118
+res:-39991
